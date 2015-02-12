@@ -77,7 +77,7 @@ HexGrid.prototype = {
 		// create Hex instances and place them on the grid, and add them to the group for easy management
 		this.meshes = [];
 		for (i = 0; i < this.cells.length; i++) {
-			hex = new Hex(cellSize, this.cellScale, this.hexGeo, color || this.randomizeRGB('100, 100, 100', 200));
+			hex = new Hex(cellSize, this.cellScale, this.hexGeo, color || this.randomizeRGB('100, 100, 100', 40));
 			cell = this.cells[i];
 			cell.w = hex;
 			

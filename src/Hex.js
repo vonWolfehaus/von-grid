@@ -53,7 +53,7 @@ Hex.createVert = function(type, size, i) {
 
 Hex.prototype = {
 	placeAt: function(cube) {
-		// i found these algorithms through trial and error, please don't touch
+		// i found this algorithm through trial and error, please don't touch
 		if (this.type === Hex.FLAT) {
 			this.position.x = cube.x * this.width * 0.75;
 			this.position.z = (cube.z - cube.y) * this.height * 0.5;
