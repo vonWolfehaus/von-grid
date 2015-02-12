@@ -7,3 +7,10 @@ I created a hex grid (hex-shaped made with hexes) as a base, and maybe I (you?) 
 I also created a square grid to help me think about how to abstract the grid enough to build a decent API for, so you should be able to use the `Board` class with whatever grid you want, provided you implement the interface.
 
 Please use this to make awesome hex-based games.
+
+## Features
+
+- Simple API for attaching objects to the grid through `Board.js`
+- Mouse interaction with the grid's cells (over, out, down, up, click)
+- Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
+- Adjustable properties: cell size, grid size, mouse interactivity, perfect rotation, "flat" and "pointy" versions, cell bevel
