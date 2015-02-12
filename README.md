@@ -1,5 +1,6 @@
-# ThreeJS hexagonal and square grid systems
+# Hexagonal and square grid systems
 
+![screenshot](hex-grid.jpg)
 I never found a good (and free!) library for creating perfect hexagons and arranging them in a grid. But I did find [Amit's wonderful explanation](http://www.redblobgames.com/grids/hexagons/), and finally had the time to throw something together.
 
 I created a hex grid (hex-shaped made with hexes) as a base, and maybe I (you?) will add more functionality, like sparse/non-uniform maps, data import (perhaps an editor?), and obviously Amit's stuff on pathfinding and other traversal features.
