@@ -80,16 +80,17 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	// handle interaction
 	selector.onSelect.add(function(obj) {
 		if (obj.objectType === Board.Cell) {
-			if (movingPiece) {
-				moveEntityToCell(obj);
-				return;
-			}
 			// select the sprite if one was already there
 			var e = obj.entity;
 			if (e) {
-				selector.select(e);
+				selector.select(e, false); // don't fire the signal when overriding or you'll cause a stack overflow with recursion
+				movingPiece = e; // new move
 			}
 			else {
+				if (movingPiece) {
+					moveEntityToCell(obj);
+					return;
+				}
 				// cycle through the sprites, placing them on the clicked cell
 				var p = sprites[currentPiece++];
 				if (currentPiece === sprites.length) {
@@ -99,10 +100,6 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 			}
 		}
 		else {
-			if (movingPiece) {
-				moveEntityToCell(obj.cell);
-				return;
-			}
 			movingPiece = obj;
 		}
 	}, this);
@@ -112,11 +109,6 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	}, this);*/
 
 	function moveEntityToCell(cell) {
-		// move the selected piece to a new cell
-		if (cell.entity) {
-			// unless there's already something there
-			return;
-		}
 		board.placeEntityAtCell(movingPiece, cell);
 		movingPiece = null;
 	}

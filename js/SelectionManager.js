@@ -26,16 +26,19 @@ var SelectionManager = function(mouse) {
 }
 
 SelectionManager.prototype = {
-	select: function(obj) {
+	select: function(obj, fireSignal) {
 		if (!obj) return;
+		fireSignal = fireSignal || true;
 		
 		if (this.selected !== obj) {
 			// deselect previous object
-			this.clearSelection();
+			this.clearSelection(fireSignal);
 		}
 		if (obj.selected) {
 			if (this.toggleSelection) {
-				this.onDeselect.dispatch(obj);
+				if (fireSignal) {
+					this.onDeselect.dispatch(obj);
+				}
 				obj.deselect();
 			}
 		}
@@ -43,12 +46,17 @@ SelectionManager.prototype = {
 			obj.select();
 		}
 		this.selected = obj;
-		this.onSelect.dispatch(obj);
+		if (fireSignal) {
+			this.onSelect.dispatch(obj);
+		}
 	},
 	
-	clearSelection: function() {
+	clearSelection: function(fireSignal) {
+		fireSignal = fireSignal || true;
 		if (this.selected) {
-			this.onDeselect.dispatch(this.selected);
+			if (fireSignal) {
+				this.onDeselect.dispatch(this.selected);
+			}
 			this.selected.deselect();
 		}
 		this.selected = null;
@@ -66,23 +74,6 @@ SelectionManager.prototype = {
 				this.select(obj);
 				break;
 		}
-	},
-	
-	_handleSelect: function(current, newObj) {
-		if (current && current !== newObj) {
-			// deselect previous object
-			this.clearSelection();
-		}
-		if (newObj.selected) {
-			if (this.toggleSelection) {
-				this.onDeselect.dispatch(newObj);
-				newObj.deselect();
-			}
-		}
-		else {
-			newObj.select();
-		}
-		current = newObj;
 	}
 };
 
