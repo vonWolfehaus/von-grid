@@ -41,7 +41,7 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	}, true);
 	
 	var grid = new HexGrid({
-		size: 4,
+		rings: 4,
 		cellSize: 10,
 		cellScale: 0.95
 	});
@@ -80,48 +80,35 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	// handle interaction
 	selector.onSelect.add(function(obj) {
 		if (obj.objectType === Board.Cell) {
-			obj.deselect();
-			board.highlightNeighbors(obj);
-			return;
-			
 			if (movingPiece) {
 				moveEntityToCell(obj);
 				return;
 			}
-			
-			// cycle through the sprites, placing them on the clicked cell
-			var p = sprites[currentPiece++];
-			if (currentPiece === sprites.length) {
-				currentPiece = 0;
+			// select the sprite if one was already there
+			var e = obj.entity;
+			if (e) {
+				selector.select(e);
 			}
-			board.placeEntityAtCell(p, obj);
+			else {
+				// cycle through the sprites, placing them on the clicked cell
+				var p = sprites[currentPiece++];
+				if (currentPiece === sprites.length) {
+					currentPiece = 0;
+				}
+				board.placeEntityAtCell(p, obj);
+			}
 		}
 		else {
 			if (movingPiece) {
 				moveEntityToCell(obj.cell);
 				return;
 			}
-			
-			// select the cell that the sprite is sitting on, if any
-			var c = obj.cell;
-			if (c) {
-				if (c.selected) {
-					c.deselect();
-				}
-				else {
-					c.select();
-					movingPiece = obj;
-				}
-			}
-			else {
-				movingPiece = obj;
-			}
+			movingPiece = obj;
 		}
 	}, this);
 	
 	/*selector.onDeselect.add(function(obj) {
-		obj.deselect();
-		movingPiece = null;
+		
 	}, this);*/
 
 	function moveEntityToCell(cell) {

@@ -14,17 +14,13 @@ var SelectionManager = function(mouse) {
 	this.onSelect = new Signal();
 	this.onDeselect = new Signal();
 	
-	// allow selection of board cells; if false, will only manage entity selection
-	this.selectCells = true;
-	// allow multiple entities to be selected at once
-	this.multiselect = false;
+	this.selected = null;
+	// deselect if player clicked on the same thing twice
+	this.toggleSelection = false;
 	
-	// any piece sitting on the active cell, or just the selected piece (whichever suits the game)
-	// this.activeEntity = null;
-	// this.activeEntities = new LinkedList();
-	// our custom structure that holds the cell geo
-	this.activeCell = null;
-	this.activeCells = new LinkedList();
+	// allow multiple entities to be selected at once
+	// this.multiselect = false; // todo
+	// this.allSelected = new LinkedList();
 	
 	this.mouse.signal.add(this.onMouse, this);
 }
@@ -33,40 +29,60 @@ SelectionManager.prototype = {
 	select: function(obj) {
 		if (!obj) return;
 		
-		this.activeCell = obj;
-		this.activeCell.select();
-		
-		this.onSelect.dispatch(this.activeCell);
+		if (this.selected !== obj) {
+			// deselect previous object
+			this.clearSelection();
+		}
+		if (obj.selected) {
+			if (this.toggleSelection) {
+				this.onDeselect.dispatch(obj);
+				obj.deselect();
+			}
+		}
+		else {
+			obj.select();
+		}
+		this.selected = obj;
+		this.onSelect.dispatch(obj);
 	},
 	
-	deselect: function() {
-		if (!this.activeCell) return;
-		this.onDeselect.dispatch(this.activeCell);
-		
-		this.activeCell.deselect();
-		
-		this.activeCell = null;
-		// this.activeEntity = null;
+	clearSelection: function() {
+		if (this.selected) {
+			this.onDeselect.dispatch(this.selected);
+			this.selected.deselect();
+		}
+		this.selected = null;
 	},
 	
 	onMouse: function(type, obj) {
 		switch (type) {
 			case MouseCaster.DOWN:
 				if (!obj) {
-					this.deselect();
+					this.clearSelection();
 				}
 				break;
 				
 			case MouseCaster.CLICK:
-				if (this.activeCell && obj === this.activeCell.obj) {
-					break; // ignore click on same obj
-				}
-				this.deselect();
-				if (obj) {
-					this.select(obj);
-				}
+				this.select(obj);
 				break;
 		}
+	},
+	
+	_handleSelect: function(current, newObj) {
+		if (current && current !== newObj) {
+			// deselect previous object
+			this.clearSelection();
+		}
+		if (newObj.selected) {
+			if (this.toggleSelection) {
+				this.onDeselect.dispatch(newObj);
+				newObj.deselect();
+			}
+		}
+		else {
+			newObj.select();
+		}
+		current = newObj;
 	}
 };
 
