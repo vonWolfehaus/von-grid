@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+	<meta name="author" content="Corey Birnbaum" />
+	<title>Grid</title>
+	
+	<link href="../css/normalize.css" rel="stylesheet" type="text/css"/>
+	<style>
+		body {
+			overflow: hidden;
+		}
+		#view {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	</style>
+</head>
+
+<body>
+	
+	<div id="view"></div>
+	
+
+<script type="text/javascript" src="../js/lib/three.min.js"></script>
+<script type="text/javascript" src="../js/lib/OrbitControls.js"></script>
+<script type="text/javascript" src="../js/lib/require.js"></script>
+<script type="text/javascript">
+requirejs.config({
+	baseUrl: '../js'
+});
+requirejs(['HexGrid', 'SquareGrid', 'Board', 'Scene', 'MouseCaster', 'Sprite', 'SelectionManager', 'utils/Tools'],
+function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
+	// setup the thing
+	var scene = new Scene({
+		element: document.getElementById('view'),
+		cameraPosition: {x:0, y:200, z:0}
+	}, true);
+	
+	var grid = new HexGrid({
+		rings: 4,
+		cellSize: 10,
+		cellScale: 0.95
+	});
+	/*var grid = new SquareGrid({
+		width: 8,
+		height: 8,
+		cellSize: 15,
+		cellScale: 0.95
+	});*/
+	
+	var mouse = new MouseCaster(scene.container, scene.camera);
+	var selector = new SelectionManager(mouse);
+	var board = new Board(grid);
+	
+	scene.add(board.group);
+	scene.focusOn(board.group);
+	
+	// populate the board
+	var i, sprites = [];
+	var spriteConfig = {
+		container: board.group,
+		url: '../img/water.png',
+		scale: 10,
+		offsetY: 6
+	};
+	
+	for (i = 0; i < 5; i++) {
+		sprites[i] = new Sprite(spriteConfig);
+		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(10, 40), Tools.randomInt(100));
+	}
+	
+	// keep track of states
+	var currentPiece = 0;
+	var movingPiece = null;
+	
+	// handle interaction
+	selector.onSelect.add(function(obj) {
+		if (obj.objectType === Board.Cell) {
+			// select the sprite if one was already there
+			var e = obj.entity;
+			if (e) {
+				selector.select(e, false); // don't fire the signal when overriding or you'll cause a stack overflow with recursion
+				movingPiece = e; // new move
+			}
+			else {
+				if (movingPiece) {
+					moveEntityToCell(obj);
+					return;
+				}
+				// cycle through the sprites, placing them on the clicked cell
+				var p = sprites[currentPiece++];
+				if (currentPiece === sprites.length) {
+					currentPiece = 0;
+				}
+				board.placeEntityAtCell(p, obj);
+			}
+		}
+		else {
+			movingPiece = obj;
+		}
+	}, this);
+	
+	/*selector.onDeselect.add(function(obj) {
+		
+	}, this);*/
+
+	function moveEntityToCell(cell) {
+		board.placeEntityAtCell(movingPiece, cell);
+		movingPiece = null;
+	}
+	
+	// start the thing
+	update();
+	function update() {
+		mouse.update();
+		scene.render();
+		requestAnimationFrame(update);
+	}
+});
+</script>
+</body>
+</html>

@@ -141,10 +141,6 @@ HexGrid.prototype = {
 		Hexagon-specific conversion math
 	 */
 	
-	/*getHexNeighbor: function(hex, direction) {
-		return this.cells[this.]
-	},*/
-	
 	cubeToHash: function(cube) {
 		return cube.x+this.hashDelimeter+cube.y+this.hashDelimeter+cube.z;
 	},
