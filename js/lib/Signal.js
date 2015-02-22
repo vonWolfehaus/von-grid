@@ -3,16 +3,16 @@
 var SignalBinding = function (signal, listener, isOnce, listenerContext, priority) {
 
     /**
-    * @property {Game} _listener - Handler function bound to the signal.
+    * @property _listener - Handler function bound to the signal.
     * @private
     */
     this._listener = listener;
 
     /**
-    * @property {boolean} _isOnce - If binding should be executed just once.
+    * @property {boolean} isOnce - If binding should be executed just once.
     * @private
     */
-    this._isOnce = isOnce;
+    this.isOnce = isOnce;
 
     /**
     * @property {object|undefined|null} context - Context on which listener will be executed (object that should represent the `this` variable inside listener function).
@@ -20,10 +20,10 @@ var SignalBinding = function (signal, listener, isOnce, listenerContext, priorit
     this.context = listenerContext;
 
     /**
-    * @property {Signal} _signal - Reference to Signal object that listener is currently bound to.
+    * @property {Signal} signal - Reference to Signal object that listener is currently bound to.
     * @private
     */
-    this._signal = signal;
+    this.signal = signal;
 
     /**
     * @property {number} _priority - Listener priority.
@@ -65,7 +65,7 @@ SignalBinding.prototype = {
             params = this.params ? this.params.concat(paramsArr) : paramsArr;
             handlerReturn = this._listener.apply(this.context, params);
 
-            if (this._isOnce)
+            if (this.isOnce)
             {
                 this.detach();
             }
@@ -77,12 +77,12 @@ SignalBinding.prototype = {
 
     /**
     * Detach binding from signal.
-    * alias to: @see mySignal.remove(myBinding.getListener());
+    * alias to: @see mySignal.remove(myBinding.listener);
     * @method SignalBinding#detach
     * @return {function|null} Handler function bound to the signal or `null` if binding was previously detached.
     */
     detach: function () {
-        return this.isBound() ? this._signal.remove(this._listener, this.context) : null;
+        return this.isBound() ? this.signal.remove(this._listener, this.context) : null;
     },
 
     /**
@@ -90,31 +90,7 @@ SignalBinding.prototype = {
     * @return {boolean} True if binding is still bound to the signal and has a listener.
     */
     isBound: function () {
-        return (!!this._signal && !!this._listener);
-    },
-
-    /**
-    * @method SignalBinding#isOnce
-    * @return {boolean} If SignalBinding will only be executed once.
-    */
-    isOnce: function () {
-        return this._isOnce;
-    },
-
-    /**
-    * @method SignalBinding#getListener
-    * @return {Function} Handler function bound to the signal.
-    */
-    getListener: function () {
-        return this._listener;
-    },
-
-    /**
-    * @method SignalBinding#getSignal
-    * @return {Signal} Signal that listener is currently bound to.
-    */
-    getSignal: function () {
-        return this._signal;
+        return (!!this.signal && !!this._listener);
     },
 
     /**
@@ -123,7 +99,7 @@ SignalBinding.prototype = {
     * @private
     */
     _destroy: function () {
-        delete this._signal;
+        delete this.signal;
         delete this._listener;
         delete this.context;
     },
@@ -133,7 +109,7 @@ SignalBinding.prototype = {
     * @return {string} String representation of the object.
     */
     toString: function () {
-        return '[SignalBinding isOnce:' + this._isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
+        return '[SignalBinding isOnce:' + this.isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
     }
 
 };
@@ -238,7 +214,7 @@ Signal.prototype = {
         {
             binding = this._bindings[prevIndex];
 
-            if (binding.isOnce() !== isOnce)
+            if (binding.isOnce !== isOnce)
             {
                 throw new Error('You cannot add' + (isOnce ? '' : 'Once') + '() then add' + (!isOnce ? '' : 'Once') + '() the same listener without removing the relationship first.');
             }
@@ -516,6 +492,8 @@ Signal.prototype = {
 
 Signal.prototype.constructor = Signal;
 
-global.Signal = Signal;
-
+// UMD wrapper
+if (typeof exports === 'object') module.exports = Signal;
+else if (typeof define === 'function' && define.amd) define(function() { return Signal });
+else global.Signal = Signal;
 }(this));

@@ -7,7 +7,7 @@
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
 	
-	<link href="lib/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="../css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
@@ -25,26 +25,28 @@
 	<div id="view"></div>
 	
 
-<script type="text/javascript" src="lib/Signal.js"></script>
-<script type="text/javascript" src="lib/three.min.js"></script>
-<script type="text/javascript" src="lib/require.js"></script>
-<script type="text/javascript" src="lib/OrbitControls.js"></script>
+<script type="text/javascript" src="../js/lib/three.min.js"></script>
+<script type="text/javascript" src="../js/lib/OrbitControls.js"></script>
+<script type="text/javascript" src="../js/lib/require.js"></script>
 <script type="text/javascript">
+requirejs.config({
+	baseUrl: '../js'
+});
 requirejs(['SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, Board, Scene, MouseCaster) {
 	
-	var scene = new Scene({x:0, y:500, z:0}/*, false*/);
-
-	scene.attachTo(document.getElementById('view'));
+	var scene = new Scene({
+		element: document.getElementById('view'),
+		cameraPosition: {x:0, y:200, z:0}
+	}, true);
 	
 	var grid = new SquareGrid({
-		size: 5,
-		cellSize: 40,
+		width: 5,
+		height: 8,
+		cellSize: 10,
 		cellScale: 0.95
 	});
 	
-	var mouse = new MouseCaster(scene.scene, scene.camera);
-	
-	var board = new Board(grid, mouse);
+	var board = new Board(grid);
 	
 	scene.add(board.group);
 	scene.focusOn(board.group);
@@ -52,7 +54,6 @@ requirejs(['SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, 
 	update();
 	
 	function update() {
-		mouse.update();
 		scene.render();
 		requestAnimationFrame(update);
 	}
