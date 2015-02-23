@@ -32,7 +32,7 @@
 requirejs.config({
 	baseUrl: '../js'
 });
-requirejs(['SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, Board, Scene, MouseCaster) {
+requirejs(['graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, Board, Scene, MouseCaster) {
 	
 	var scene = new Scene({
 		element: document.getElementById('view'),

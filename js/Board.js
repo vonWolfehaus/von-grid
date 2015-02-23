@@ -2,14 +2,15 @@
 	Interface to the grid. Holds data about what's occupying cells, and a general interface from entities to cells.
  */
 
-define(function() {
+define(['pathing/AStarFinder'], function(AStarFinder) {
 
-var Board = function(grid) {
+var Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 	
 	this.pieces = []; // change to LinkedList when integrated into engine
 	this.group = new THREE.Group();
 	this.grid = null;
+	this.finder = new AStarFinder(finderConfig);
 	
 	this.setGrid(grid);
 };
@@ -39,12 +40,20 @@ Board.prototype = {
 		cell.entity = entity;
 	},
 	
-	highlightNeighbors: function(cell) {
+	findPath: function(startCell, endCell) {
+		return this.finder.findPath(startCell, endCell, this.grid);
+	},
+	
+	getRandomCell: function() {
+		return this.grid.getRandomCell();
+	},
+	
+	/*highlightNeighbors: function(cell) {
 		var n = this.grid.getNeighbors(cell);
 		for (var i = 0; i < n.length; i++) {
 			n[i].select();
 		}
-	},
+	},*/
 	
 	// rotate the board either left (-1, default) or right (1)
 	rotate: function(direction, animate) {
@@ -62,7 +71,7 @@ Board.prototype = {
 		
 		entity.deactivate();
 		entity.container = this.group;
-		entity.activate(cell.x, entity.offsetY, cell.z);
+		entity.placeEntityAtCell(entity, cell);
 	},
 	
 	removePiece: function(entity) {

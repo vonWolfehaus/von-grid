@@ -5,7 +5,7 @@
 	Cube and axial coordinate systems
  */
 
-define(['Hex', 'utils/Tools'], function(Hex, Tools) {
+define(['graphs/Hex', 'Tools'], function(Hex, Tools) {
 
 var HexGrid = function(config) {
 	var x, y, z, c;
@@ -36,6 +36,7 @@ var HexGrid = function(config) {
 	this.rotationIncrement = Hex.POINTY;
 	// holds the grid position of each cell in cube coordinates, to which our meshes are attached to in the Board entity
 	this.cells = {}; // it's a hash so we can have sparse maps
+	this.numCells = 0;
 	// holds the mesh data that is displayed
 	this.meshes = [];
 	this.hexShape = null;
@@ -56,6 +57,7 @@ var HexGrid = function(config) {
 				c = new THREE.Vector3(x, y, z);
 				c.w = null; // for storing which hex is representing this cell
 				this.cells[this.cubeToHash(c)] = c;
+				this.numCells++;
 			}
 		}
 	}
@@ -120,10 +122,11 @@ HexGrid.prototype = {
 		var p = this.hexToPixel(c.gridPos);
 		pos.x = p.x;
 		pos.y = c.depth;
-		pos.z = -p.y;
+		pos.z = -p.y; // having to negate this is a bug... i think
 	},
 	
-	getNeighbors: function(hex, filter, diagonal) {
+	// always returns an array
+	getNeighbors: function(hex, diagonal, filter) {
 		var p = diagonal ? this._diagonals : this._directions;
 		var i, h, l = p.length;
 		this._list.length = 0;
@@ -131,10 +134,43 @@ HexGrid.prototype = {
 			this._vec3.copy(hex.gridPos);
 			this._vec3.add(p[i]);
 			h = this.cells[this.cubeToHash(this._vec3)];
-			if (!h) continue;
+			if (!h /*|| filter(h)*/) continue;
 			this._list.push(h.w);
 		}
 		return this._list;
+	},
+	
+	distance: function(cellA, cellB) {
+		// console.log('distance: '+this.cubeDistance(cellA.gridPos, cellB.gridPos));
+		return this.cubeDistance(cellA.gridPos, cellB.gridPos);
+	},
+	
+	clearPath: function() {
+		var i, c;
+		for (i in this.cells) {
+			c = this.cells[i].w;
+			c.opened = false;
+			c.closed = false;
+			c.g = 0;
+		}
+	},
+	
+	traverse: function(cb) {
+		var i;
+		for (i in this.cells) {
+			cb(this.cells[i].w);
+		}
+	},
+	
+	getRandomCell: function() {
+		var c, i = 0, x = Tools.randomInt(0, this.numCells-1);
+		for (c in this.cells) {
+			if (i === x) {
+				return this.cells[c].w;
+			}
+			i++;
+		}
+		return this.cells['0'+this.hashDelimeter+'0'+this.hashDelimeter+'0'];
 	},
 	
 	/*

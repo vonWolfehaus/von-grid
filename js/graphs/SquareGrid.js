@@ -2,7 +2,7 @@
 	Handles grid cell management (placement math for eg pathfinding, range-finding, etc), exposes generalized interface.
  */
 
-define(['Square', 'utils/Tools'], function(Square, Tools) {
+define(['graphs/Square', 'Tools'], function(Square, Tools) {
 
 var SquareGrid = function(config) {
 	var x, z, c;
@@ -34,6 +34,7 @@ var SquareGrid = function(config) {
 	this.rotationIncrement = Square.POINTY;
 	// holds the grid position of each cell, to which our meshes are attached to in the Board entity
 	this.cells = [];
+	this.numCells = 0;
 	// holds the mesh data that is displayed
 	this.meshes = null;
 	this.boxShape = null;
@@ -51,6 +52,7 @@ var SquareGrid = function(config) {
 			c = new THREE.Vector3(x, 0, z + 1);
 			c.w = null; // for storing which box is representing this cell
 			this.cells.push(c);
+			this.numCells++;
 		}
 	}
 	
@@ -92,6 +94,16 @@ SquareGrid.prototype = {
 		pos.x = c.position.x + (this.cellSize/2);
 		pos.y = c.depth;
 		pos.z = c.position.z - (this.cellSize/2);
+	},
+	
+	getRandomCell: function() {
+		var i, x = Tools.randomInt(0, this.cells.length-1);
+		for (i = 0; i < this.cells.length; i++) {
+			if (i === x) {
+				return this.cells[i].w;
+			}
+		}
+		return this.cells[0];
 	},
 	
 	/*

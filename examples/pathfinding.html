@@ -26,19 +26,20 @@
 	
 
 <script type="text/javascript" src="../js/lib/three.min.js"></script>
-<script type="text/javascript" src="../js/lib/OrbitControls.js"></script>
+<!-- <script type="text/javascript" src="../js/lib/OrbitControls.js"></script> -->
 <script type="text/javascript" src="../js/lib/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
 	baseUrl: '../js'
 });
-requirejs(['HexGrid', 'SquareGrid', 'Board', 'Scene', 'MouseCaster', 'Sprite', 'SelectionManager', 'utils/Tools'],
+requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../extras/Sprite', 'SelectionManager', 'Tools'],
 function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
 	// setup the thing
 	var scene = new Scene({
 		element: document.getElementById('view'),
+		cameraType: 'OrthographicCamera',
 		cameraPosition: {x:0, y:200, z:0}
-	}, true);
+	}, false);
 	
 	var grid = new HexGrid({
 		rings: 4,
@@ -53,14 +54,17 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	});*/
 	
 	var mouse = new MouseCaster(scene.container, scene.camera);
-	var selector = new SelectionManager(mouse);
-	var board = new Board(grid);
+	// we only want to scan while the mouse is held down
+	mouse.active = false;
+	
+	var board = new Board(grid, {
+		
+	});
 	
 	scene.add(board.group);
 	scene.focusOn(board.group);
 	
 	// populate the board
-	var i, sprites = [];
 	var spriteConfig = {
 		container: board.group,
 		url: '../img/water.png',
@@ -68,58 +72,160 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 		offsetY: 6
 	};
 	
-	for (i = 0; i < 5; i++) {
-		sprites[i] = new Sprite(spriteConfig);
-		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(10, 40), Tools.randomInt(100));
+	var startSprite = new Sprite(spriteConfig);
+	startSprite.activate();
+	board.placeEntityAtCell(startSprite, board.getRandomCell());
+	
+	spriteConfig.url = '../img/fire.png'
+	var endSprite = new Sprite(spriteConfig);
+	endSprite.activate();
+	board.placeEntityAtCell(endSprite, board.getRandomCell());
+	
+	// path markers
+	spriteConfig.url = '../img/marker.png'
+	spriteConfig.scale = 7;
+	var markers = [];
+	for (var i = 0; i < 20; i++) {
+		markers[i] = new Sprite(spriteConfig);
 	}
 	
 	// keep track of states
-	var currentPiece = 0;
 	var movingPiece = null;
+	var lastCell = null;
 	
 	// handle interaction
-	selector.onSelect.add(function(obj) {
+	mouse.signal.add(function(type, obj) {
+		switch (type) {
+			case MouseCaster.DOWN:
+				// force an update to get latest data
+				mouse.active = true;
+				mouse.update();
+				obj = mouse.pickedObject;
+				// "pick up" the piece we selected, if any
+				movingPiece = obj;
+				if (obj && obj.objectType === Board.Cell) {
+					movingPiece = obj.entity;
+					lastCell = obj;
+				}
+				
+				if (movingPiece) {
+					// since we're moving the path around again, clear the old one visually
+					clearMarkers();
+					// grid.traverse(clearCell);
+					
+					if (movingPiece.objectType === Board.Entity) {
+						lastCell = movingPiece.cell;
+					}
+				}
+				break;
+				
+			case MouseCaster.UP:
+				// disable the mouse until the user clicks again
+				mouse.active = false;
+				if (movingPiece) {
+					// user was moving a piece around, so place it at the nearest cell
+					var c = findCellUnderMouse();
+					board.placeEntityAtCell(movingPiece, c || lastCell);
+					// now re-run the pathfinder
+					var path = board.findPath(startSprite.cell, endSprite.cell);
+					// highlight the path
+					if (path) {
+						var m;
+						for (var i = 0; i < path.length; i++) {
+							m = markers[i];
+							if (!m) {
+								// just in case
+								m = markers[i] = new Sprite(spriteConfig);
+							}
+							m.activate();
+							board.placeEntityAtCell(m, path[i]);
+						}
+					}
+				}
+				movingPiece = null;
+				break;
+		}
+	}, this);
+	
+	/*selector.onSelect.add(function(obj) {
 		if (obj.objectType === Board.Cell) {
-			// select the sprite if one was already there
+			// select the sprite if one was there
 			var e = obj.entity;
 			if (e) {
 				selector.select(e, false); // don't fire the signal when overriding or you'll cause a stack overflow with recursion
 				movingPiece = e; // new move
 			}
 			else {
+				selector.clearSelection(false);
 				if (movingPiece) {
 					moveEntityToCell(obj);
 					return;
 				}
-				// cycle through the sprites, placing them on the clicked cell
-				var p = sprites[currentPiece++];
-				if (currentPiece === sprites.length) {
-					currentPiece = 0;
-				}
-				board.placeEntityAtCell(p, obj);
+				board.placeEntityAtCell(endSprite, obj);
 			}
 		}
 		else {
 			movingPiece = obj;
 		}
-	}, this);
-	
-	/*selector.onDeselect.add(function(obj) {
-		
 	}, this);*/
 
-	function moveEntityToCell(cell) {
-		board.placeEntityAtCell(movingPiece, cell);
-		movingPiece = null;
+	function findCellUnderMouse() {
+		var i, c;
+		var objects = mouse.allObjects;
+		for (i = 0; i < objects.length; i++) {
+			c = objects[i].object.userData.structure;
+			if (c && c.objectType && c.objectType === Board.Cell) {
+				return c;
+			}
+		}
+		return null;
+	}
+	
+	function clearCell(c) {
+		if (c.selected) {
+			c.deselect();
+		}
+	}
+	
+	function clearMarkers() {
+		var i;
+		for (i = 0; i < markers.length; i++) {
+			markers[i].disable();
+		}
 	}
 	
 	// start the thing
 	update();
 	function update() {
 		mouse.update();
+		if (movingPiece) {
+			movingPiece.position.copy(mouse.position);
+			movingPiece.position.y = movingPiece.offsetY;
+		}
+		scene.updateOrthoZoom();
 		scene.render();
 		requestAnimationFrame(update);
 	}
+	
+	function onMouseWheel(evt) {
+		evt.preventDefault();
+		evt.stopPropagation();
+		var delta = 0;
+		if (evt.wheelDelta !== undefined) { // WebKit / Opera / Explorer 9
+			delta = evt.wheelDelta;
+		}
+		else if (evt.detail !== undefined) { // Firefox
+			delta = -evt.detail;
+		}
+		if (delta > 0) {
+			scene.orthoZoom++;
+		}
+		else {
+			scene.orthoZoom--;
+		}
+	}
+	document.addEventListener('mousewheel', onMouseWheel, false );
+	document.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
 });
 </script>
 </body>

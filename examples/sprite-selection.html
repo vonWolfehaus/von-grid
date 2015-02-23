@@ -32,7 +32,7 @@
 requirejs.config({
 	baseUrl: '../js'
 });
-requirejs(['HexGrid', 'SquareGrid', 'Board', 'Scene', 'MouseCaster', 'Sprite', 'SelectionManager', 'utils/Tools'],
+requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../extras/Sprite', 'SelectionManager', 'Tools'],
 function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
 	// setup the thing
 	var scene = new Scene({

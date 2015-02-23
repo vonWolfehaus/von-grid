@@ -2,11 +2,7 @@
 	
  */
 
-define(['utils/Tools', 'lib/LinkedList', 'MouseCaster', 'lib/Signal'], function(Tools, LinkedList, MouseCaster, Signal) {
-
-var States = {
-	
-};
+define(['Tools', 'lib/LinkedList', 'MouseCaster', 'lib/Signal'], function(Tools, LinkedList, MouseCaster, Signal) {
 
 var SelectionManager = function(mouse) {
 	this.mouse = mouse;
@@ -45,6 +41,7 @@ SelectionManager.prototype = {
 		else {
 			obj.select();
 		}
+		
 		this.selected = obj;
 		if (fireSignal) {
 			this.onSelect.dispatch(obj);

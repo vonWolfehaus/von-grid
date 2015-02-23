@@ -1,6 +1,6 @@
 /*
 	Handy utility library.
-	@source https://github.com/vonWolfehaus/von-component/blob/master/src/utils/Tools.js
+	@source https://github.com/vonWolfehaus/von-component/blob/master/src/Tools.js
 */
 define({
 	PI: Math.PI,
@@ -184,5 +184,5 @@ define({
 		color = color.substring(0, color.length-1);
 		color += ')';
 		return color;
-	},
+	}
 });

@@ -1,13 +1,13 @@
 /*
 	Wraps three.sprite to take care of boilerplate and add data for the board to use.
  */
-define(['utils/Tools'], function(Tools) {
+define(['Tools'], function(Tools) {
 
 // constructor
 var Sprite = function(settings) {
 	this.material = null;
 	this.geo = null;
-
+	
 	this.url = null;
 	this.container = null;
 	this.texture = null;

@@ -14,11 +14,14 @@ var MouseCaster = function(group, camera) {
 	this.pickedObject = null;
 	// the object currently being "held"
 	this.selectedObject = null;
+	// store the results of the last cast
+	this.allObjects = null;
 	// disable the caster easily to temporarily prevent user input
 	this.active = true;
 	
 	// you can track exactly where the mouse is in the 3D scene by using the z component
 	this.position = new THREE.Vector3();
+	this.screenPosition = new THREE.Vector2();
 	this.signal = new Signal();
 	
 	// behind-the-scenes stuff you shouldn't worry about
@@ -38,66 +41,71 @@ MouseCaster.DOWN = 'down';
 MouseCaster.UP = 'up';
 MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
 
-MouseCaster.prototype.update = function() {
-	if (!this.active) {
-		return;
-	}
-	
-	this._raycaster.setFromCamera(this.position, this._camera);
-	
-	var intersects = this._raycaster.intersectObject(this._group, true);
-	var hit, obj;
-	
-	if (intersects.length > 0) {
-		// get the first object under the mouse
-		hit = intersects[0];
-		obj = hit.object.userData.structure;
-		if (this.pickedObject != obj) {
-			// the first object changed, meaning there's a different one, or none at all
+MouseCaster.prototype = {
+	update: function() {
+		if (!this.active) {
+			return;
+		}
+		
+		this._raycaster.setFromCamera(this.screenPosition, this._camera);
+		
+		var intersects = this._raycaster.intersectObject(this._group, true);
+		var hit, obj;
+		
+		if (intersects.length > 0) {
+			// get the first object under the mouse
+			hit = intersects[0];
+			obj = hit.object.userData.structure;
+			if (this.pickedObject != obj) {
+				// the first object changed, meaning there's a different one, or none at all
+				if (this.pickedObject) {
+					// it's a new object, notify the old object is going away
+					this.signal.dispatch(MouseCaster.OUT, this.pickedObject);
+				}
+				/*else {
+					// hit a new object when nothing was there previously
+				}*/
+				this.pickedObject = obj;
+				this.selectedObject = null; // cancel click, otherwise it'll confuse the user
+				
+				this.signal.dispatch(MouseCaster.OVER, this.pickedObject);
+			}
+			this.position = hit.point;
+			this.screenPosition.z = hit.distance;
+		}
+		else {
+			// there isn't anything under the mouse
 			if (this.pickedObject) {
-				// it's a new object, notify the old object is going away
+				// there was though, we just moved out
 				this.signal.dispatch(MouseCaster.OUT, this.pickedObject);
 			}
-			/*else {
-				// hit a new object when nothing was there previously
-			}*/
-			this.pickedObject = obj;
-			this.selectedObject = null; // cancel click, otherwise it'll confuse the user
-			
-			this.signal.dispatch(MouseCaster.OVER, this.pickedObject);
+			this.pickedObject = null;
+			this.selectedObject = null;
 		}
-		this.position.z = hit.distance;
-	}
-	else {
-		// there isn't anything under the mouse
-		if (this.pickedObject) {
-			// there was though, we just moved out
-			this.signal.dispatch(MouseCaster.OUT, this.pickedObject);
-		}
-		this.pickedObject = null;
-		this.selectedObject = null;
-	}
-};
-
-MouseCaster.prototype._onDocumentMouseDown = function(evt) {
-		if (this.pickedObject) {
-			this.selectedObject = this.pickedObject;
-		}
-		this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
-};
-	
-MouseCaster.prototype._onDocumentMouseUp = function(evt) {
-		this.signal.dispatch(MouseCaster.UP, this.pickedObject);
 		
-		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
-			this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
-		}
-};
-	
-MouseCaster.prototype._onDocumentMouseMove = function(evt) {
-		evt.preventDefault();
-		this.position.x = (evt.clientX / window.innerWidth) * 2 - 1;
-		this.position.y = -(evt.clientY / window.innerHeight) * 2 + 1;
+		this.allObjects = intersects;
+	},
+
+	_onDocumentMouseDown: function(evt) {
+			if (this.pickedObject) {
+				this.selectedObject = this.pickedObject;
+			}
+			this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
+	},
+		
+	_onDocumentMouseUp: function(evt) {
+			this.signal.dispatch(MouseCaster.UP, this.pickedObject);
+			
+			if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
+				this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
+			}
+	},
+		
+	_onDocumentMouseMove: function(evt) {
+			evt.preventDefault();
+			this.screenPosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
+			this.screenPosition.y = -(evt.clientY / window.innerHeight) * 2 + 1;
+	}
 };
 
 return MouseCaster;
