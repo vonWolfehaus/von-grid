@@ -7,7 +7,7 @@
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
 	
-	<link href="../css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
@@ -25,14 +25,14 @@
 	<div id="view"></div>
 	
 
-<script type="text/javascript" src="../js/lib/three.min.js"></script>
-<script type="text/javascript" src="../js/lib/OrbitControls.js"></script>
-<script type="text/javascript" src="../js/lib/require.js"></script>
+<script type="text/javascript" src="../src/lib/three.min.js"></script>
+<script type="text/javascript" src="../src/lib/OrbitControls.js"></script>
+<script type="text/javascript" src="../src/lib/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
-	baseUrl: '../js'
+	baseUrl: '../src'
 });
-requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../extras/Sprite', 'SelectionManager', 'Tools'],
+requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../examples/js/Sprite', 'SelectionManager', 'Tools'],
 function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
 	// setup the thing
 	var scene = new Scene({
@@ -63,7 +63,7 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	var i, sprites = [];
 	var spriteConfig = {
 		container: board.group,
-		url: '../img/water.png',
+		url: '../examples/img/water.png',
 		scale: 10,
 		offsetY: 6
 	};

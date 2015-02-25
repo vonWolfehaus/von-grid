@@ -1,5 +1,5 @@
 /*
-	Handles grid cell management (placement math for eg pathfinding, range, etc) and grid conversion math.
+	2D hexagonal graph. Handles grid cell management (placement math for eg pathfinding, range, etc) and grid conversion math.
 	
 	http://www.redblobgames.com/grids/hexagons/
 	Cube and axial coordinate systems
@@ -127,15 +127,28 @@ HexGrid.prototype = {
 	
 	// always returns an array
 	getNeighbors: function(hex, diagonal, filter) {
-		var p = diagonal ? this._diagonals : this._directions;
-		var i, h, l = p.length;
+		var i, c, l = this._directions.length;
 		this._list.length = 0;
 		for (i = 0; i < l; i++) {
 			this._vec3.copy(hex.gridPos);
-			this._vec3.add(p[i]);
-			h = this.cells[this.cubeToHash(this._vec3)];
-			if (!h /*|| filter(h)*/) continue;
-			this._list.push(h.w);
+			this._vec3.add(this._directions[i]);
+			c = this.cells[this.cubeToHash(this._vec3)];
+			if (!c || (filter && filter(c.w))) {
+				continue;
+			}
+			this._list.push(c.w);
+		}
+		if (diagonal) {
+			l = this._diagonals.length;
+			for (i = 0; i < l; i++) {
+				this._vec3.copy(hex.gridPos);
+				this._vec3.add(this._diagonals[i]);
+				c = this.cells[this.cubeToHash(this._vec3)];
+				if (!c || (filter && filter(c.w))) {
+					continue;
+				}
+				this._list.push(c.w);
+			}
 		}
 		return this._list;
 	},
@@ -149,9 +162,10 @@ HexGrid.prototype = {
 		var i, c;
 		for (i in this.cells) {
 			c = this.cells[i].w;
-			c.opened = false;
-			c.closed = false;
-			c.g = 0;
+			c.calcCost = 0;
+			c.priority = 0;
+			c.parent = null;
+			c.visited = false;
 		}
 	},
 	

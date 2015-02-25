@@ -11,7 +11,7 @@ var LinkedListNode = function() {
 	cached nodes) there can only be a single instance of an object in the list at the same time. Adding the same
 	object a second time will result in a silent return from the add method.
 	
-	In order to keep a track of node links, an object must be able to identify itself with a uniqueId function.
+	In order to keep a track of node links, an object must be able to identify itself with a uniqueID function.
 	
 	To add an item use:
 	<pre><code>
@@ -33,16 +33,17 @@ var LinkedList = function() {
 	this.last = null;
 	this.length = 0;
 	this.objToNodeMap = {}; // a quick lookup list to map linked list nodes to objects
-	this.uniqueId = Date.now() + '' + Math.floor(Math.random()*1000);
-	this.priority = 0; // used by Nexus to sort component list such that some are updated before others
+	this.uniqueID = Date.now() + '' + Math.floor(Math.random()*1000);
+	
+	this.sortArray = [];
 	
 	/*
 		Get the LinkedListNode for this object.
 		@param obj The object to get the node for
 	 */
 	this.getNode = function (obj) {
-		// objects added to a list must implement a uniqueId which returns a unique object identifier string
-		return this.objToNodeMap[obj.uniqueId];
+		// objects added to a list must implement a uniqueID which returns a unique object identifier string
+		return this.objToNodeMap[obj.uniqueID];
 	};
 
 	/*
@@ -51,10 +52,10 @@ var LinkedList = function() {
 	 */
 	this.addNode = function (obj) {
 		var node = new LinkedListNode();
-		if (!obj.uniqueId) {
+		if (!obj.uniqueID) {
 			try {
-				obj.uniqueId = LinkedList.generateID();
-				console.log('New ID: '+obj.uniqueId);
+				obj.uniqueID = LinkedList.generateID();
+				console.log('New ID: '+obj.uniqueID);
 			}
 			catch (err) {
 				console.error('[LinkedList.addNode] obj passed is immutable: cannot attach necessary identifier');
@@ -64,13 +65,13 @@ var LinkedList = function() {
 		
 		node.obj = obj;
 		node.free = false;
-		this.objToNodeMap[obj.uniqueId] = node;
+		this.objToNodeMap[obj.uniqueID] = node;
 		return node;
 	};
 	
 	this.swapObjects = function(node, newObj) {
-		this.objToNodeMap[node.obj.uniqueId] = null;
-		this.objToNodeMap[newObj.uniqueId] = node;
+		this.objToNodeMap[node.obj.uniqueID] = null;
+		this.objToNodeMap[newObj.uniqueID] = node;
 		node.obj = newObj;
 	};
 
@@ -79,7 +80,7 @@ var LinkedList = function() {
 		@param obj The object to add
 	 */
 	this.add = function (obj) {
-		var node = this.objToNodeMap[obj.uniqueId];
+		var node = this.objToNodeMap[obj.uniqueID];
 		
 		if (!node) {
 			node = this.addNode(obj);
@@ -119,7 +120,7 @@ var LinkedList = function() {
 	};
 
 	this.has = function (obj) {
-		return !!this.objToNodeMap[obj.uniqueId];
+		return !!this.objToNodeMap[obj.uniqueID];
 	};
 
 	/*
@@ -179,18 +180,19 @@ var LinkedList = function() {
 		Take everything off the list and put it in an array, sort it, then put it back.
 	 */
 	this.sort = function (compare) {
-		var sortArray = [];
+		var sortArray = this.sortArray;
 		var i, l, node = this.first;
+		sortArray.length = 0;
 		
 		while (node) {
-			sortArray.push(node.object());
-			node = node.next();
+			sortArray.push(node.obj);
+			node = node.next;
 		}
 		
 		this.clear();
 		
 		sortArray.sort(compare);
-
+		// console.log(sortArray);
 		l = sortArray.length;
 		for (i = 0; i < l; i++) {
 			this.add(sortArray[i]);

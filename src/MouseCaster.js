@@ -19,6 +19,9 @@ var MouseCaster = function(group, camera) {
 	// disable the caster easily to temporarily prevent user input
 	this.active = true;
 	
+	this.shift = false;
+	this.ctrl = false;
+	
 	// you can track exactly where the mouse is in the 3D scene by using the z component
 	this.position = new THREE.Vector3();
 	this.screenPosition = new THREE.Vector2();
@@ -87,24 +90,28 @@ MouseCaster.prototype = {
 	},
 
 	_onDocumentMouseDown: function(evt) {
-			if (this.pickedObject) {
-				this.selectedObject = this.pickedObject;
-			}
-			this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
+		if (this.pickedObject) {
+			this.selectedObject = this.pickedObject;
+		}
+		this.shift = evt.shiftKey;
+		this.ctrl = evt.ctrlKey;
+		this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
 	},
 		
 	_onDocumentMouseUp: function(evt) {
-			this.signal.dispatch(MouseCaster.UP, this.pickedObject);
-			
-			if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
-				this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
-			}
+		this.shift = evt.shiftKey;
+		this.ctrl = evt.ctrlKey;
+		this.signal.dispatch(MouseCaster.UP, this.pickedObject);
+		
+		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
+			this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
+		}
 	},
 		
 	_onDocumentMouseMove: function(evt) {
-			evt.preventDefault();
-			this.screenPosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
-			this.screenPosition.y = -(evt.clientY / window.innerHeight) * 2 + 1;
+		evt.preventDefault();
+		this.screenPosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
+		this.screenPosition.y = -(evt.clientY / window.innerHeight) * 2 + 1;
 	}
 };
 

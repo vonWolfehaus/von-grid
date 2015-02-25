@@ -1,6 +1,6 @@
 # Hexagonal and square grid systems
 
-![screenshot](img/hex-grid.jpg)
+![screenshot](hex-grid.jpg)
 
 I never found a good (and free!) library for creating perfect hexagons and arranging them in a grid. But I did find [Amit's wonderful explanation](http://www.redblobgames.com/grids/hexagons/), and finally had the time to throw something together.
 

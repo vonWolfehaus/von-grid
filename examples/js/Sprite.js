@@ -14,6 +14,7 @@ var Sprite = function(settings) {
 	this.scale = 1;
 	this.highlight = 'rgb(0, 0, 255)';
 	this.offsetY = 0; // how high off the board this object sits
+	this.obstacle = false;
 	
 	// attribute override
 	Tools.merge(this, settings);

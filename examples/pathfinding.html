@@ -7,7 +7,7 @@
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
 	
-	<link href="../css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
@@ -25,14 +25,14 @@
 	<div id="view"></div>
 	
 
-<script type="text/javascript" src="../js/lib/three.min.js"></script>
-<!-- <script type="text/javascript" src="../js/lib/OrbitControls.js"></script> -->
-<script type="text/javascript" src="../js/lib/require.js"></script>
+<script type="text/javascript" src="../src/lib/three.min.js"></script>
+<!-- <script type="text/javascript" src="../src/lib/OrbitControls.js"></script> -->
+<script type="text/javascript" src="../src/lib/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
-	baseUrl: '../js'
+	baseUrl: '../src'
 });
-requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../extras/Sprite', 'SelectionManager', 'Tools'],
+requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../examples/js/Sprite', 'SelectionManager', 'Tools'],
 function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
 	// setup the thing
 	var scene = new Scene({
@@ -42,7 +42,7 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	}, false);
 	
 	var grid = new HexGrid({
-		rings: 4,
+		rings: 6,
 		cellSize: 10,
 		cellScale: 0.95
 	});
@@ -58,7 +58,7 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	mouse.active = false;
 	
 	var board = new Board(grid, {
-		
+		allowDiagonal: false
 	});
 	
 	scene.add(board.group);
@@ -67,7 +67,7 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	// populate the board
 	var spriteConfig = {
 		container: board.group,
-		url: '../img/water.png',
+		url: '../examples/img/water.png',
 		scale: 10,
 		offsetY: 6
 	};
@@ -76,17 +76,32 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	startSprite.activate();
 	board.placeEntityAtCell(startSprite, board.getRandomCell());
 	
-	spriteConfig.url = '../img/fire.png'
+	spriteConfig.url = '../examples/img/fire.png'
 	var endSprite = new Sprite(spriteConfig);
 	endSprite.activate();
 	board.placeEntityAtCell(endSprite, board.getRandomCell());
 	
 	// path markers
-	spriteConfig.url = '../img/marker.png'
+	spriteConfig.url = '../examples/img/marker.png'
 	spriteConfig.scale = 7;
+	var i;
 	var markers = [];
-	for (var i = 0; i < 20; i++) {
+	for (i = 0; i < 20; i++) {
 		markers[i] = new Sprite(spriteConfig);
+	}
+	
+	// obstacles
+	var obstacleConfig = {
+		container: board.group,
+		url: '../examples/img/obstacle.png',
+		scale: 10,
+		offsetY: 6,
+		obstacle: true
+	};
+	var obstacles = [];
+	var obstaclesUsed = [];
+	for (i = 0; i < 20; i++) {
+		obstacles[i] = new Sprite(obstacleConfig);
 	}
 	
 	// keep track of states
@@ -97,21 +112,40 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 	mouse.signal.add(function(type, obj) {
 		switch (type) {
 			case MouseCaster.DOWN:
-				// force an update to get latest data
+				// force an update to get latest data from the mouse's raycast
 				mouse.active = true;
 				mouse.update();
 				obj = mouse.pickedObject;
 				// "pick up" the piece we selected, if any
 				movingPiece = obj;
-				if (obj && obj.objectType === Board.Cell) {
-					movingPiece = obj.entity;
-					lastCell = obj;
+				if (obj) {
+					if (obj.objectType === Board.Cell) {
+						// if a cell was clicked, pick up the entity that was sitting on it, if any
+						movingPiece = obj.entity;
+						lastCell = obj;
+						
+						if (!movingPiece) {
+							// place obstacle on empty cells
+							placeObstacle(obj);
+						}
+					}
+					else if (movingPiece !== startSprite && movingPiece !== endSprite && !movingPiece.obstacle) {
+						// place obstacle on cells with markers on them too
+						placeObstacle(obj.cell);
+					}
 				}
 				
 				if (movingPiece) {
 					// since we're moving the path around again, clear the old one visually
 					clearMarkers();
-					// grid.traverse(clearCell);
+					
+					if (mouse.shift) {
+						removeObstacle(movingPiece);
+						movingPiece = null;
+						// map changed, so update the path
+						createPath();
+						break;
+					}
 					
 					if (movingPiece.objectType === Board.Entity) {
 						lastCell = movingPiece.cell;
@@ -125,50 +159,39 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 				if (movingPiece) {
 					// user was moving a piece around, so place it at the nearest cell
 					var c = findCellUnderMouse();
+					// update cell in case user moved obstacle
+					if (c && movingPiece.obstacle) {
+						movingPiece.cell.walkable = true;
+						c.walkable = false;
+					}
+					// or the last cell that we picked it up from, in case it was off the board/null
 					board.placeEntityAtCell(movingPiece, c || lastCell);
 					// now re-run the pathfinder
-					var path = board.findPath(startSprite.cell, endSprite.cell);
-					// highlight the path
-					if (path) {
-						var m;
-						for (var i = 0; i < path.length; i++) {
-							m = markers[i];
-							if (!m) {
-								// just in case
-								m = markers[i] = new Sprite(spriteConfig);
-							}
-							m.activate();
-							board.placeEntityAtCell(m, path[i]);
-						}
-					}
+					createPath();
 				}
 				movingPiece = null;
 				break;
 		}
 	}, this);
 	
-	/*selector.onSelect.add(function(obj) {
-		if (obj.objectType === Board.Cell) {
-			// select the sprite if one was there
-			var e = obj.entity;
-			if (e) {
-				selector.select(e, false); // don't fire the signal when overriding or you'll cause a stack overflow with recursion
-				movingPiece = e; // new move
+	// helpers
+	
+	function createPath() {
+		grid.traverse(deselectVisited);
+		var path = board.findPath(startSprite.cell, endSprite.cell);
+		// highlight the path
+		if (path) {
+			for (var i = 0; i < path.length; i++) {
+				var s = markers[i];
+				if (!s) s = markers[i] = new Sprite(spriteConfig);
+				s.activate();
+				board.placeEntityAtCell(s, path[i]);
 			}
-			else {
-				selector.clearSelection(false);
-				if (movingPiece) {
-					moveEntityToCell(obj);
-					return;
-				}
-				board.placeEntityAtCell(endSprite, obj);
-			}
+			// see which cells were visited
+			grid.traverse(selectVisited);
 		}
-		else {
-			movingPiece = obj;
-		}
-	}, this);*/
-
+	}
+	
 	function findCellUnderMouse() {
 		var i, c;
 		var objects = mouse.allObjects;
@@ -181,7 +204,13 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 		return null;
 	}
 	
-	function clearCell(c) {
+	function selectVisited(c) {
+		if (c.visited) {
+			c.select();
+		}
+	}
+	
+	function deselectVisited(c) {
 		if (c.selected) {
 			c.deselect();
 		}
@@ -194,20 +223,48 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 		}
 	}
 	
+	function removeObstacle(obj) {
+		// poor man's object pool
+		var i = obstaclesUsed.indexOf(obj);
+		if (i !== -1) {
+			obstaclesUsed.splice(i, 1);
+			obstacles.push(obj);
+			obj.cell.walkable = true;
+			obj.cell.entity = null;
+			obj.cell = null;
+			obj.disable();
+		}
+	}
+	
+	function placeObstacle(cell) {
+		// poor man's object pool
+		var s = obstacles.pop();
+		if (!s) s = obstacles[obstacles.length] = new Sprite(obstacleConfig);
+		obstaclesUsed.push(s);
+		s.activate();
+		cell.walkable = false;
+		board.placeEntityAtCell(s, cell);
+		
+		// re-run the pathfinder with new obstacle
+		createPath();
+	}
+	
 	// start the thing
+	createPath();
 	update();
+	
 	function update() {
 		mouse.update();
 		if (movingPiece) {
 			movingPiece.position.copy(mouse.position);
 			movingPiece.position.y = movingPiece.offsetY;
 		}
-		scene.updateOrthoZoom();
 		scene.render();
 		requestAnimationFrame(update);
 	}
 	
 	function onMouseWheel(evt) {
+		// zooming an orthographic camera
 		evt.preventDefault();
 		evt.stopPropagation();
 		var delta = 0;
@@ -223,7 +280,9 @@ function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManage
 		else {
 			scene.orthoZoom--;
 		}
+		scene.updateOrthoZoom();
 	}
+	
 	document.addEventListener('mousewheel', onMouseWheel, false );
 	document.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
 });

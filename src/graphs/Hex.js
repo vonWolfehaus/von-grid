@@ -17,13 +17,14 @@ var Hex = function(size, scale, geometry, material) {
 	this.entity = null;
 	
 	this.selected = false;
-	this.highlight = '0x0000ff';
-	
-	// pathing
-	this.opened = false;
-	this.closed = false;
-	this.walkable = true;
-	this.g = 0;
+	this.highlight = '0x222266';
+
+	this.walkable = true; // path option
+	// used by pathfinder, overwritten at runtime, don't touch
+	this.calcCost = 0;
+	this.priority = 0;
+	this.visited = false;
+	this.parent = null;
 	
 	if (this.type === Hex.FLAT) {
 		this.width = this.size * 2;
@@ -66,7 +67,6 @@ Hex.POINTY = 30 * Tools.DEG_TO_RAD;
 
 Hex.prototype = {
 	select: function() {
-		this._emissive = this.material.emissive.getHex();
 		this.material.emissive.setHex(this.highlight);
 		this.selected = true;
 	},

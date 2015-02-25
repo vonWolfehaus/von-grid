@@ -1,5 +1,5 @@
 /*
-	Handles grid cell management (placement math for eg pathfinding, range-finding, etc), exposes generalized interface.
+	2D square graph. Handles grid cell management (placement math for eg pathfinding, range-finding, etc), exposes generalized interface.
  */
 
 define(['graphs/Square', 'Tools'], function(Square, Tools) {
@@ -82,6 +82,12 @@ var SquareGrid = function(config) {
 	}
 	// rotate the group depending on the shape the grid is in
 	this.group.rotation.y = this.type;
+	
+	// pre-computed permutations
+	this._directions = [new THREE.Vector2(+1, 0), new THREE.Vector2(0, -1),
+						new THREE.Vector2(-1, 0), new THREE.Vector2(0, +1)];
+	this._diagonals = [new THREE.Vector2(-1, -1), new THREE.Vector2(-1, +1), 
+						new THREE.Vector2(+1, +1), new THREE.Vector2(+1, -1)];
 };
 
 SquareGrid.prototype = {

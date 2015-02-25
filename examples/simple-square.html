@@ -7,7 +7,7 @@
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
 	
-	<link href="../css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
@@ -25,12 +25,12 @@
 	<div id="view"></div>
 	
 
-<script type="text/javascript" src="../js/lib/three.min.js"></script>
-<script type="text/javascript" src="../js/lib/OrbitControls.js"></script>
-<script type="text/javascript" src="../js/lib/require.js"></script>
+<script type="text/javascript" src="../src/lib/three.min.js"></script>
+<script type="text/javascript" src="../src/lib/OrbitControls.js"></script>
+<script type="text/javascript" src="../src/lib/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
-	baseUrl: '../js'
+	baseUrl: '../src'
 });
 requirejs(['graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, Board, Scene, MouseCaster) {
 	

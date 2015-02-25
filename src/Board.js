@@ -15,7 +15,7 @@ var Board = function(grid, finderConfig) {
 	this.setGrid(grid);
 };
 
-// useful enums for type checking. change to whatever fits your game. there are just examples
+// useful enums for type checking. change to whatever fits your game. these are just examples
 Board.Cell = 'cell';
 Board.Entity = 'entity'; // dynamic things
 Board.Structure = 'structure'; // static things
@@ -69,7 +69,7 @@ Board.prototype = {
 	addPieceAt: function(entity, cell) {
 		this.pieces.push(entity);
 		
-		entity.deactivate();
+		entity.disable();
 		entity.container = this.group;
 		entity.placeEntityAtCell(entity, cell);
 	},
@@ -78,7 +78,7 @@ Board.prototype = {
 		var i = this.pieces.indexOf(entity);
 		this.pieces.splice(i, 1);
 		
-		entity.deactivate();
+		entity.disable();
 	},
 	
 	clear: function() {
