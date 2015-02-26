@@ -10,6 +10,8 @@ I also created a square grid to help me think about how to abstract the grid eno
 
 Please use this to make awesome hex-based web games.
 
+![screenshot](pathfinding.jpg)
+
 ## Features
 
 - Simple API for attaching objects to the grid through `Board.js`
