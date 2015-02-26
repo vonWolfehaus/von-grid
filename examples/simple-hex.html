@@ -32,11 +32,11 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['graphs/HexGrid', 'Board', 'Scene', 'MouseCaster'], function(HexGrid, Board, Scene, MouseCaster) {
+requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, MouseCaster) {
 	
 	var scene = new Scene({
 		element: document.getElementById('view'),
-		cameraPosition: {x:0, y:200, z:0}
+		cameraPosition: {x:0, y:150, z:150}
 	}, true);
 	
 	var grid = new HexGrid({

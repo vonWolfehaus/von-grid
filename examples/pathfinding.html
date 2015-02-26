@@ -32,8 +32,8 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster', '../examples/js/Sprite', 'SelectionManager', 'Tools'],
-function(HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager, Tools) {
+requirejs(['utils/Tools', 'graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'utils/Scene', 'utils/MouseCaster', '../examples/js/Sprite', 'utils/SelectionManager'],
+function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager) {
 	// setup the thing
 	var scene = new Scene({
 		element: document.getElementById('view'),

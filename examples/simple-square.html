@@ -32,11 +32,11 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['graphs/SquareGrid', 'Board', 'Scene', 'MouseCaster'], function(SquareGrid, Board, Scene, MouseCaster) {
+requirejs(['utils/Tools', 'graphs/SquareGrid', 'Board', 'utils/Scene', 'utils/MouseCaster'], function(Tools, SquareGrid, Board, Scene, MouseCaster) {
 	
 	var scene = new Scene({
 		element: document.getElementById('view'),
-		cameraPosition: {x:0, y:200, z:0}
+		cameraPosition: {x:0, y:150, z:150}
 	}, true);
 	
 	var grid = new SquareGrid({

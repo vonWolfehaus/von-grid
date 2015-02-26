@@ -2,7 +2,7 @@
 	
  */
 
-define(['Tools', 'lib/LinkedList', 'MouseCaster', 'lib/Signal'], function(Tools, LinkedList, MouseCaster, Signal) {
+define(['utils/Tools', 'lib/LinkedList', 'utils/MouseCaster', 'lib/Signal'], function(Tools, LinkedList, MouseCaster, Signal) {
 
 var SelectionManager = function(mouse) {
 	this.mouse = mouse;

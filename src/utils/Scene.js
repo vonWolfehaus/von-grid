@@ -1,4 +1,4 @@
-define(['Tools'], function(Tools) {
+define(['utils/Tools'], function(Tools) {
 /*
 	Sets up and manages a THREEjs container, camera, and light, making it easy to get going.
 	Also provides camera control.

@@ -5,7 +5,7 @@
 	Cube and axial coordinate systems
  */
 
-define(['graphs/Hex', 'Tools'], function(Hex, Tools) {
+define(['graphs/Hex', 'utils/Tools'], function(Hex, Tools) {
 
 var HexGrid = function(config) {
 	var x, y, z, c;

@@ -1,7 +1,7 @@
 /*
 	Wraps three.sprite to take care of boilerplate and add data for the board to use.
  */
-define(['Tools'], function(Tools) {
+define(['utils/Tools'], function(Tools) {
 
 // constructor
 var Sprite = function(settings) {

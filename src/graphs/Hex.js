@@ -2,7 +2,7 @@
 	Grid cell that constructs its geometry for rendering and holds gameplay properties.
  */
 
-define(['Tools'], function(Tools) {
+define(['utils/Tools'], function(Tools) {
 
 var Hex = function(size, scale, geometry, material) {
 	this.type = Hex.FLAT;

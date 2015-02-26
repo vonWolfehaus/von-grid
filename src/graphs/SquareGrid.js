@@ -2,7 +2,7 @@
 	2D square graph. Handles grid cell management (placement math for eg pathfinding, range-finding, etc), exposes generalized interface.
  */
 
-define(['graphs/Square', 'Tools'], function(Square, Tools) {
+define(['graphs/Square', 'utils/Tools'], function(Square, Tools) {
 
 var SquareGrid = function(config) {
 	var x, z, c;

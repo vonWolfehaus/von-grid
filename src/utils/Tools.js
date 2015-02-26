@@ -1,8 +1,9 @@
+(function(global) {
 /*
 	Handy utility library.
 	@source https://github.com/vonWolfehaus/von-component/blob/master/src/Tools.js
 */
-define({
+var Tools = {
 	PI: Math.PI,
 	TAU: Math.PI * 2,
 	DEG_TO_RAD: 0.0174532925,
@@ -185,4 +186,10 @@ define({
 		color += ')';
 		return color;
 	}
-});
+};
+
+// UMD wrapper
+if (typeof exports === 'object') module.exports = Tools;
+else if (typeof define === 'function' && define.amd) define(function() { return Tools });
+else global.Tools = Tools;
+}(this));

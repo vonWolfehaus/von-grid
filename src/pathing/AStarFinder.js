@@ -1,4 +1,4 @@
-define(['Tools', 'pathing/Util', 'lib/LinkedList'], function(Tools, Util, LinkedList) {
+define(['utils/Tools', 'pathing/Util', 'lib/LinkedList'], function(Tools, Util, LinkedList) {
 
 /*
 	A* path-finder based upon http://www.redblobgames.com/pathfinding/a-star/introduction.html
