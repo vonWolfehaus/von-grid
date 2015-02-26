@@ -43,7 +43,10 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	var grid = new HexGrid({
 		rings: 4,
 		cellSize: 10,
-		cellScale: 0.95
+		cellScale: 0.95,
+		extrudeSettings: {
+			amount: 1
+		}
 	});
 	/*var grid = new SquareGrid({
 		width: 8,
@@ -70,7 +73,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	
 	for (i = 0; i < 5; i++) {
 		sprites[i] = new Sprite(spriteConfig);
-		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(10, 40), Tools.randomInt(100));
+		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(15, 40), Tools.randomInt(100));
 	}
 	
 	// keep track of states

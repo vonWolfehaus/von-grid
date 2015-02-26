@@ -26,7 +26,7 @@
 	
 
 <script type="text/javascript" src="../src/lib/three.min.js"></script>
-<!-- <script type="text/javascript" src="../src/lib/OrbitControls.js"></script> -->
+<script type="text/javascript" src="../src/lib/OrbitControls.js"></script>
 <script type="text/javascript" src="../src/lib/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
@@ -37,9 +37,9 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	// setup the thing
 	var scene = new Scene({
 		element: document.getElementById('view'),
-		cameraType: 'OrthographicCamera',
+		// cameraType: 'OrthographicCamera',
 		cameraPosition: {x:0, y:200, z:0}
-	}, false);
+	}, true);
 	
 	var grid = new HexGrid({
 		rings: 6,
@@ -47,8 +47,8 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 		cellScale: 0.95
 	});
 	/*var grid = new SquareGrid({
-		width: 8,
-		height: 8,
+		width: 10,
+		height: 10,
 		cellSize: 15,
 		cellScale: 0.95
 	});*/
@@ -58,7 +58,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	mouse.active = false;
 	
 	var board = new Board(grid, {
-		allowDiagonal: false
+		allowDiagonal: true
 	});
 	
 	scene.add(board.group);
@@ -72,14 +72,22 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 		offsetY: 6
 	};
 	
+	var a = board.getRandomCell();
+	var b = board.getRandomCell();
+	if (a === b) {
+		// they're on top of each other, so place one at a diagonal of the other
+		var neighbors = grid.getNeighbors(a, true);
+		b = neighbors[0];
+	}
+	
 	var startSprite = new Sprite(spriteConfig);
 	startSprite.activate();
-	board.placeEntityAtCell(startSprite, board.getRandomCell());
+	board.placeEntityAtCell(startSprite, a);
 	
 	spriteConfig.url = '../examples/img/fire.png'
 	var endSprite = new Sprite(spriteConfig);
 	endSprite.activate();
-	board.placeEntityAtCell(endSprite, board.getRandomCell());
+	board.placeEntityAtCell(endSprite, b);
 	
 	// path markers
 	spriteConfig.url = '../examples/img/marker.png'
@@ -257,7 +265,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 		mouse.update();
 		if (movingPiece) {
 			movingPiece.position.copy(mouse.position);
-			movingPiece.position.y = movingPiece.offsetY;
+			movingPiece.position.y = 5 + movingPiece.offsetY;
 		}
 		scene.render();
 		requestAnimationFrame(update);

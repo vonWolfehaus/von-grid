@@ -33,13 +33,14 @@ var SquareGrid = function(config) {
 	
 	this.rotationIncrement = Square.POINTY;
 	// holds the grid position of each cell, to which our meshes are attached to in the Board entity
-	this.cells = [];
+	this.cells = {};
 	this.numCells = 0;
 	// holds the mesh data that is displayed
 	this.meshes = null;
 	this.boxShape = null;
 	this.boxGeo = null;
 	this.boxMat = gridSettings.material;
+	this.hashDelimeter = '.';
 	
 	// the grid holds its own Group to manipulate and make it easy to add/remove from the scene
 	this.group = new THREE.Group();
@@ -51,7 +52,7 @@ var SquareGrid = function(config) {
 		for (z = -halfH; z < halfH; z++) {
 			c = new THREE.Vector3(x, 0, z + 1);
 			c.w = null; // for storing which box is representing this cell
-			this.cells.push(c);
+			this.cells[this.boxToHash(c)] = c;
 			this.numCells++;
 		}
 	}
@@ -69,7 +70,7 @@ var SquareGrid = function(config) {
 	
 	// create Square instances and place them on the grid, and add them to the group for easy management
 	this.meshes = [];
-	for (i = 0; i < this.cells.length; i++) {
+	for (i in this.cells) {
 		box = new Square(this.cellSize, this.cellScale, this.boxGeo, this.boxMat);
 		cell = this.cells[i];
 		cell.w = box;
@@ -84,10 +85,13 @@ var SquareGrid = function(config) {
 	this.group.rotation.y = this.type;
 	
 	// pre-computed permutations
-	this._directions = [new THREE.Vector2(+1, 0), new THREE.Vector2(0, -1),
-						new THREE.Vector2(-1, 0), new THREE.Vector2(0, +1)];
-	this._diagonals = [new THREE.Vector2(-1, -1), new THREE.Vector2(-1, +1), 
-						new THREE.Vector2(+1, +1), new THREE.Vector2(+1, -1)];
+	this._directions = [new THREE.Vector3(+1, 0, 0), new THREE.Vector3(0, 0, -1),
+						new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 0, +1)];
+	this._diagonals = [new THREE.Vector3(-1, 0, -1), new THREE.Vector3(-1, 0, +1), 
+						new THREE.Vector3(+1, 0, +1), new THREE.Vector3(+1, 0, -1)];
+	// cached objects
+	this._list = [];
+	this._vec3 = new THREE.Vector3();
 };
 
 SquareGrid.prototype = {
@@ -98,23 +102,80 @@ SquareGrid.prototype = {
 	// grid cell (Hex in this case) to position in pixels/world
 	cellToPixel: function(c, pos) {
 		pos.x = c.position.x + (this.cellSize/2);
-		pos.y = c.depth;
+		pos.y = c.depth + (c.depth/2);
 		pos.z = c.position.z - (this.cellSize/2);
 	},
 	
-	getRandomCell: function() {
-		var i, x = Tools.randomInt(0, this.cells.length-1);
-		for (i = 0; i < this.cells.length; i++) {
-			if (i === x) {
-				return this.cells[i].w;
+	// always returns an array
+	getNeighbors: function(box, diagonal, filter) {
+		var i, c, l = this._directions.length;
+		this._list.length = 0;
+		for (i = 0; i < l; i++) {
+			this._vec3.copy(box.gridPos);
+			this._vec3.add(this._directions[i]);
+			c = this.cells[this.boxToHash(this._vec3)];
+			if (!c || (filter && filter(c.w))) {
+				continue;
+			}
+			this._list.push(c.w);
+		}
+		if (diagonal) {
+			for (i = 0; i < l; i++) {
+				this._vec3.copy(box.gridPos);
+				this._vec3.add(this._diagonals[i]);
+				c = this.cells[this.boxToHash(this._vec3)];
+				if (!c || (filter && filter(c.w))) {
+					continue;
+				}
+				this._list.push(c.w);
 			}
 		}
-		return this.cells[0];
+		return this._list;
+	},
+	
+	distance: function(cellA, cellB) {
+		var a = cellA.gridPos;
+		var b = cellB.gridPos;
+		// console.log('distance: '+(Math.abs(a.x - b.x) + Math.abs(a.z - b.z)));
+		return Math.abs(a.x - b.x) + Math.abs(a.z - b.z);
+	},
+	
+	clearPath: function() {
+		var i, c;
+		for (i in this.cells) {
+			c = this.cells[i].w;
+			c.calcCost = 0;
+			c.priority = 0;
+			c.parent = null;
+			c.visited = false;
+		}
+	},
+	
+	traverse: function(cb) {
+		var i;
+		for (i in this.cells) {
+			cb(this.cells[i].w);
+		}
+	},
+	
+	getRandomCell: function() {
+		var c, i = 0, x = Tools.randomInt(0, this.numCells);
+		for (c in this.cells) {
+			if (i === x) {
+				return this.cells[c].w;
+			}
+			i++;
+		}
+		return this.cells[c].w;
 	},
 	
 	/*
 		Square-specific conversion math.
 	 */
+	
+	boxToHash: function(box) {
+		return box.x+this.hashDelimeter+box.z;
+	},
 };
 
 return SquareGrid;

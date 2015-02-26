@@ -13,6 +13,8 @@ var Scene = function(sceneConfig, controlConfig) {
 		clearColor: '#fff',
 		sortObjects: false,
 		fog: null,
+		light: new THREE.DirectionalLight(0xffffff),
+		lightPosition: null,
 		cameraType: 'PerspectiveCamera',
 		cameraPosition: null // {x, y, z}
 	};
@@ -41,9 +43,12 @@ var Scene = function(sceneConfig, controlConfig) {
 	this.container = new THREE.Scene();
 	this.container.fog = sceneSettings.fog;
 	
-	this.light = new THREE.DirectionalLight(0xffffff);
-	this.light.position.set(-1, 1, -1).normalize();
-	this.container.add(this.light);
+	this.container.add(new THREE.AmbientLight(0xbbbbbb));
+	
+	if (!sceneSettings.lightPosition) {
+		sceneSettings.light.position.set(-1, 1, -1).normalize();
+	}
+	this.container.add(sceneSettings.light);
 	
 	if (sceneSettings.cameraType === 'OrthographicCamera') {
 		var width = window.innerWidth / this.orthoZoom;

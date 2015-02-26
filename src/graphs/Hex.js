@@ -16,6 +16,15 @@ var Hex = function(size, scale, geometry, material) {
 	this.gridPos = null; // reference to cube coordinate (a Vec3) in grid that this view represents
 	this.entity = null;
 	
+	if (this.type === Hex.FLAT) {
+		this.width = this.size * 2;
+		this.height = Math.sqrt(3)/2 * this.width;
+	}
+	else {
+		this.height = this.size * 2;
+		this.width = Math.sqrt(3)/2 * this.height;
+	}
+	
 	this.selected = false;
 	this.highlight = '0x222266';
 
@@ -26,19 +35,10 @@ var Hex = function(size, scale, geometry, material) {
 	this.visited = false;
 	this.parent = null;
 	
-	if (this.type === Hex.FLAT) {
-		this.width = this.size * 2;
-		this.height = Math.sqrt(3)/2 * this.width;
-	}
-	else {
-		this.height = this.size * 2;
-		this.width = Math.sqrt(3)/2 * this.height;
-	}
-	
-	var color = Tools.randomizeRGB('80, 80, 80', 30);
+	var color = Tools.randomizeRGB('30, 30, 30', 10);
 	
 	if (!this.material) {
-		this.material = new THREE.MeshPhongMaterial({
+		this.material = new THREE.MeshPhongMaterial({ // shiny!
 			color: color,
 			ambient: color
 		});
@@ -86,6 +86,7 @@ Hex.prototype = {
 			this.position.x = cube.x * this.width * 0.5;
 			this.position.z = (cell.z - cell.y) * this.height * 0.75;
 		}
+		this.position.y = 0;
 		this.gridPos = cell;
 	}
 };

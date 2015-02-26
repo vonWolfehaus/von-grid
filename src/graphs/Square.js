@@ -17,20 +17,19 @@ var Square = function(size, scale, geometry, material) {
 	this.entity = null; // reference to cell object in grid that this view represents
 
 	this.width = size;
-	this.height = size;
+	this.height = size; // horizontal
 	
 	this.selected = false;
-	this.highlight = '0x0000ff';
+	this.highlight = '0x222266';
 	
-	// pathfinding stuff
-	/*this.g = 0;
-	this.h = 0;
-	this.f = 0;*/
-	this.closed = false;
-	this.opened = true;
-	this.walkable = true;
+	this.walkable = true; // path option
+	// used by pathfinder, overwritten at runtime, don't touch
+	this.calcCost = 0;
+	this.priority = 0;
+	this.visited = false;
+	this.parent = null;
 	
-	var color = Tools.randomizeRGB('80, 80, 80', 30);
+	var color = Tools.randomizeRGB('30, 30, 30', 10);
 	
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({
@@ -62,7 +61,6 @@ Square.POINTY = 45 * 0.0174532925;
 
 Square.prototype = {
 	select: function() {
-		this._emissive = this.material.emissive.getHex();
 		this.material.emissive.setHex(this.highlight);
 		this.selected = true;
 	},
@@ -74,6 +72,7 @@ Square.prototype = {
 	
 	placeAt: function(cell) {
 		this.position.x = cell.x * this.size/* - (this.size / 2)*/;
+		this.position.y = 0;
 		this.position.z = cell.z * this.size/* - (this.size / 2)*/;
 		this.gridPos = cell;
 	}

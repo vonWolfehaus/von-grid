@@ -83,6 +83,8 @@ var HexGrid = function(config) {
 	// create Hex instances and place them on the grid, and add them to the group for easy management
 	this.meshes = [];
 	for (i in this.cells) {
+		// gridSettings.extrudeSettings.amount = Math.floor(Math.random() * 10) + 1;
+		// this.hexGeo = new THREE.ExtrudeGeometry(this.hexShape, gridSettings.extrudeSettings);
 		hex = new Hex(this.cellSize, this.cellScale, this.hexGeo, this.hexMat);
 		c = this.cells[i];
 		c.w = hex;
@@ -121,7 +123,7 @@ HexGrid.prototype = {
 	cellToPixel: function(c, pos) {
 		var p = this.hexToPixel(c.gridPos);
 		pos.x = p.x;
-		pos.y = c.depth;
+		pos.y = c.depth + (c.depth/2);
 		pos.z = -p.y; // having to negate this is a bug... i think
 	},
 	
@@ -139,7 +141,6 @@ HexGrid.prototype = {
 			this._list.push(c.w);
 		}
 		if (diagonal) {
-			l = this._diagonals.length;
 			for (i = 0; i < l; i++) {
 				this._vec3.copy(hex.gridPos);
 				this._vec3.add(this._diagonals[i]);
@@ -177,14 +178,14 @@ HexGrid.prototype = {
 	},
 	
 	getRandomCell: function() {
-		var c, i = 0, x = Tools.randomInt(0, this.numCells-1);
+		var c, i = 0, x = Tools.randomInt(0, this.numCells);
 		for (c in this.cells) {
 			if (i === x) {
 				return this.cells[c].w;
 			}
 			i++;
 		}
-		return this.cells['0'+this.hashDelimeter+'0'+this.hashDelimeter+'0'];
+		return this.cells[c].w;
 	},
 	
 	/*

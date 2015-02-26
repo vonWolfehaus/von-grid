@@ -13,9 +13,10 @@ Please use this to make awesome hex-based web games.
 ## Features
 
 - Simple API for attaching objects to the grid through `Board.js`
+- A* Pathfinding
 - Mouse interaction with the grid's cells (over, out, down, up, click)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
-- Adjustable properties: cell size, grid size, mouse interactivity, perfect rotation, "flat" and "pointy" versions, cell bevel
+- Adjustable properties: cell size, grid size, mouse interactivity, board rotation, "flat" and "pointy" versions, cell bevel
 
 ## Usage
 
