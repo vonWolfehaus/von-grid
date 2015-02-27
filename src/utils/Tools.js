@@ -185,6 +185,31 @@ var Tools = {
 		color = color.substring(0, color.length-1);
 		color += ')';
 		return color;
+	},
+	
+	getJSON: function(url, callback, scope) {
+		var xhr;
+		if (typeof XMLHttpRequest !== 'undefined') {
+			xhr = new XMLHttpRequest();
+		}
+		else {
+			var versions = ["MSXML2.XmlHttp.5.0", "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0", "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
+			for (var i = 0, len = versions.length; i < len; i++) {
+				try {
+					xhr = new ActiveXObject(versions[i]);
+					break;
+				} catch (err) { }
+			}
+		}	
+		xhr.onreadystatechange = function() {
+			if (this.readyState < 4 || this.status !== 200) {
+				console.warn('[Tools] Error - '+this.statusText +' - loading '+url);
+				return;
+			}
+			callback.call(scope || this, JSON.parse(this.responseText));
+		}
+		xhr.open('GET', url, true);
+		xhr.send('');
 	}
 };
 

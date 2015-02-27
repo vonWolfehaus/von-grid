@@ -1,18 +1,18 @@
 /*
-	2D hexagonal graph. Handles grid cell management (placement math for eg pathfinding, range, etc) and grid conversion math.
-	
-	http://www.redblobgames.com/grids/hexagons/
-	Cube and axial coordinate systems
+	Graph of hexagons. Handles grid cell management (placement math for eg pathfinding, range, etc) and grid conversion math.
+	[Cube and axial coordinate systems](http://www.redblobgames.com/grids/hexagons/).
+	@author Corey Birnbaum
  */
 
 define(['graphs/Hex', 'utils/Tools'], function(Hex, Tools) {
 
 var HexGrid = function(config) {
-	var x, y, z, c;
 	if (!config) config = {};
 	var gridSettings = {
 		rings: 5,
+		url: null,
 		type: Hex.FLAT,
+		// depthStep: 2,
 		cellSize: 10,
 		cellScale: 0.95,
 		extrudeSettings: {
@@ -27,11 +27,12 @@ var HexGrid = function(config) {
 	
 	Tools.merge(true, gridSettings, config);
 	
-	// number of cells (in radius)
+	// number of cells (in radius); only used if the map is generated
 	this.size = gridSettings.rings;
 	this.cellSize = gridSettings.cellSize;
 	this.cellScale = gridSettings.cellScale;
 	this.type = gridSettings.type;
+	this.extrudeSettings = gridSettings.extrudeSettings;
 	
 	this.rotationIncrement = Hex.POINTY;
 	// holds the grid position of each cell in cube coordinates, to which our meshes are attached to in the Board entity
@@ -49,22 +50,8 @@ var HexGrid = function(config) {
 	// the grid holds its own Group to manipulate and make it easy to add/remove from the scene
 	this.group = new THREE.Group();
 	
-	// construct a hex-shaped grid
-	for (x = -this.size; x < this.size+1; x++) {
-		for (y = -this.size; y < this.size+1; y++) {
-			z = -x-y;
-			if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
-				c = new THREE.Vector3(x, y, z);
-				c.w = null; // for storing which hex is representing this cell
-				this.cells[this.cubeToHash(c)] = c;
-				this.numCells++;
-			}
-		}
-	}
-	
-	// only use a single geometry instance for all cells ensures conformance and performance
-	var i, hex;
-	var verts = [];
+	// create base shape used for building geometry
+	var i, verts = [];
 	// create the skeleton of the hex
 	for (i = 0; i < 6; i++) {
 		verts.push(this.createVert(Hex.FLAT, i));
@@ -77,29 +64,6 @@ var HexGrid = function(config) {
 	}
 	this.hexShape.lineTo(verts[0].x, verts[0].y);
 	
-	// this.hexGeo = new THREE.ShapeGeometry(this.hexShape);
-	this.hexGeo = new THREE.ExtrudeGeometry(this.hexShape, gridSettings.extrudeSettings);
-	
-	// create Hex instances and place them on the grid, and add them to the group for easy management
-	this.meshes = [];
-	for (i in this.cells) {
-		// gridSettings.extrudeSettings.amount = Math.floor(Math.random() * 10) + 1;
-		// this.hexGeo = new THREE.ExtrudeGeometry(this.hexShape, gridSettings.extrudeSettings);
-		hex = new Hex(this.cellSize, this.cellScale, this.hexGeo, this.hexMat);
-		c = this.cells[i];
-		c.w = hex;
-		hex.depth = gridSettings.extrudeSettings.amount;
-		
-		hex.placeAt(c);
-		
-		this.meshes.push(hex);
-		this.group.add(hex.view);
-	}
-	// rotate the group depending on the shape the grid is in
-	this.group.rotation.y = this.type - (30 * Tools.DEG_TO_RAD);
-	this.hexWidth = hex.width;
-	this.hexHeight = hex.height;
-	
 	// pre-computed permutations
 	this._directions = [new THREE.Vector3(+1, -1, 0), new THREE.Vector3(+1, 0, -1), new THREE.Vector3(0, +1, -1),
 						new THREE.Vector3(-1, +1, 0), new THREE.Vector3(-1, 0, +1), new THREE.Vector3(0, -1, +1)];
@@ -108,16 +72,117 @@ var HexGrid = function(config) {
 	// cached objects
 	this._list = [];
 	this._vec3 = new THREE.Vector3();
-					
+	this._geoCache = [];
+	this._matCache = [];
+	
+	// build the grid depending on what was passed in
+	if (gridSettings.url) {
+		Tools.getJSON(gridSettings.url, this.onLoad, this);
+	}
+	else {
+		this.generate();
+	}
 };
 
 HexGrid.SQRT3 = Math.sqrt(3); // used often in conversions
 
 HexGrid.prototype = {
-	
 	/*
 		High-level functions that the Board interfaces with (all grids implement)
 	 */
+	
+	
+	// create a flat, hexagon-shaped grid.
+	generate: function() {
+		var x, y, z, c, i, hex;
+		
+		// this.hexGeo = new THREE.ShapeGeometry(this.hexShape);
+		this.hexGeo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+		this.meshes = [];
+		
+		for (x = -this.size; x < this.size+1; x++) {
+			for (y = -this.size; y < this.size+1; y++) {
+				z = -x-y;
+				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
+					c = new THREE.Vector3(x, y, z);
+					// create Hex instances and place them on the grid, and add them to the group for easy management
+					hex = new Hex(this.cellSize, this.cellScale, this.hexGeo, this.hexMat);
+					c.w = hex; // for storing which hex is representing this cell
+					hex.depth = this.extrudeSettings.amount;
+					hex.placeAt(c);
+					
+					this.cells[this.cubeToHash(c)] = c;
+					
+					this.meshes.push(hex);
+					this.group.add(hex.view);
+					
+					this.numCells++;
+				}
+			}
+		}
+		
+		// rotate the group depending on the shape the grid is in
+		this.group.rotation.y = this.type - (30 * Tools.DEG_TO_RAD);
+		this.hexWidth = hex.width;
+		this.hexHeight = hex.height;
+	},
+	
+	// load a grid from a parsed json object.
+	/*
+		xyz are hex cube coordinates
+		json = {
+			cells: [
+				{x, y, z, depth, matConfig: {
+					cacheid: 0,
+					type: 'MeshLambertMaterial',
+					color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
+					texture: url
+				}}
+				...
+			]
+		}
+	*/
+	onLoad: function(json) {
+		console.log(json);
+		var i, c, v, hex, geo, mat;
+		var cells = json.cells;
+		
+		this.meshes = [];
+		// create Hex instances and place them on the grid, and add them to the group for easy management
+		for (i = 0; i < cells.length; i++) {
+			c = cells[i];
+			v = new THREE.Vector3(c.x, c.y, c.z);
+			this.cells[this.cubeToHash(v)] = v;
+			
+			geo = this._geoCache[c.depth];
+			if (!geo) {
+				this.extrudeSettings.amount = c.depth;
+				geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+				this._geoCache[c.depth] = geo;
+			}
+			
+			mat = this._matCache[c.matConfig.cacheid];
+			if (!mat) { // MaterialLoader? we currently only support basic stuff though. maybe later
+				mat.map = THREE.ImageUtils.loadTexture(c.matConfig.texture);
+				delete c.matConfig.texture;
+				mat = new THREE[c.matConfig.type](c.matConfig);
+				this._matCache[c.matConfig.cacheid] = mat;
+			}
+			
+			hex = new Hex(this.cellSize, this.cellScale, geo, mat);
+			hex.depth = this.extrudeSettings.amount;
+			v.w = hex;
+			hex.placeAt(v);
+			
+			this.meshes.push(hex);
+			this.group.add(hex.view);
+		}
+		
+		// rotate the group depending on the shape the grid is in
+		this.group.rotation.y = this.type - (30 * Tools.DEG_TO_RAD);
+		this.hexWidth = hex.width;
+		this.hexHeight = hex.height;
+	},
 	
 	// grid cell (Hex in this case) to position in pixels/world
 	cellToPixel: function(c, pos) {
@@ -186,6 +251,10 @@ HexGrid.prototype = {
 			i++;
 		}
 		return this.cells[c].w;
+	},
+	
+	dispose: function() {
+		// TODO
 	},
 	
 	/*
