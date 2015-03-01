@@ -206,17 +206,18 @@ HexGrid.prototype = {
 		// return this._conversionVec.set(h.x, h.y, -h.x - h.y);
 	},
 
-	hexToPixel: function(h) {
-		x = this.cellSize * HexGrid.SQRT3 * (h.x + (h.y / 2));
-		y = this.cellSize * (3 / 2) * h.y;
-		return {x: x, y: y};
-		// return this._conversionVec.set(x, y, 0);
-	},
-	
 	cubeToHex: function(h) {
 		return h; // {x: h.x, y: h.y};
 	},
 
+	hexToPixel: function(h) {
+		var x, y;
+		x = h.x * this.hexWidth * 0.75;
+		y = (h.z - h.y) * this.hexHeight * 0.5;
+		return {x: x, y: -y};
+		// return this._conversionVec.set(x, y, 0);
+	},
+	
 	/*axialToPixel: function(cube) {
 		var xOffset = cube.z * (this.hexWidth / 2);
 		var xCoord = (cube.x * this.hexWidth) + xOffset;
@@ -225,9 +226,8 @@ HexGrid.prototype = {
 		// return this._conversionVec.set(xCoord, 0, zCoord);
 	},*/
 
-
 	hexRound: function(h) {
-		return this.cubeToHex(this.cubeRound(this.hexToCube(h)));
+		return /*this.cubeToHex(*/this.cubeRound(this.hexToCube(h));
 	},
 
 	cubeRound: function(h) {
@@ -249,10 +249,9 @@ HexGrid.prototype = {
 			rz = -rx-ry;
 		}
 		
-		return {x: rx, y: ry, z: rz};
-		// return this._conversionVec.set(rx, ry, rz);
-	 },
-
+		// return {x: rx, y: ry, z: rz};
+		return this._conversionVec.set(rx, ry, rz);
+	},
 	
 	hexDistance: function(a, b) {
 		var ac = hexToCube(a);

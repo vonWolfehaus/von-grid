@@ -71,13 +71,13 @@ Hex.prototype = {
 	},
 	
 	deselect: function() {
-		if (this._emissive && this.material.emissive) {
+		if (this._emissive !== null && this.material.emissive) {
 			this.material.emissive.setHex(this._emissive);
 		}
 		this.selected = false;
 	},
 	
-	// Hexagon cells are in cube coordinates
+	// Hexagon cells are in cube coordinates; this is a modified HexGrid.hexToPixel
 	placeAt: function(cell) {
 		this.position.x = cell.x * this.width * 0.75;
 		this.position.y = 0;

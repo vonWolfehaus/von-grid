@@ -86,7 +86,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 			// select the sprite if one was already there
 			var e = obj.entity;
 			if (e) {
-				selector.select(e, false); // don't fire the signal when overriding or you'll cause a stack overflow with recursion
+				selector.select(e, false); // don't fire the signal when firing manually or you'll cause a stack overflow with recursion
 				movingPiece = e; // new move
 			}
 			else {

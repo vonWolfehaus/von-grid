@@ -29,7 +29,7 @@ function EditorPlane(scene, grid, mouse) {
 	this.scene.add(this.hoverMesh.mesh);
 	
 	this.geoCache = [];
-	
+	// this.hoverMesh.mesh.visible = false;
 	
 	this.mouse = mouse;
 	// this.mouse.signal.add(this.onMouse, this);
@@ -77,11 +77,11 @@ EditorPlane.prototype = {
 		}
 		switch (type) {
 			case MouseCaster.OVER:
-				this.hoverMesh.visible = false;
+				// this.hoverMesh.mesh.visible = false;
 				obj.select();
 				break;
 			case MouseCaster.OUT:
-				this.hoverMesh.visible = true;
+				// this.hoverMesh.mesh.visible = true;
 				obj.deselect();
 				break;
 			case MouseCaster.DOWN:

@@ -50,13 +50,6 @@ Board.prototype = {
 		return this.grid.getRandomCell();
 	},
 	
-	/*highlightNeighbors: function(cell) {
-		var n = this.grid.getNeighbors(cell);
-		for (var i = 0; i < n.length; i++) {
-			n[i].select();
-		}
-	},*/
-	
 	// rotate the board either left (-1, default) or right (1)
 	rotate: function(direction, animate) {
 		animate = animate || false;
@@ -64,7 +57,7 @@ Board.prototype = {
 			// todo?
 		}
 		else {
-			this.grid.group.rotation.y += (this.grid.rotationIncrement * (direction || -1)) * 2;
+			this.group.rotation.y += (this.grid.rotationIncrement * (direction || -1)) * 2;
 		}
 	},
 	
