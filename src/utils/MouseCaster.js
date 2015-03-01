@@ -9,13 +9,13 @@ define(['lib/Signal'], function(Signal) {
 	camera - the camera to cast from
  */
 var MouseCaster = function(group, camera) {
-	
+	this.down = false;
 	// the object that was just clicked on
 	this.pickedObject = null;
 	// the object currently being "held"
 	this.selectedObject = null;
 	// store the results of the last cast
-	this.allObjects = null;
+	this.allHits = null;
 	// disable the caster easily to temporarily prevent user input
 	this.active = true;
 	
@@ -73,7 +73,7 @@ MouseCaster.prototype = {
 				
 				this.signal.dispatch(MouseCaster.OVER, this.pickedObject);
 			}
-			this.position = hit.point;
+			this.position.copy(hit.point);
 			this.screenPosition.z = hit.distance;
 		}
 		else {
@@ -86,7 +86,7 @@ MouseCaster.prototype = {
 			this.selectedObject = null;
 		}
 		
-		this.allObjects = intersects;
+		this.allHits = intersects;
 	},
 
 	_onDocumentMouseDown: function(evt) {
@@ -95,12 +95,14 @@ MouseCaster.prototype = {
 		}
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
+		this.down = true;
 		this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
 	},
 		
 	_onDocumentMouseUp: function(evt) {
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
+		this.down = false;
 		this.signal.dispatch(MouseCaster.UP, this.pickedObject);
 		
 		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {

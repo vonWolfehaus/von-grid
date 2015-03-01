@@ -32,7 +32,7 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['utils/Tools', 'graphs/SquareGrid', 'Board', 'utils/Scene', 'utils/MouseCaster'], function(Tools, SquareGrid, Board, Scene, MouseCaster) {
+requirejs(['utils/Tools', 'graphs/SquareGrid', 'Board', 'utils/Scene'], function(Tools, SquareGrid, Board, Scene) {
 	
 	var scene = new Scene({
 		element: document.getElementById('view'),

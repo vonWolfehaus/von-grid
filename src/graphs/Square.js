@@ -38,20 +38,20 @@ var Square = function(size, scale, geometry, material) {
 		});
 	}
 	
-	this.view = new THREE.Mesh(geometry, this.material);
-	/*this.view = new THREE.Line(this.shape.createPointsGeometry(), new THREE.LineBasicMaterial({
+	this.mesh = new THREE.Mesh(geometry, this.material);
+	/*this.mesh = new THREE.Line(this.shape.createPointsGeometry(), new THREE.LineBasicMaterial({
 		color: this.color,
 		linewidth: 3 // this doesn't work on windows because ANGLE doesn't implement it (the WebGL driver)
 	}));*/
 
-	this.view.userData.structure = this;
+	this.mesh.userData.structure = this;
 	
 	// create references so we can control orientation through this (Square), instead of drilling down
-	this.position = this.view.position;
-	this.rotation = this.view.rotation;
+	this.position = this.mesh.position;
+	this.rotation = this.mesh.rotation;
 	// rotate it to face "up" (Y+)
 	this.rotation.x = -90 * 0.0174532925;
-	this.view.scale.set(scale, scale, scale);
+	this.mesh.scale.set(scale, scale, scale);
 	
 	this._emissive = this.material.emissive.getHex();
 };

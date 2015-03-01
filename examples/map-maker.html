@@ -32,7 +32,7 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene'], function(Tools, HexGrid, Board, Scene) {
+requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples/js/EditorPlane', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, EditorPlane, MouseCaster) {
 	
 	var scene = new Scene({
 		element: document.getElementById('view'),
@@ -40,19 +40,25 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene'], function(To
 	}, true);
 	
 	var grid = new HexGrid({
-		rings: 4,
+		rings: 1,
 		cellSize: 10,
 		cellScale: 0.95
 	});
+	
+	var mouse = new MouseCaster(scene.container, scene.camera);
+	
+	var plane = new EditorPlane(scene, grid, mouse);
 	
 	var board = new Board(grid);
 	
 	scene.add(board.group);
 	scene.focusOn(board.group);
-
+	
 	update();
 	
 	function update() {
+		mouse.update();
+		plane.update();
 		scene.render();
 		requestAnimationFrame(update);
 	}

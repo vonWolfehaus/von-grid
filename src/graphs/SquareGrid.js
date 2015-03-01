@@ -79,7 +79,7 @@ var SquareGrid = function(config) {
 		box.placeAt(cell);
 		
 		this.meshes.push(box);
-		this.group.add(box.view);
+		this.group.add(box.mesh);
 	}
 	// rotate the group depending on the shape the grid is in
 	this.group.rotation.y = this.type;

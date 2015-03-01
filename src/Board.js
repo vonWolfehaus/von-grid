@@ -2,15 +2,17 @@
 	Interface to the grid. Holds data about what's occupying cells, and a general interface from entities to cells.
  */
 
-define(['pathing/AStarFinder'], function(AStarFinder) {
+define(['utils/Loader', 'pathing/AStarFinder'], function(Loader, AStarFinder) {
 
 var Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 	
-	this.pieces = []; // change to LinkedList when integrated into engine
+	// this.pieces = []; // haven't found a use for this yet
 	this.group = new THREE.Group();
 	this.grid = null;
 	this.finder = new AStarFinder(finderConfig);
+	// need to keep a resource cache around, so this Loader does that, use it instead of THREE.ImageUtils
+	Loader.init();
 	
 	this.setGrid(grid);
 };
@@ -27,7 +29,7 @@ Board.prototype = {
 		
 	},
 	
-	// immediately a piece to a cell; doesn't have to be a member of the board
+	// immediately snap a piece to a cell; doesn't have to be a member of the board, merely copies position
 	placeEntityAtCell: function(entity, cell) {
 		this.grid.cellToPixel(cell, entity.position);
 		entity.position.y += entity.offsetY;
@@ -66,7 +68,8 @@ Board.prototype = {
 		}
 	},
 	
-	addPieceAt: function(entity, cell) {
+	// i think it's better to grab cells from the grid, then check the entities on them instead
+	/*addPieceAt: function(entity, cell) {
 		this.pieces.push(entity);
 		
 		entity.disable();
@@ -85,7 +88,7 @@ Board.prototype = {
 		this.pieces.length = 0;
 		// does not dig into children of children because they'll be removed when their parent is removed anyway
 		this.group.children.length = 0;
-	},
+	},*/
 	
 	setGrid: function(newGrid) {
 		if (this.grid) {

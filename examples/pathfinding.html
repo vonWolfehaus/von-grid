@@ -202,7 +202,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	
 	function findCellUnderMouse() {
 		var i, c;
-		var objects = mouse.allObjects;
+		var objects = mouse.allHits;
 		for (i = 0; i < objects.length; i++) {
 			c = objects[i].object.userData.structure;
 			if (c && c.objectType && c.objectType === Board.Cell) {
