@@ -4,19 +4,21 @@
 
 I never found a good (and free!) library for creating perfect hexagons and arranging them in a grid. But I did find [Amit's wonderful explanation](http://www.redblobgames.com/grids/hexagons/), and finally had the time to throw something together.
 
-I created a hex grid (hex-shaped made with hexes) as a base, and maybe I (you?) will add more functionality, like data import (perhaps an editor?), or Amit's cool features (ring selection, wrapping, etc).
+You can use the `Board` class with different graph types (hex, square, and later on: abstract), or you can make your own if you implement the interface.
 
-I also created a square grid to help me think about how to abstract the grid enough to build a decent API for, so you should be able to use the `Board` class with whatever grid you want, provided you implement the interface.
-
-Please use this to make awesome hex-based web games.
+Please use this to make awesome hex-based web games. Or port the code and make awesome hex games there. Just make hex games, ok?
 
 ## Features
 
 - Simple API for attaching objects to the grid through `Board.js`
-- A* Pathfinding
-- Mouse interaction with the grid's cells (over, out, down, up, click)
+- **A* Pathfinding**
+- Make maps with `examples/map-maker.html`! (no import/export yet, but it's still cool)
+- Varied height
+- Sparse maps
+- Multi-material support
+- **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
-- Adjustable properties: cell size, grid size, mouse interactivity, board rotation, "flat" and "pointy" versions, cell bevel
+- Square version that ~~can be used interchangeably~~(currently working but lots of disparities as I build the Map Maker)
 
 ## Usage
 
