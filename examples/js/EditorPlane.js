@@ -81,7 +81,7 @@ EditorPlane.prototype = {
 		}
 		switch (type) {
 			case MouseCaster.WHEEL:
-				console.log(this.mouse.wheel);
+				// console.log(this.mouse.wheel);
 				if (this._overCell) {
 					this.hoverMesh.mesh.visible = false;
 					var gridPos = this._overCell.gridPos;

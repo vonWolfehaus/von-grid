@@ -94,6 +94,7 @@ MouseCaster.prototype = {
 	},
 
 	_onDocumentMouseDown: function(evt) {
+		evt.preventDefault();
 		if (this.pickedObject) {
 			this.selectedObject = this.pickedObject;
 		}
@@ -104,6 +105,7 @@ MouseCaster.prototype = {
 	},
 		
 	_onDocumentMouseUp: function(evt) {
+		evt.preventDefault();
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
 		this.down = false;
