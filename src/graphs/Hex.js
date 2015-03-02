@@ -68,6 +68,7 @@ Hex.prototype = {
 			this.material.emissive.setHex(this.highlight);
 		}
 		this.selected = true;
+		return this;
 	},
 	
 	deselect: function() {
@@ -75,6 +76,7 @@ Hex.prototype = {
 			this.material.emissive.setHex(this._emissive);
 		}
 		this.selected = false;
+		return this;
 	},
 	
 	// Hexagon cells are in cube coordinates; this is a modified HexGrid.hexToPixel
@@ -83,6 +85,11 @@ Hex.prototype = {
 		this.position.y = 0;
 		this.position.z = (cell.z - cell.y) * this.height * 0.5;
 		this.gridPos = cell;
+		cell.w = this;
+	},
+	
+	dispose: function() {
+		// TODO
 	}
 };
 

@@ -22,7 +22,8 @@ var Scene = function(sceneConfig, controlConfig) {
 	var controlSettings = {
 		minDistance: 100,
 		maxDistance: 1000,
-		zoomSpeed: 2
+		zoomSpeed: 2,
+		noZoom: false
 	};
 	
 	Tools.merge(sceneSettings, sceneConfig);
@@ -65,6 +66,7 @@ var Scene = function(sceneConfig, controlConfig) {
 		this.controls.minDistance = controlSettings.minDistance;
 		this.controls.maxDistance = controlSettings.maxDistance;
 		this.controls.zoomSpeed = controlSettings.zoomSpeed;
+		this.controls.noZoom = controlSettings.noZoom;
 	}
 	
 	if (sceneSettings.cameraPosition) {

@@ -37,30 +37,71 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 	var scene = new Scene({
 		element: document.getElementById('view'),
 		cameraPosition: {x:0, y:150, z:150}
-	}, true);
+	}, {
+		noZoom: false
+	});
+	
+	// listen to the orbit controls to disable the raycaster while user adjusts the view
+	scene.controls.addEventListener('wheel', onControlWheel);
 	
 	var grid = new HexGrid({
 		rings: 1,
 		cellSize: 10,
+		cellDepth: 5,
 		cellScale: 0.95
 	});
 	
-	var mouse = new MouseCaster(scene.container, scene.camera);
-	
-	var plane = new EditorPlane(scene, grid, mouse);
-	
 	var board = new Board(grid);
+	var mouse = new MouseCaster(board.group, scene.camera);
+	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
+	mouse.signal.add(onMouse, this);
+	
+	var plane = new EditorPlane(board.group, grid, mouse);
+	plane.addHoverMeshToGroup(scene.container);
 	
 	scene.add(board.group);
 	scene.focusOn(board.group);
 	
 	update();
-	
 	function update() {
+		if (wheelTimer < 10) {
+			wheelTimer++;
+			if (wheelTimer === 10) {
+				mouse.active = true;
+			}
+		}
+		
 		mouse.update();
 		plane.update();
 		scene.render();
 		requestAnimationFrame(update);
+	}
+	
+	var wheelTimer = 10;
+	function onControlWheel() {
+		mouse.active = false;
+		wheelTimer = 0;
+	}
+	
+	function onMouse(type, obj) {
+		switch (type) {
+			case MouseCaster.OVER:
+				if (obj) {
+					scene.controls.noZoom = true;
+				}
+				break;
+			case MouseCaster.OUT:
+				if (obj) {
+					scene.controls.noZoom = false;
+				}
+				break;
+			case MouseCaster.WHEEL:
+				if (mouse.wheel < 1) {
+					// prevent wheel from going negative since cells can't extrude inside-out (well, shouldn't)
+					mouse.wheel = 1;
+				}
+				break;
+		}
 	}
 });
 </script>

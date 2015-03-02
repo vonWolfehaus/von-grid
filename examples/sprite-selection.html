@@ -43,9 +43,11 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	var grid = new HexGrid({
 		rings: 4,
 		cellSize: 10,
+		cellDepth: 2,
 		cellScale: 0.95,
 		extrudeSettings: {
-			amount: 1
+			// options passed directly to: http://threejs.org/docs/#Reference/Extras.Geometries/ExtrudeGeometry
+			// but don't use amount, instead use cellDepth
 		}
 	});
 	/*var grid = new SquareGrid({
@@ -53,6 +55,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 		height: 8,
 		cellSize: 15,
 		cellScale: 0.95
+		// same extrudeSettings as Hex
 	});*/
 	
 	var mouse = new MouseCaster(scene.container, scene.camera);
@@ -73,7 +76,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	
 	for (i = 0; i < 5; i++) {
 		sprites[i] = new Sprite(spriteConfig);
-		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(15, 40), Tools.randomInt(100));
+		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(grid.extrudeSettings.amount + 15, 40), Tools.randomInt(100));
 	}
 	
 	// keep track of states

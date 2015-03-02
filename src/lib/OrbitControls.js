@@ -129,6 +129,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var changeEvent = { type: 'change' };
 	var startEvent = { type: 'start'};
 	var endEvent = { type: 'end'};
+	var wheelEvent = { type: 'wheel'};
 
 	this.rotateLeft = function ( angle ) {
 
@@ -486,8 +487,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		scope.update();
-		scope.dispatchEvent( startEvent );
-		scope.dispatchEvent( endEvent );
+		scope.dispatchEvent( wheelEvent );
+		// scope.dispatchEvent( endEvent );
 
 	}
 

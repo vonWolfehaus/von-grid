@@ -21,20 +21,23 @@ var MouseCaster = function(group, camera) {
 	
 	this.shift = false;
 	this.ctrl = false;
+	this.wheel = 0;
 	
 	// you can track exactly where the mouse is in the 3D scene by using the z component
 	this.position = new THREE.Vector3();
 	this.screenPosition = new THREE.Vector2();
 	this.signal = new Signal();
+	this.group = group;
 	
 	// behind-the-scenes stuff you shouldn't worry about
-	this._group = group;
 	this._camera = camera;
 	this._raycaster = new THREE.Raycaster();
 	
 	document.addEventListener('mousemove', this._onDocumentMouseMove.bind(this), false);
 	document.addEventListener('mousedown', this._onDocumentMouseDown.bind(this), false);
 	document.addEventListener('mouseup', this._onDocumentMouseUp.bind(this), false);
+	document.addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
+	document.addEventListener('DOMMouseScroll', this._onMouseWheel.bind(this), false); // firefox
 };
 
 // statics to describe the events we dispatch
@@ -43,6 +46,7 @@ MouseCaster.OUT = 'out';
 MouseCaster.DOWN = 'down';
 MouseCaster.UP = 'up';
 MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
+MouseCaster.WHEEL = 'wheel';
 
 MouseCaster.prototype = {
 	update: function() {
@@ -52,7 +56,7 @@ MouseCaster.prototype = {
 		
 		this._raycaster.setFromCamera(this.screenPosition, this._camera);
 		
-		var intersects = this._raycaster.intersectObject(this._group, true);
+		var intersects = this._raycaster.intersectObject(this.group, true);
 		var hit, obj;
 		
 		if (intersects.length > 0) {
@@ -114,6 +118,30 @@ MouseCaster.prototype = {
 		evt.preventDefault();
 		this.screenPosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
 		this.screenPosition.y = -(evt.clientY / window.innerHeight) * 2 + 1;
+	},
+	
+	_onMouseWheel: function(evt) {
+		if (!this.active) {
+			return;
+		}
+		evt.preventDefault();
+		evt.stopPropagation();
+
+		var delta = 0;
+		if (evt.wheelDelta !== undefined) { // WebKit / Opera / Explorer 9
+			delta = evt.wheelDelta;
+		}
+		else if (evt.detail !== undefined) { // Firefox
+			delta = -evt.detail;
+		}
+		if (delta > 0) {
+			this.wheel++;
+		}
+		else {
+			this.wheel--;
+		}
+		// console.log(this.wheel);
+		this.signal.dispatch(MouseCaster.WHEEL, this.wheel);
 	}
 };
 

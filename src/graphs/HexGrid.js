@@ -13,9 +13,10 @@ var HexGrid = function(config) {
 		url: null, // loads in map JSON data for arbitrary/sparse maps created with the editor
 		// depthStep: 2,
 		cellSize: 10,
+		cellDepth: 1,
 		cellScale: 0.95,
 		extrudeSettings: {
-			amount: 1,
+			amount: 1, // this gets overwritten, use cellDepth instead
 			bevelEnabled: true,
 			bevelSegments: 1,
 			steps: 1,
@@ -30,7 +31,9 @@ var HexGrid = function(config) {
 	this.size = gridSettings.rings;
 	this.cellSize = gridSettings.cellSize;
 	this.cellScale = gridSettings.cellScale;
+	
 	this.extrudeSettings = gridSettings.extrudeSettings;
+	this.extrudeSettings.amount = gridSettings.cellDepth;
 	
 	this.rotationIncrement = 30 * Tools.DEG_TO_RAD;
 	// holds the grid position of each cell in cube coordinates, to which our meshes are attached to in the Board entity
@@ -39,8 +42,9 @@ var HexGrid = function(config) {
 	// holds the Hex instances data that is displayed; still working on a decent naming convention, sorry
 	this.meshes = [];
 	this.hexShape = null;
-	this.hexGeo = null;
-	this.hexMat = gridSettings.material;
+	// this.hexGeo = null;
+	// this.hexGeo = new THREE.ShapeGeometry(this.hexShape);
+	// this.hexMat = gridSettings.material;
 	this.hexWidth = 0;
 	this.hexHeight = 0;
 	this.hashDelimeter = '.';
@@ -174,10 +178,47 @@ HexGrid.prototype = {
 	
 	// handy for selection hinting
 	generateCellView: function(height, material) {
+		height = Math.abs(height) || this.extrudeSettings.amount;
 		this.extrudeSettings.amount = height;
-		var geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+		var geo = this._geoCache[height];
+		if (!geo) {
+			geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+			this._geoCache[height] = geo;
+		}
 		var hex = new Hex(this.cellSize, this.cellScale, geo, material);
+		hex.depth = height;
 		return hex;
+	},
+	
+	// make a new cell for the hex
+	add: function(gridPos, hex) {
+		var c = new THREE.Vector3();
+		c.copy(gridPos);
+		if (!hex) {
+			hex = this.generateCellView();
+		}
+		c.w = hex;
+		hex.placeAt(c);
+		this.cells[this.cubeToHash(c)] = c;
+		
+		this.meshes.push(hex);
+		this.group.add(hex.mesh);
+		
+		this.numCells++;
+	},
+	
+	remove: function(hex) {
+		delete this.cells[this.cubeToHash(hex.gridPos)];
+		hex.gridPos.w = null;
+		
+		var i = this.meshes.indexOf(hex);
+		if (i !== -1) {
+			this.meshes.splice(i, 1);
+		}
+		this.group.remove(hex.mesh);
+		
+		this.numCells--;
+		hex.dispose();
 	},
 	
 	dispose: function() {
@@ -272,28 +313,16 @@ HexGrid.prototype = {
 	// create a flat, hexagon-shaped grid.
 	generate: function() {
 		var x, y, z, c, i, hex;
+		c = new THREE.Vector3();
 		
-		// this.hexGeo = new THREE.ShapeGeometry(this.hexShape);
-		this.hexGeo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
 		this.meshes = [];
 		
 		for (x = -this.size; x < this.size+1; x++) {
 			for (y = -this.size; y < this.size+1; y++) {
 				z = -x-y;
 				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
-					c = new THREE.Vector3(x, y, z);
-					// create Hex instances and place them on the grid, and add them to the group for easy management
-					hex = new Hex(this.cellSize, this.cellScale, this.hexGeo, this.hexMat);
-					c.w = hex; // for storing which hex is representing this cell
-					hex.depth = this.extrudeSettings.amount;
-					hex.placeAt(c);
-					
-					this.cells[this.cubeToHash(c)] = c;
-					
-					this.meshes.push(hex);
-					this.group.add(hex.mesh);
-					
-					this.numCells++;
+					c.set(x, y, z);
+					this.add(c);
 				}
 			}
 		}
@@ -328,8 +357,6 @@ HexGrid.prototype = {
 		// create Hex instances and place them on the grid, and add them to the group for easy management
 		for (i = 0; i < cells.length; i++) {
 			c = cells[i];
-			v = new THREE.Vector3(c.x, c.y, c.z);
-			this.cells[this.cubeToHash(v)] = v;
 			
 			geo = this._geoCache[c.depth];
 			if (!geo) {
@@ -348,11 +375,8 @@ HexGrid.prototype = {
 			
 			hex = new Hex(this.cellSize, this.cellScale, geo, mat);
 			hex.depth = this.extrudeSettings.amount;
-			v.w = hex;
-			hex.placeAt(v);
 			
-			this.meshes.push(hex);
-			this.group.add(hex.mesh);
+			this.add(c, hex);
 		}
 	}
 
