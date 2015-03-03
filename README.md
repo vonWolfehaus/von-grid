@@ -15,12 +15,39 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 - Make maps with `examples/map-maker.html`! (no import/export yet, but it's still cool)
 - Varied height
 - Sparse maps
-- Multi-material support
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
 - Square version ~~that can be used interchangeably~~(currently working but lots of disparities as I build the Map Maker)
 
 ## Usage
+
+#### Basic board
+
+```javascript
+var scene = new Scene({ // I made a very handy util for creating three.js scenes quickly
+	cameraPosition: {x:0, y:150, z:150}
+}, true); // add orbit controls
+
+var grid = new HexGrid({
+	rings: 4
+});
+
+var board = new Board(grid);
+
+scene.add(board.group);
+scene.focusOn(board.group);
+
+update();
+
+function update() {
+	scene.render();
+	requestAnimationFrame(update);
+}
+```
+Produces this:
+
+![screenshot](hex-grid-basic.jpg)
+
 
 #### Map Maker
 
