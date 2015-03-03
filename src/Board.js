@@ -1,5 +1,7 @@
 /*
 	Interface to the grid. Holds data about what's occupying cells, and a general interface from entities to cells.
+	
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 
 define(['utils/Loader', 'pathing/AStarFinder'], function(Loader, AStarFinder) {
@@ -42,8 +44,8 @@ Board.prototype = {
 		cell.entity = entity;
 	},
 	
-	findPath: function(startCell, endCell) {
-		return this.finder.findPath(startCell, endCell, this.grid);
+	findPath: function(startCell, endCell, heuristic) {
+		return this.finder.findPath(startCell, endCell, heuristic, this.grid);
 	},
 	
 	getRandomCell: function() {

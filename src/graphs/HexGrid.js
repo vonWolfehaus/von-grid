@@ -1,7 +1,7 @@
 /*
 	Graph of hexagons. Handles grid cell management (placement math for eg pathfinding, range, etc) and grid conversion math.
 	[Cube coordinate system](http://www.redblobgames.com/grids/hexagons/).
-	@author Corey Birnbaum
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 
 define(['utils/Loader', 'graphs/Hex', 'utils/Tools'], function(Loader, Hex, Tools) {
@@ -123,7 +123,7 @@ HexGrid.prototype = {
 			this._vec3.copy(hex.gridPos);
 			this._vec3.add(this._directions[i]);
 			c = this.cells[this.cubeToHash(this._vec3)];
-			if (!c || (filter && filter(c.w))) {
+			if (!c || (filter && !filter(hex, c.w))) {
 				continue;
 			}
 			this._list.push(c.w);
@@ -133,7 +133,7 @@ HexGrid.prototype = {
 				this._vec3.copy(hex.gridPos);
 				this._vec3.add(this._diagonals[i]);
 				c = this.cells[this.cubeToHash(this._vec3)];
-				if (!c || (filter && filter(c.w))) {
+				if (!c || (filter && !filter(hex, c.w))) {
 					continue;
 				}
 				this._list.push(c.w);
@@ -143,8 +143,9 @@ HexGrid.prototype = {
 	},
 	
 	distance: function(cellA, cellB) {
-		// console.log('distance: '+this.cubeDistance(cellA.gridPos, cellB.gridPos));
-		return this.cubeDistance(cellA.gridPos, cellB.gridPos);
+		var d = this.cubeDistance(cellA.gridPos, cellB.gridPos);
+		d += cellB.depth - cellA.depth;
+		return d;
 	},
 	
 	clearPath: function() {
@@ -332,7 +333,7 @@ HexGrid.prototype = {
 		xyz are hex cube coordinates
 		json = {
 			cells: [
-				{x, y, z, depth, mat_cache_id},
+				{x, y, z, depth, mat_cache_id, custom_data},
 				...
 			],
 			materials: [
@@ -375,6 +376,7 @@ HexGrid.prototype = {
 			
 			hex = new Hex(this.cellSize, this.cellScale, geo, mat);
 			hex.depth = this.extrudeSettings.amount;
+			hex.userData.mapData = custom_data;
 			
 			this.add(c, hex);
 		}

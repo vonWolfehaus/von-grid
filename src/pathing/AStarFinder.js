@@ -2,6 +2,7 @@ define(['utils/Tools', 'pathing/Util', 'lib/LinkedList'], function(Tools, Util, 
 
 /*
 	A* path-finder based upon http://www.redblobgames.com/pathfinding/a-star/introduction.html
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 function AStarFinder(finderConfig) {
 	finderConfig = finderConfig || {};
@@ -19,8 +20,9 @@ AStarFinder.prototype = {
 		Find and return the path.
 		@return Array<Cell> The path, including both start and end positions. Null if it failed.
 	 */
-	findPath: function(startNode, endNode, grid) {
+	findPath: function(startNode, endNode, heuristic, grid) {
 		var current, costSoFar, neighbors, neighbor, i, l;
+		heuristic = heuristic || this.heuristicFilter;
 		// clear old values from previous finding
 		grid.clearPath();
 		
@@ -44,7 +46,7 @@ AStarFinder.prototype = {
 			}
 
 			// cycle through each neighbor of the current current
-			neighbors = grid.getNeighbors(current, this.allowDiagonal, this.heuristicFilter);
+			neighbors = grid.getNeighbors(current, this.allowDiagonal, heuristic);
 			for (i = 0, l = neighbors.length; i < l; i++) {
 				neighbor = neighbors[i];
 				
@@ -78,7 +80,6 @@ AStarFinder.prototype = {
 	},
 	
 	compare: function(nodeA, nodeB) {
-		// return nodeA.calcCost - nodeB.calcCost;
 		return nodeA.priority - nodeB.priority;
 	},
 

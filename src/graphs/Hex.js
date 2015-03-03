@@ -16,11 +16,13 @@ var Hex = function(size, scale, geometry, material) {
 	this.objectType = 'cell'; // Board.Cell
 	this.gridPos = null; // reference to cube coordinate (a Vec3) in grid that this view represents
 	this.entity = null;
+	this.userData = {};
 	
 	this.selected = false;
 	this.highlight = '0x222266';
-
-	this.walkable = true; // path option
+	
+	// path options
+	this.walkable = true;
 	// used by pathfinder, overwritten at runtime, don't touch
 	this.calcCost = 0;
 	this.priority = 0;

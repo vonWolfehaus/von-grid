@@ -29,6 +29,13 @@
 <!-- <script type="text/javascript" src="../src/lib/OrbitControls.js"></script> -->
 <script type="text/javascript" src="../src/lib/require.js"></script>
 <script type="text/javascript">
+/*
+	Hi! In this example I setup a regular board, choose a couple random spots, and put a start and end sprite on them, then have the pathfinder do its thing. There's a lot of sprite interaction logic so you can drag the end points around as well as place and remove obstacles.
+	
+	If you want to see the pathfinder in action on varied terrain, go change the Grid's generateCellView() function to use a height of `Math.floor(Math.random() * 40)+1` (for example), then comment out the cameraType just below here so it'll use a perspective camera instead, allowing you to see the differences in height.
+	
+	I also added an example heuristic filter that will discard neighbors that are too tall to "jump" to, forcing the algorithm to find a winding path through the valleys and canyons. It's also possible to not find a path in this scenario, in which case `null` is returned.
+*/
 requirejs.config({
 	baseUrl: '../src'
 });
@@ -58,7 +65,9 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	mouse.active = false;
 	
 	var board = new Board(grid, {
-		allowDiagonal: false
+		allowDiagonal: false,
+		// this is the fallback, but you can override it by passing a specific heuristic in board.findPath()
+		heuristicFilter: isCellTraversable
 	});
 	
 	scene.add(board.group);
@@ -77,7 +86,8 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	if (a === b) {
 		// they're on top of each other, so place one at a diagonal of the other
 		var neighbors = grid.getNeighbors(a, true);
-		b = neighbors[0];
+		// the diagonals are added to the list after all the others are, so we pick the last one
+		b = neighbors[neighbors.length-1];
 	}
 	
 	var startSprite = new Sprite(spriteConfig);
@@ -187,7 +197,7 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 	function createPath() {
 		grid.traverse(deselectVisited);
 		var path = board.findPath(startSprite.cell, endSprite.cell);
-		// highlight the path
+		// highlight the path with markers
 		if (path) {
 			for (var i = 0; i < path.length; i++) {
 				var s = markers[i];
@@ -210,6 +220,15 @@ function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, Selectio
 			}
 		}
 		return null;
+	}
+	
+	function isCellTraversable(origin, next) {
+		// example of how to filter out neighbors that are too tall to traverse
+		// but allows the algorithm to "jump" down to whatever depth
+		if (next.depth - origin.depth > 10) {
+			return false; // no, filter out next
+		}
+		return true; // yes, keep next for consideration
 	}
 	
 	function selectVisited(c) {

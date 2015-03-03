@@ -44,7 +44,7 @@ var Scene = function(sceneConfig, controlConfig) {
 	this.container = new THREE.Scene();
 	this.container.fog = sceneSettings.fog;
 	
-	this.container.add(new THREE.AmbientLight(0xbbbbbb));
+	this.container.add(new THREE.AmbientLight(0xdddddd));
 	
 	if (!sceneSettings.lightPosition) {
 		sceneSettings.light.position.set(-1, 1, -1).normalize();
