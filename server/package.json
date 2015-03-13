@@ -1,20 +1,19 @@
 {
-	"name": "city",
-	"version": "0.0.1",
-	"description": "",
-	"main": "server.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+	"name": "hex-grid",
+	"version": "1.0.1",
+	"description": "Hexagonal (and other) grid stuff with three.js",
+	"author": {
+	  "name": "Corey Birnbaum",
+	  "email": "corey@coreybirnbaum.com",
+	  "url": "https://github.com/vonWolfehaus/von-canvas2d"
 	},
-	"author": "NST",
 	"private": true,
-	"license": "",
 	"dependencies": {
+		
+	},
+	"devDependencies": {
 		"connect": "*",
 		"minimist": "*",
 		"serve-static": "*"
-	},
-	"devDependencies": {
-		
 	}
 }

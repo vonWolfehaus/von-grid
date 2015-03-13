@@ -4,7 +4,7 @@
 
 I never found a good (and free!) library for creating perfect hexagons and arranging them in a grid. But I did find [Amit's wonderful explanation](http://www.redblobgames.com/grids/hexagons/), and finally had the time to throw something together.
 
-You can use the `Board` class with different graph types (hex, square, and later on: abstract), or you can make your own if you implement the interface.
+You can use the `Board` class with different graph types (hex and square), or you can make your own if you implement the interface.
 
 Please use this to make awesome hex-based web games. Or port the code and make awesome hex games there. Just make cool hex games, ok?
 
@@ -47,16 +47,6 @@ function update() {
 Produces this:
 
 ![screenshot](hex-grid-basic.jpg)
-
-
-#### Map Maker
-
-- Click on empty cell: create cell
-- Click on cell: remove cell
-- Mousewheel on cell: adjust height of cell
-- Mousewheel elsewhere: adjust zoom of camera
-- Left click and drag: orbit camera
-- Right click and drag: pan camera
 
 #### Examples
 

@@ -4,7 +4,7 @@
 	@author Corey Birnbaum
  */
 
-define(['utils/Loader', 'utils/Tools', 'utils/MouseCaster'], function(Loader, Tools, MouseCaster) {
+define(['utils/Loader', 'utils/Tools', 'utils/MouseCaster', 'lib/Signal'], function(Loader, Tools, MouseCaster, Signal) {
 
 function EditorPlane(scene, grid, mouse, board) {
 	this.geometry = null;
@@ -33,6 +33,8 @@ function EditorPlane(scene, grid, mouse, board) {
 	this.mouse = mouse;
 	this.mouse.signal.add(this.onMouse, this);
 	this.mouseDelta = new THREE.Vector3();
+	
+	this.mapChanged = new Signal();
 	
 	this._vec3 = new THREE.Vector3();
 	this._overCell = null;
@@ -93,6 +95,8 @@ EditorPlane.prototype = {
 					cell = this.grid.generateCellView(this.mouse.wheel * this.heightStep);
 					this.grid.add(gridPos, cell);
 					this._lastHeight = this.mouse.wheel;
+					
+					this.mapChanged.dispatch();
 				}
 				break;
 				
@@ -119,11 +123,6 @@ EditorPlane.prototype = {
 				
 			case MouseCaster.UP:
 				this.hoverMesh.mesh.visible = true;
-				// remove cells already there
-				if (obj) {
-					this.grid.remove(obj);
-					break;
-				}
 				// don't create new cells if user is trying to orbit camera
 				var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 				var dy = this.mouseDelta.y - this.mouse.screenPosition.y;
@@ -136,6 +135,18 @@ EditorPlane.prototype = {
 					this.mouse.wheel = this._lastHeight;
 					cell = this.grid.generateCellView(this.mouse.wheel * this.heightStep);
 					this.grid.add(this.grid.pixelToCell(this._vec3), cell);
+					
+					this.mapChanged.dispatch();
+				}
+				break;
+				
+			case MouseCaster.CLICK:
+				// remove cells already there
+				if (obj) {
+					this.grid.remove(obj);
+					
+					this.mapChanged.dispatch();
+					break;
 				}
 				break;
 		}

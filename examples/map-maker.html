@@ -8,21 +8,38 @@
 	<title>Grid</title>
 	
 	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="css/map-maker.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
-		}
-		#view {
-			position: absolute;
-			top: 0;
-			left: 0;
 		}
 	</style>
 </head>
 
 <body>
 	
-	<div id="view"></div>
+	<div id="view" class="absolute"></div>
+	<div id="control-panel" class="absolute">
+		<h2>Instructions</h2>
+		<ul>
+		<li>Click on empty cell: create cell</li>
+		<li>Click on cell: remove cell</li>
+		<li>Mousewheel on cell: adjust height of cell</li>
+		<li>Mousewheel elsewhere: adjust zoom of camera</li>
+		<li>Left click and drag: orbit camera</li>
+		<li>Right click and drag: pan camera</li>
+		</ul>
+		<h2>Editor settings</h2>
+		<span>Editor plane size: 100</span>
+		<span>Height step: 5</span>
+		<br/>
+		<h2>Save/Load</h2>
+		<button id="download-btn">Download Map</button>
+		Opens a new window. Right-click on contents and save it as a .json file.
+		<div>Drop a json file here to load it</div>
+		<h2>Materials</h2>
+		...
+	</div>
 	
 
 <script type="text/javascript" src="../src/lib/three.min.js"></script>
@@ -34,9 +51,28 @@ requirejs.config({
 });
 requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples/js/EditorPlane', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, EditorPlane, MouseCaster) {
 	
+	// make ui
+	var namespace = 'vongrid.map';
+	
+	var map = window.localStorage.getItem(namespace);
+	if (map) {
+		map = JSON.parse(map);
+	}
+	
+	var timeTilAutoSave = 300;
+	var saveTimer = 10;
+	var dirtyMap = true;
+	
+	var btn = document.getElementById('download-btn');
+	btn.onclick = function(evt) {
+		downloadMap();
+	};
+	
+	// setup the thing
+	
 	var scene = new Scene({
 		element: document.getElementById('view'),
-		cameraPosition: {x:0, y:150, z:150}
+		cameraPosition: {x:0, y:300, z:120}
 	}, {
 		noZoom: false
 	});
@@ -51,6 +87,40 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 		cellScale: 0.95
 	});
 	
+	if (map) {
+		console.log(map);
+		// grid.onLoad(map);
+	}
+	else {
+		var mapCells = [];
+		var cell, mat;
+		for (var c in grid.cells) {
+			cell = grid.cells[c];
+			mapCells.push({
+				x: cell.x,
+				y: cell.y,
+				z: cell.z,
+				depth: cell.w.depth,
+				mat_cache_id: 0,
+				custom_data: cell.w.userData.mapData
+			});
+		}
+		var mapMats = [];
+		for (var i = 0; i < grid._matCache.length; i++) {
+			mat = grid._matCache[i];
+			/*mapMats.push({
+				cache_id: i,
+				type: mat.type,
+				// color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
+				imgURL: // get this value from the ui
+			});*/
+		}
+		map = {
+			cells: mapCells,
+			materials: mapMats
+		};
+	}
+	
 	var board = new Board(grid);
 	var mouse = new MouseCaster(board.group, scene.camera);
 	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
@@ -58,6 +128,8 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 	
 	var plane = new EditorPlane(board.group, grid, mouse);
 	plane.addHoverMeshToGroup(scene.container);
+	
+	plane.mapChanged.add(onMapChange, this);
 	
 	scene.add(board.group);
 	scene.focusOn(board.group);
@@ -70,7 +142,14 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 				mouse.active = true;
 			}
 		}
-		
+		if (dirtyMap) {
+			saveTimer--;
+			if (saveTimer === 0) {
+				dirtyMap = false;
+				window.localStorage.setItem(namespace, JSON.stringify(map));
+				console.log('Auto-saved new map data');
+			}
+		}
 		mouse.update();
 		plane.update();
 		scene.render();
@@ -102,6 +181,38 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 				}
 				break;
 		}
+	}
+	
+	function onMapChange(data) {
+		dirtyMap = true;
+		saveTimer = timeTilAutoSave;
+	}
+	
+	function loadMap() {
+		
+	}
+	
+	function save() {
+		// {x, y, z, depth, mat_cache_id, custom_data}
+		/*
+		{
+					cache_id: 0,
+					type: 'MeshLambertMaterial',
+					color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
+					imgURL: url
+				},
+				{
+					cache_id: 1, ...
+				}
+		*/
+	}
+	
+	function downloadMap() {
+		var data = window.localStorage.getItem('vongrid.map');
+		if (!data) return;
+		var url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
+		window.open(url, '_blank');
+		window.focus();
 	}
 });
 </script>

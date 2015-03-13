@@ -1,0 +1,11 @@
+.absolute {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+#control-panel {
+	padding: 10px;
+	width: 200px;
+	min-height: 200px;
+	background-color: rgba(200, 200, 200, 0.8);
+}
