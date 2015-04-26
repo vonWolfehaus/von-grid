@@ -62,6 +62,7 @@ EditorPlane.prototype = {
 	
 	update: function() {
 		if (this.mouse.down) {
+			// ignore interactions while panning or editing
 			return;
 		}
 		if (this.mouse.allHits && this.mouse.allHits[0]) {
@@ -129,8 +130,8 @@ EditorPlane.prototype = {
 				if (Math.sqrt(dx * dx + dy * dy) > this.mousePanMinDistance) {
 					break;
 				}
-				// else create a new cell
-				if (hit) {
+				// else create a new cell, if one isn't already there
+				if (hit && !obj) {
 					this.hoverMesh.mesh.visible = false;
 					this.mouse.wheel = this._lastHeight;
 					cell = this.grid.generateCellView(this.mouse.wheel * this.heightStep);

@@ -110,8 +110,9 @@ MouseCaster.prototype = {
 		this.ctrl = evt.ctrlKey;
 		this.down = false;
 		this.signal.dispatch(MouseCaster.UP, this.pickedObject);
-		
+		// console.log('up');
 		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
+			// console.log('click');
 			this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
 		}
 	},

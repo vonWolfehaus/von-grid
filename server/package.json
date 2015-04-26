@@ -4,8 +4,7 @@
 	"description": "Hexagonal (and other) grid stuff with three.js",
 	"author": {
 	  "name": "Corey Birnbaum",
-	  "email": "corey@coreybirnbaum.com",
-	  "url": "https://github.com/vonWolfehaus/von-canvas2d"
+	  "email": "corey@coreybirnbaum.com"
 	},
 	"private": true,
 	"dependencies": {
