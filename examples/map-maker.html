@@ -6,7 +6,7 @@
 	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
-	
+
 	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<link href="css/map-maker.css" rel="stylesheet" type="text/css"/>
 	<style>
@@ -17,7 +17,7 @@
 </head>
 
 <body>
-	
+
 	<div id="view" class="absolute"></div>
 	<div id="control-panel" class="absolute">
 		<h2>Instructions</h2>
@@ -29,18 +29,21 @@
 		<li>Left click and drag: orbit camera</li>
 		<li>Right click and drag: pan camera</li>
 		</ul>
+
 		<h2>Editor settings</h2>
 		<span>Editor plane size: 100</span>
 		<span>Height step: 5</span>
 		<br/>
+
 		<h2>Save/Load</h2>
 		<button id="download-btn">Download Map</button>
-		Opens a new window. Right-click on contents and save it as a .json file.
-		<div>Drop a json file here to load it</div>
+		<br/>
+		Load map: <input type="file" id="load-btn" />
+
 		<h2>Materials</h2>
 		...
 	</div>
-	
+
 
 <script type="text/javascript" src="../src/lib/three.min.js"></script>
 <script type="text/javascript" src="../src/lib/OrbitControls.js"></script>
@@ -50,43 +53,71 @@ requirejs.config({
 	baseUrl: '../src'
 });
 requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples/js/EditorPlane', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, EditorPlane, MouseCaster) {
-	
+
 	// make ui
 	var namespace = 'vongrid.map';
-	
+
 	var map = window.localStorage.getItem(namespace);
 	if (map) {
 		map = JSON.parse(map);
 	}
-	
+
 	var timeTilAutoSave = 300;
 	var saveTimer = 10;
 	var dirtyMap = true;
-	
+
 	var btn = document.getElementById('download-btn');
-	btn.onclick = function(evt) {
+	btn.onmouseup = function(evt) {
+		mouse.preventDefault();
 		downloadMap();
+		return false;
 	};
-	
+
+	btn = document.getElementById('load-btn');
+	btn.addEventListener('change', function(evt) {
+		mouse.preventDefault();
+
+		var file = evt.target.files[0];
+		if (!file) {
+			return;
+		}
+
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var json = null;
+			try {
+				json = JSON.parse(e.target.result);
+			}
+			catch(err) {
+				console.warn('File is not json format');
+				return;
+			}
+			loadMap(json);
+		};
+
+		reader.readAsText(file);
+		return false;
+	}, false);
+
 	// setup the thing
-	
+
 	var scene = new Scene({
 		element: document.getElementById('view'),
 		cameraPosition: {x:0, y:300, z:120}
 	}, {
 		noZoom: false
 	});
-	
+
 	// listen to the orbit controls to disable the raycaster while user adjusts the view
 	scene.controls.addEventListener('wheel', onControlWheel);
-	
+
 	var grid = new HexGrid({
 		rings: 1,
 		cellSize: 10,
 		cellDepth: 5,
 		cellScale: 0.95
 	});
-	
+
 	if (map) {
 		// console.log(map);
 		// grid.onLoad(map);
@@ -120,20 +151,20 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 			materials: mapMats
 		};
 	}
-	
+
 	var board = new Board(grid);
 	var mouse = new MouseCaster(board.group, scene.camera);
 	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
 	mouse.signal.add(onMouse, this);
-	
+
 	var plane = new EditorPlane(board.group, grid, mouse);
 	plane.addHoverMeshToGroup(scene.container);
-	
+
 	plane.mapChanged.add(onMapChange, this);
-	
+
 	scene.add(board.group);
 	scene.focusOn(board.group);
-	
+
 	update();
 	function update() {
 		if (wheelTimer < 10) {
@@ -155,13 +186,13 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 		scene.render();
 		requestAnimationFrame(update);
 	}
-	
+
 	var wheelTimer = 10;
 	function onControlWheel() {
 		mouse.active = false;
 		wheelTimer = 0;
 	}
-	
+
 	function onMouse(type, obj) {
 		switch (type) {
 			case MouseCaster.OVER:
@@ -182,16 +213,38 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 				break;
 		}
 	}
-	
+
 	function onMapChange(data) {
 		dirtyMap = true;
 		saveTimer = timeTilAutoSave;
 	}
-	
-	function loadMap() {
-		
+
+	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js
+	var link = document.createElement( 'a' );
+	link.style.display = 'none';
+	document.body.appendChild( link ); // Firefox workaround
+
+	function exportString(output, filename) {
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		link.href = objectURL;
+		link.download = filename || 'data.json';
+		link.target = '_blank';
+
+		var event = document.createEvent("MouseEvents");
+		event.initMouseEvent(
+			"click", true, false, window, 0, 0, 0, 0, 0
+			, false, false, false, false, 0, null
+		);
+		link.dispatchEvent(event);
 	}
-	
+
+	function loadMap(json) {
+		console.log(json.cells)
+		// grid.cells
+	}
+
 	function save() {
 		// {x, y, z, depth, mat_cache_id, custom_data}
 		/*
@@ -206,13 +259,18 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 				}
 		*/
 	}
-	
+
 	function downloadMap() {
-		var data = window.localStorage.getItem('vongrid.map');
-		if (!data) return;
-		var url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
-		window.open(url, '_blank');
-		window.focus();
+		var output = null;
+
+		try {
+			output = JSON.stringify( map, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		} catch ( e ) {
+			output = JSON.stringify( map );
+		}
+
+		exportString( output, 'hex-map.json' );
 	}
 });
 </script>

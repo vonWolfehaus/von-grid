@@ -53,6 +53,6 @@ Produces this:
 For the simple examples you can drop them into Chrome, but for ones that require images or models, you'll have to spin up [Node](http://nodejs.org/):
 ```
 npm install
-node server/server.js
+node server/serv.js
 ```
 Then you can navigate to the address it gives you in the console and go from there.

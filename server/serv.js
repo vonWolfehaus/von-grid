@@ -1,7 +1,7 @@
 var connect = require('connect'),
 	serveStatic = require('serve-static'),
 	argv = require('minimist')(process.argv.slice(2)),
-	port = argv.p || 3001;
+	port = argv.p || 9001;
 
 var app = connect();
 

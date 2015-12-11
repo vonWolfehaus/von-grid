@@ -10,3 +10,5 @@ server/node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+hex-map.json
