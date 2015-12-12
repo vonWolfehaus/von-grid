@@ -38,7 +38,9 @@
 		<h2>Save/Load</h2>
 		<button id="download-btn">Download Map</button>
 		<br/>
-		Load map: <input type="file" id="load-btn" />
+		<div>
+			Load map: <input type="file" id="load-btn" />
+		</div>
 
 		<h2>Materials</h2>
 		...
@@ -96,6 +98,8 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 		};
 
 		reader.readAsText(file);
+
+		evt.target.value = ''; // reset file to blank
 		return false;
 	}, false);
 
@@ -225,24 +229,26 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 	document.body.appendChild( link ); // Firefox workaround
 
 	function exportString(output, filename) {
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
+		var blob = new Blob([output], {type: 'text/plain'});
+		var objectURL = URL.createObjectURL(blob);
 
 		link.href = objectURL;
 		link.download = filename || 'data.json';
 		link.target = '_blank';
 
-		var event = document.createEvent("MouseEvents");
-		event.initMouseEvent(
-			"click", true, false, window, 0, 0, 0, 0, 0
-			, false, false, false, false, 0, null
+		var evt = document.createEvent('MouseEvents');
+		evt.initMouseEvent(
+			'click', true, false, window, 0, 0, 0, 0, 0,
+			false, false, false, false, 0, null
 		);
-		link.dispatchEvent(event);
+		link.dispatchEvent(evt);
 	}
 
 	function loadMap(json) {
-		console.log(json.cells)
-		// grid.cells
+		board.group.remove(grid.group);
+		grid.onLoad(json);
+		board.setGrid(grid);
+		scene.add(board.group);
 	}
 
 	function save() {
@@ -264,13 +270,13 @@ requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples
 		var output = null;
 
 		try {
-			output = JSON.stringify( map, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( e ) {
-			output = JSON.stringify( map );
+			output = JSON.stringify(map, null, '\t');
+			output = output.replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+		} catch (e) {
+			output = JSON.stringify(map);
 		}
 
-		exportString( output, 'hex-map.json' );
+		exportString(output, 'hex-map.json');
 	}
 });
 </script>
