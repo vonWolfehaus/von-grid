@@ -7,8 +7,8 @@
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
 
-	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
-	<link href="css/map-maker.css" rel="stylesheet" type="text/css"/>
+	<link href="../examples/css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="style.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
 			overflow: hidden;
@@ -54,7 +54,7 @@
 requirejs.config({
 	baseUrl: '../src'
 });
-requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../examples/js/EditorPlane', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, EditorPlane, MouseCaster) {
+requirejs(['utils/Tools', 'graphs/HexGrid', 'Board', 'utils/Scene', '../editor/js/EditorPlane', 'utils/MouseCaster'], function(Tools, HexGrid, Board, Scene, EditorPlane, MouseCaster) {
 
 	// make ui
 	var namespace = 'vongrid.map';
