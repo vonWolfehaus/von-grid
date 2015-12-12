@@ -12,7 +12,7 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 
 - Simple API for attaching objects to the grid through `Board.js`
 - **A* pathfinding**
-- Make maps with `examples/map-maker.html`! (no import/export yet, but it's still cool)
+- Make maps with `examples/map-maker.html`
 - Varied height
 - Sparse maps
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
