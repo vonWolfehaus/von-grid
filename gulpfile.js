@@ -11,28 +11,9 @@ var pkg = require('./package.json');
 
 var dist = './dist';
 var src = './src';
-var components = src+'/components';
-var scripts = src+'/modules';
+var scripts = src+'/**/*.js';
+var styles = src+'/**/*.styl';
 var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
-
-var bundles = {
-	lib: [
-		src+'/lib/page.min.js',
-		src+'/lib/riot.min.js',
-		src+'/lib/material.min.js',
-		src+'/lib/define.min.js',
-		src+'/lib/baobab.min.js',
-		src+'/lib/wildemitter.min.js',
-		src+'/lib/moment-with-locales.min.js',
-	],
-	modules: [
-		scripts+'/**/*.js',
-	],
-	common: [
-		components+'/mixins/*.js',
-		components+'/**/*.tag'
-	]
-};
 
 /*----------------------------------------------------------------------
 	MACRO
@@ -40,9 +21,7 @@ var bundles = {
 
 gulp.task('default', ['clean'], function() {
 	runSequence(
-		['scripts'],
-		['styles'],
-		['copy:root', 'pages', 'assets']
+		['scripts']
 	);
 });
 
@@ -51,8 +30,6 @@ gulp.task('clean', del.bind(null, [dist]));
 gulp.task('dev', ['clean'], function() {
 	runSequence(
 		['scripts'],
-		['styles'],
-		['copy:root', 'pages', 'assets'],
 		['serve']
 	);
 });
@@ -61,27 +38,18 @@ gulp.task('dev', ['clean'], function() {
 	SCRIPTS
 */
 
-gulp.task('scripts', ['scripts:lib', 'scripts:modules', 'scripts:common']);
-
-gulp.task('scripts:lib', function() {
-	return gulp.src(bundles.lib)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.concat('lib.js'))
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe($.size({title: 'scripts:lib'}));
-});
-
-gulp.task('scripts:modules', function() {
+gulp.task('scripts', function() {
 	return gulp.src(bundles.modules)
 		.pipe($.sortAmd())
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.eslint({ fix: true }))
-		.pipe($.eslint.formatEach())
-		.pipe($.eslint.failOnError())
+		//.pipe($.plumber({errorHandler: handleErrors}))
+		//.pipe($.eslint({ fix: true }))
+		//.pipe($.eslint.formatEach())
+		//.pipe($.eslint.failOnError())
 		.pipe($.sourcemaps.init())
-		.pipe($.preprocess(preprocessOpts))
+		.pipe($.amdclean.gulp({
+			prefixMode: 'camelCase'
+			}))
+		//.pipe($.preprocess(preprocessOpts))
 		.pipe($.concat('modules.js'))
 		// .pipe($.uglify())
 		.pipe($.sourcemaps.write('.'))
@@ -89,41 +57,12 @@ gulp.task('scripts:modules', function() {
 		.pipe($.size({title: 'scripts:modules'}));
 });
 
-gulp.task('scripts:common', function() {
-	return gulp.src(bundles.common)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.if('*.tag', $.riot({ compact: true })))
-		.pipe($.eslint({ fix: true }))
-		.pipe($.eslint.format())
-		.pipe($.eslint.failAfterError())
-		.pipe($.preprocess(preprocessOpts))
-		.pipe($.concat('common.js'))
-		//pipe($.uglify().on('error', $.util.log))
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe($.size({title: 'scripts:common'}));
-});
-
-gulp.task('scripts:welcome', function() {
-	return gulp.src(components+'/welcome/*.tag')
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.riot({ compact: true }))
-		.pipe($.preprocess(preprocessOpts))
-		.pipe($.concat('welcome.js'))
-		.pipe($.uglify())
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe($.size({title: 'scripts:welcome'}));
-});
-
 /*----------------------------------------------------------------------
 	CSS
 */
-
+/*
 gulp.task('styles', function() {
-	return gulp.src([components+'/**/*.styl'])
+	return gulp.src(styles)
 		.pipe($.plumber({errorHandler: handleErrors}))
 		.pipe($.sourcemaps.init())
 		.pipe($.stylus({
@@ -133,56 +72,8 @@ gulp.task('styles', function() {
 		.pipe($.concat('styles.css'))
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(dist))
-		.pipe($.size({title: 'styles'}));
 });
-
-/*----------------------------------------------------------------------
-	HTML
 */
-
-gulp.task('pages', function() {
-	return gulp.src(src+'/**/*.html')
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.preprocess(preprocessOpts))
-		.pipe($.minifyHtml({
-			empty: true
-		}))
-		.pipe($.flatten())
-		.pipe(gulp.dest(dist));
-});
-
-/*----------------------------------------------------------------------
-	COPY
-*/
-
-gulp.task('copy:root', function() {
-	return gulp.src([
-			src+'/lib/material.min.css',
-			src+'/lib/*.map',
-			src+'/images/favicon.ico'
-		])
-		.pipe($.flatten())
-		.pipe(gulp.dest(dist));
-});
-
-/*----------------------------------------------------------------------
-	ASSETS
-*/
-
-gulp.task('assets', ['images', 'fonts']);
-
-gulp.task('images', function() {
-	return gulp.src(src+'/images/**/*.{svg,png,jpg}')
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.flatten())
-		.pipe(gulp.dest(dist+'/images'))
-		.pipe($.size({title: 'images'}));
-});
-
-gulp.task('fonts', function() {
-	return gulp.src([src+'/fonts/*.*'])
-		.pipe(gulp.dest(dist+'/fonts'));
-});
 
 /*----------------------------------------------------------------------
 	SERVER
