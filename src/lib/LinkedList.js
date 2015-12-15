@@ -1,4 +1,4 @@
-(function(global) {
+define(function() {
 
 var LinkedListNode = function() {
 	this.obj = null;
@@ -10,9 +10,9 @@ var LinkedListNode = function() {
 	A high-speed doubly-linked list of objects. Note that for speed reasons (using a dictionary lookup of
 	cached nodes) there can only be a single instance of an object in the list at the same time. Adding the same
 	object a second time will result in a silent return from the add method.
-	
+
 	In order to keep a track of node links, an object must be able to identify itself with a uniqueID function.
-	
+
 	To add an item use:
 	<pre><code>
 	  list.add(newItem);
@@ -34,9 +34,9 @@ var LinkedList = function() {
 	this.length = 0;
 	this.objToNodeMap = {}; // a quick lookup list to map linked list nodes to objects
 	this.uniqueID = Date.now() + '' + Math.floor(Math.random()*1000);
-	
+
 	this.sortArray = [];
-	
+
 	/*
 		Get the LinkedListNode for this object.
 		@param obj The object to get the node for
@@ -62,13 +62,13 @@ var LinkedList = function() {
 				return null;
 			}
 		}
-		
+
 		node.obj = obj;
 		node.free = false;
 		this.objToNodeMap[obj.uniqueID] = node;
 		return node;
 	};
-	
+
 	this.swapObjects = function(node, newObj) {
 		this.objToNodeMap[node.obj.uniqueID] = null;
 		this.objToNodeMap[newObj.uniqueID] = node;
@@ -81,12 +81,12 @@ var LinkedList = function() {
 	 */
 	this.add = function (obj) {
 		var node = this.objToNodeMap[obj.uniqueID];
-		
+
 		if (!node) {
 			node = this.addNode(obj);
 		} else {
 			if (node.free === false) return;
-			
+
 			// reusing a node, so we clean it up
 			// this caching of node/object pairs is the reason an object can only exist
 			// once in a list -- which also makes things faster (not always creating new node
@@ -175,7 +175,7 @@ var LinkedList = function() {
 		// check to see if we are now last
 		if (this.last == c) this.last = b;
 	};
-	
+
 	/*
 		Take everything off the list and put it in an array, sort it, then put it back.
 	 */
@@ -183,14 +183,14 @@ var LinkedList = function() {
 		var sortArray = this.sortArray;
 		var i, l, node = this.first;
 		sortArray.length = 0;
-		
+
 		while (node) {
 			sortArray.push(node.obj);
 			node = node.next;
 		}
-		
+
 		this.clear();
-		
+
 		sortArray.sort(compare);
 		// console.log(sortArray);
 		l = sortArray.length;
@@ -225,10 +225,10 @@ var LinkedList = function() {
 		node.next = null;
 
 		this.length--;
-		
+
 		return true;
 	};
-	
+
 	// remove the head and return it's object
 	this.shift = function() {
 		var node = this.first;
@@ -242,11 +242,11 @@ var LinkedList = function() {
 		if (node.next) {
 			node.next.prev = node.prev;
 		}
-		
+
 		// make the next on the list first (can be null)
 		this.first = node.next;
 		if (!node.next) this.last = null; // make sure we clear this
-		
+
 		node.free = true;
 		node.prev = null;
 		node.next = null;
@@ -254,7 +254,7 @@ var LinkedList = function() {
 		this.length--;
 		return node.obj;
 	};
-	
+
 	// remove the tail and return it's object
 	this.pop = function() {
 		var node = this.last;
@@ -267,11 +267,11 @@ var LinkedList = function() {
 		if (node.next) {
 			node.next.prev = node.prev;
 		}
-		
+
 		// this node's previous becomes last
 		this.last = node.prev;
 		if (!node.prev) this.first = null; // make sure we clear this
-		
+
 		node.free = true;
 		node.prev = null;
 		node.next = null;
@@ -279,7 +279,7 @@ var LinkedList = function() {
 		this.length--;
 		return node.obj;
 	};
-	
+
 	/**
 	 * Add the passed list to this list, leaving it untouched.
 	 */
@@ -296,25 +296,25 @@ var LinkedList = function() {
 	 */
 	this.clear = function() {
 		var next = this.first;
-		
+
 		while (next) {
 			next.free = true;
 			next = next.next;
 		}
-		
+
 		this.first = null;
 		this.length = 0;
 	};
-	
+
 	this.dispose = function() {
 		var next = this.first;
-		
+
 		while (next) {
 			next.obj = null;
 			next = next.next;
 		}
 		this.first = null;
-		
+
 		this.objToNodeMap = null;
 	};
 
@@ -339,8 +339,6 @@ LinkedList.generateID = function() {
 	return Math.random().toString(36).slice(2) + Date.now();
 };
 
-// UMD wrapper
-if (typeof exports === 'object') module.exports = LinkedList;
-else if (typeof define === 'function' && define.amd) define(function() { return LinkedList });
-else global.LinkedList = LinkedList;
-}(this));
+return LinkedList;
+
+});

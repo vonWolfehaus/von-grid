@@ -8,12 +8,16 @@ var reload = browserSync.reload;
 var path = require('path');
 
 var pkg = require('./package.json');
+var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
 
 var dist = './dist';
 var src = './src';
-var scripts = src+'/**/*.js';
-var styles = src+'/**/*.styl';
-var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
+
+var glob = {
+	scripts: src+'/**/*.js',
+	styles: src+'/**/*.styl'
+};
+
 
 /*----------------------------------------------------------------------
 	MACRO
@@ -30,7 +34,7 @@ gulp.task('clean', del.bind(null, [dist]));
 gulp.task('dev', ['clean'], function() {
 	runSequence(
 		['scripts'],
-		['serve']
+		['watch']
 	);
 });
 
@@ -38,23 +42,39 @@ gulp.task('dev', ['clean'], function() {
 	SCRIPTS
 */
 
+
+/*if (typeof exports === 'object') module.exports = Tools;
+else if (typeof define === 'function' && define.amd) define(function() { return Tools });
+else global.Tools = Tools;
+}(this));
+*/
+
 gulp.task('scripts', function() {
-	return gulp.src(bundles.modules)
-		.pipe($.sortAmd())
-		//.pipe($.plumber({errorHandler: handleErrors}))
+	return gulp.src(glob.scripts)
+		.pipe($.plumber({errorHandler: handleErrors}))
 		//.pipe($.eslint({ fix: true }))
 		//.pipe($.eslint.formatEach())
 		//.pipe($.eslint.failOnError())
-		.pipe($.sourcemaps.init())
 		.pipe($.amdclean.gulp({
-			prefixMode: 'camelCase'
-			}))
+			/*prefixTransform: function() {
+
+			},*/
+			removeAllRequires: true,
+			transformAMDChecks: false,
+			globalObject: true,
+			globalObjectName: 'hg',
+			ignoreModules: ['THREE'],
+			wrap: {
+				start: '(function(THREE) {\n',
+				end: '}(typeof THREE !== "undefined" ? THREE : null));'
+			}
+		}))
+		.pipe($.sourcemaps.init())
 		//.pipe($.preprocess(preprocessOpts))
-		.pipe($.concat('modules.js'))
+		.pipe($.concat('hex-grid.min.js'))
 		// .pipe($.uglify())
 		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe($.size({title: 'scripts:modules'}));
+		.pipe(gulp.dest(dist));
 });
 
 /*----------------------------------------------------------------------
@@ -81,44 +101,25 @@ gulp.task('styles', function() {
 
 // Defines the list of resources to watch for changes.
 function watch() {
-	gulp.watch(bundles.modules, ['scripts:modules', reload]);
-	gulp.watch(bundles.lib, ['scripts:lib', reload]);
-	gulp.watch(bundles.common, ['scripts:common', reload]);
-	gulp.watch([components+'/**/*.styl'], ['styles', reload]);
-	gulp.watch([src+'/**/*.html'], ['pages', reload]);
-	gulp.watch([src+'/images/**/*.{svg,png,jpg}'], ['images', reload]);
+	gulp.watch(glob.scripts, ['scripts', reload]);
+	gulp.watch(glob.styles, ['styles', reload]);
 }
 
-// Serves the landing page from "out" directory.
-gulp.task('serve', ['nodemon'], function() {
-	// watch and compile frontend
-	browserSync.init({
-		notify: false,
-		proxy: 'http://localhost:3000',
-		port: 4000
-	});
+gulp.task('watch', function() {
 	watch();
 });
 
-gulp.task('nodemon', function (cb) {
-	var started = false;
-
-	return $.nodemon({
-		script: 'server.js'
-	}).on('start', function() {
-		// to avoid nodemon being started multiple times
-		if (!started) {
-			cb();
-			started = true;
+// Serves the editor
+gulp.task('serve', function() {
+	// watch and compile frontend
+	browserSync.init({
+		notify: false,
+		server: {
+			baseDir: './editor'
 		}
-	}).on('restart', function() {
-		// reload connected browsers after a slight delay so the server should be booted by then
-		setTimeout(function reload() {
-			browserSync.reload({
-				stream: false
-			});
-		}, 200);
 	});
+
+	watch();
 });
 
 /*----------------------------------------------------------------------
@@ -129,8 +130,8 @@ function handleErrors() {
 	var args = Array.prototype.slice.call(arguments);
 	// Send error to notification center with gulp-notify
 	$.notify.onError({
-		title: "Build error",
-		message: "<%= error%>",
+		title: 'Build error',
+		message: '<%= error%>',
 		showStack: true
 	}).apply(this, args);
 

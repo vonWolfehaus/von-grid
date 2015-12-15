@@ -1,5 +1,5 @@
-(function(global) {
-    
+define(function() {
+
 var SignalBinding = function (signal, listener, isOnce, listenerContext, priority) {
 
     /**
@@ -127,7 +127,7 @@ SignalBinding.prototype.constructor = SignalBinding;
 
 /**
 * A Signal is used for object communication via a custom broadcaster instead of Events.
-* 
+*
 * @class Signal
 * @constructor
 */
@@ -492,8 +492,6 @@ Signal.prototype = {
 
 Signal.prototype.constructor = Signal;
 
-// UMD wrapper
-if (typeof exports === 'object') module.exports = Signal;
-else if (typeof define === 'function' && define.amd) define(function() { return Signal });
-else global.Signal = Signal;
-}(this));
+return Signal;
+
+});
