@@ -81,15 +81,28 @@ gulp.task('scripts', function() {
 
 gulp.task('build', function(next) {
 	requirejs.optimize({
-		'findNestedDependencies': true,
-		'baseUrl': glob.scripts,
-		'optimize': 'none',
-		'out': dist,
-		'onModuleBundleComplete': function(data) {
+		findNestedDependencies: true,
+		baseUrl: src,
+		optimize: 'none',
+		out: dist+'/hex-grid.js',
+		name: 'Board',
+		onModuleBundleComplete: function(data) {
 			outputFile = data.path;
 
 			fs.writeFileSync(outputFile, amdclean.clean({
-				'filePath': outputFile
+				/*prefixTransform: function() {
+
+				},*/
+				filePath: outputFile,
+				removeAllRequires: true,
+				transformAMDChecks: false,
+				globalObject: true,
+				globalObjectName: 'hg',
+				ignoreModules: ['THREE'],
+				wrap: {
+					start: '(function(THREE) {\n',
+					end: '}(typeof THREE !== "undefined" ? THREE : null));'
+				}
 			}));
 
 			next();
