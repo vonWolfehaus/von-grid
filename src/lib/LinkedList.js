@@ -1,4 +1,4 @@
-define(function() {
+define('LinkedList', function() {
 
 var LinkedListNode = function() {
 	this.obj = null;

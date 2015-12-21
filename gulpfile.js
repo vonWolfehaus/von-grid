@@ -6,6 +6,8 @@ var runSequence = require('run-sequence');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 var path = require('path');
+var requirejs = require('requirejs');
+var amdclean = require('amdclean');
 
 var pkg = require('./package.json');
 var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
@@ -75,6 +77,24 @@ gulp.task('scripts', function() {
 		// .pipe($.uglify())
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(dist));
+});
+
+gulp.task('build', function(next) {
+	requirejs.optimize({
+		'findNestedDependencies': true,
+		'baseUrl': glob.scripts,
+		'optimize': 'none',
+		'out': dist,
+		'onModuleBundleComplete': function(data) {
+			outputFile = data.path;
+
+			fs.writeFileSync(outputFile, amdclean.clean({
+				'filePath': outputFile
+			}));
+
+			next();
+		}
+	});
 });
 
 /*----------------------------------------------------------------------

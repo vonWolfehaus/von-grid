@@ -1,4 +1,4 @@
-define(function() {
+define('Signal', function() {
 
 var SignalBinding = function (signal, listener, isOnce, listenerContext, priority) {
 
