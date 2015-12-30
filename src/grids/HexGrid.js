@@ -202,6 +202,7 @@ hg.HexGrid.prototype = {
 		this.group.add(hex.mesh);
 
 		this.numCells++;
+		return hex;
 	},
 
 	remove: function(hex) {
@@ -346,7 +347,6 @@ hg.HexGrid.prototype = {
 			]
 		}*/
 	onLoad: function(json) {
-		console.log(json);
 		var i, c, hex, geo, mat;
 		var cells = json.cells;
 
@@ -380,6 +380,22 @@ hg.HexGrid.prototype = {
 
 			this.add(c, hex);
 		}
-	}
+	},
 
+	toJSON: function() {
+		var tiles = [];
+		var c, k;
+		for (k in this.cells) {
+			c = this.cells[k];
+			tiles.push({
+				x: c.x,
+				y: c.y,
+				z: c.z,
+				depth: c.w.depth,
+				matCacheId: 0,
+				customData: c.w.userData.mapData
+			});
+		}
+		return tiles;
+	}
 };

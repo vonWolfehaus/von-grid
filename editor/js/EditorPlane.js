@@ -156,7 +156,7 @@ EditorPlane.prototype = {
 					cell = this.grid.generateCellView(this.mouse.wheel * this.heightStep);
 					this.grid.add(this.grid.pixelToCell(this._vec3), cell);
 
-					this.mapChanged.dispatch();
+					this.mapChanged.dispatch(cell);
 				}
 				break;
 

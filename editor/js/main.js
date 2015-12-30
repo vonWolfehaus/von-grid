@@ -13,7 +13,7 @@ window.addEventListener('load', function(evt) {
 
 	var saveBtn = document.getElementById('save-btn');
 	saveBtn.onmouseup = function(evt) {
-		downloadMap();
+		saveMap();
 		return false;
 	};
 
@@ -93,8 +93,8 @@ window.addEventListener('load', function(evt) {
 				y: cell.y,
 				z: cell.z,
 				depth: cell.w.depth,
-				mat_cache_id: 0,
-				custom_data: cell.w.userData.mapData
+				matCacheId: 0,
+				customData: cell.w.userData.mapData
 			});
 		}
 		var mapMats = [];
@@ -162,15 +162,15 @@ window.addEventListener('load', function(evt) {
 		}
 	}
 
-	function onMapChange(data) {
+	function onMapChange(tile) {
 		dirtyMap = true;
 		saveTimer = timeTilAutoSave;
 	}
 
 	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js
-	var link = document.createElement( 'a' );
+	var link = document.createElement('a');
 	link.style.display = 'none';
-	document.body.appendChild( link ); // Firefox workaround
+	document.body.appendChild(link); // Firefox workaround
 
 	function exportString(output, filename) {
 		var blob = new Blob([output], {type: 'text/plain'});
@@ -195,23 +195,10 @@ window.addEventListener('load', function(evt) {
 		scene.add(board.group);
 	}
 
-	function save() {
-		// {x, y, z, depth, mat_cache_id, custom_data}
-		/*
-		{
-					cache_id: 0,
-					type: 'MeshLambertMaterial',
-					color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
-					imgURL: url
-				},
-				{
-					cache_id: 1, ...
-				}
-		*/
-	}
-
-	function downloadMap() {
+	function saveMap() {
 		var output = null;
+
+		map.cells = grid.toJSON();
 
 		try {
 			output = JSON.stringify(map, null, '\t');
