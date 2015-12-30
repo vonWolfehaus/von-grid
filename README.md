@@ -6,33 +6,41 @@ I never found a good (and free!) library for creating perfect hexagons and arran
 
 You can use the `Board` class with different graph types (hex and square), or you can make your own if you implement the interface.
 
-Please use this to make awesome hex-based web games. Or port the code and make awesome hex games there. Just make cool hex games, ok?
+Please use this to make awesome hex-based web games. Or port the code and make awesome hex games there. Just make awesome hex games, ok?
 
 ## Features
 
 - Simple API for attaching objects to the grid through `Board.js`
 - **A* pathfinding**
-- Make maps with `editor/index.html` (import/export via JSON)
+- Make maps with `editor/index.html` (save/load with `.json` files)
 - Varied height
 - Sparse maps
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
-- Square version ~~that can be used interchangeably~~(currently working but lots of disparities as I build the Map Maker)
+- Square grid ~~that can be used interchangeably~~(currently working but lots of disparities as I build the editor)
+
+## Roadmap
+
+- Textured tile support (UV creation)
+- Vastly improved editor
+- Abstract graph
 
 ## Usage
 
 #### Basic board
 
+![screenshot](hex-grid-basic.jpg)
+
 ```javascript
-var scene = new Scene({ // I made a very handy util for creating three.js scenes quickly
+var scene = new hg.Scene({ // I made a very handy util for creating three.js scenes quickly
 	cameraPosition: {x:0, y:150, z:150}
 }, true); // add orbit controls
 
-var grid = new HexGrid({
+var grid = new hg.HexGrid({
 	rings: 4
 });
 
-var board = new Board(grid);
+var board = new hg.Board(grid);
 
 scene.add(board.group);
 scene.focusOn(board.group);
@@ -44,9 +52,6 @@ function update() {
 	requestAnimationFrame(update);
 }
 ```
-Produces this:
-
-![screenshot](hex-grid-basic.jpg)
 
 #### Examples
 

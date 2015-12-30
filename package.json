@@ -7,7 +7,6 @@
     "start": "node server/serv.js"
   },
   "devDependencies": {
-    "amdclean": "^2.7.0",
     "browser-sync": "^2.2.3",
     "del": "^2.0.2",
     "gulp": "^3.9.0",
@@ -25,7 +24,6 @@
     "gulp-uglify": "^1.5.1",
     "gulp-util": "^3.0.4",
     "gulp-wrap": "^0.11.0",
-    "requirejs": "^2.1.22",
     "run-sequence": "^1.0.2"
   },
   "dependencies": {}
