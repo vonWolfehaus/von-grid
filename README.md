@@ -19,7 +19,7 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
 - Square grid ~~that can be used interchangeably~~(currently working but lots of disparities as I build the editor)
 
-## Roadmap
+#### Roadmap
 
 - Textured tile support (UV creation)
 - Vastly improved editor
