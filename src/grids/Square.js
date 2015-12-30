@@ -32,7 +32,7 @@ hg.Square = function(size, scale, geometry, material) {
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({
 			color: color,
-			ambient: color
+			// ambient: color
 		});
 	}
 

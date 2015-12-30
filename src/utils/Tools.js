@@ -34,7 +34,8 @@ hg.Tools = {
 		angle %= this.TAU;
 		if (angle > this.PI) {
 			angle -= this.TAU;
-		} else if (angle < -this.PI) {
+		}
+		else if (angle < -this.PI) {
 			angle += this.TAU;
 		}
 		return angle;
@@ -61,7 +62,8 @@ hg.Tools = {
 			if (obj.constructor && !Object.prototype.hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')) {
 				return false;
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			return false;
 		}
 
@@ -85,7 +87,7 @@ hg.Tools = {
 			i = 2;
 		}
 
-		for ( ; i < length; i++) {
+		while (i < length) {
 			// Only deal with non-null/undefined values
 			if ((options = arguments[i]) !== null) {
 				// Extend the base object
@@ -118,6 +120,7 @@ hg.Tools = {
 					}
 				}
 			}
+			i++;
 		}
 
 		// Return the modified object
@@ -137,28 +140,29 @@ hg.Tools = {
 	/*
 		@source: http://jsperf.com/radix-sort
 	 */
-	radixSort: function(arr, idx_begin, idx_end, bit) {
-		idx_begin = idx_begin || 0;
-		idx_end = idx_end || arr.length;
+	radixSort: function(arr, idxBegin, idxEnd, bit) {
+		idxBegin = idxBegin || 0;
+		idxEnd = idxEnd || arr.length;
 		bit = bit || 31;
-		if (idx_begin >= (idx_end - 1) || bit < 0) {
+		if (idxBegin >= (idxEnd - 1) || bit < 0) {
 			return;
 		}
-		var idx = idx_begin;
-		var idx_ones = idx_end;
+		var idx = idxBegin;
+		var idxOnes = idxEnd;
 		var mask = 0x1 << bit;
-		while (idx < idx_ones) {
+		while (idx < idxOnes) {
 			if (arr[idx] & mask) {
-				--idx_ones;
+				--idxOnes;
 				var tmp = arr[idx];
-				arr[idx] = arr[idx_ones];
-				arr[idx_ones] = tmp;
-			} else {
+				arr[idx] = arr[idxOnes];
+				arr[idxOnes] = tmp;
+			}
+			else {
 				++idx;
 			}
 		}
-		this.radixSort(arr, idx_begin, idx_ones, bit-1);
-		this.radixSort(arr, idx_ones, idx_end, bit-1);
+		this.radixSort(arr, idxBegin, idxOnes, bit-1);
+		this.radixSort(arr, idxOnes, idxEnd, bit-1);
 	},
 
 	randomizeRGB: function(base, range) {
@@ -166,7 +170,7 @@ hg.Tools = {
 		var color = 'rgb(';
 		var i, c;
 		range = this.randomInt(range);
-		for (i = 0; i < 3; i++ ) {
+		for (i = 0; i < 3; i++) {
 			c = parseInt(rgb[i]) + range;
 			if (c < 0) c = 0;
 			else if (c > 255) c = 255;
@@ -178,19 +182,7 @@ hg.Tools = {
 	},
 
 	getJSON: function(url, callback, scope) {
-		var xhr;
-		if (typeof XMLHttpRequest !== 'undefined') {
-			xhr = new XMLHttpRequest();
-		}
-		else {
-			var versions = ["MSXML2.XmlHttp.5.0", "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0", "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
-			for (var i = 0, len = versions.length; i < len; i++) {
-				try {
-					xhr = new ActiveXObject(versions[i]);
-					break;
-				} catch (err) { }
-			}
-		}
+		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 			if (this.readyState < 4 || this.status !== 200) {
 				console.warn('[Tools] Error - '+this.statusText +' - loading '+url);

@@ -1,4 +1,4 @@
-var hg = {
+var hg = { // eslint-disable-line
 	VERSION: '0.1.0',
 
 	PI: Math.PI,

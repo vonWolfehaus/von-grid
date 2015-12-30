@@ -6,11 +6,9 @@ var runSequence = require('run-sequence');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 var path = require('path');
-var requirejs = require('requirejs');
-var amdclean = require('amdclean');
 
 var pkg = require('./package.json');
-var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
+//var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
 
 var dist = './dist';
 var src = './src';
@@ -47,9 +45,9 @@ gulp.task('dev', ['clean'], function() {
 gulp.task('scripts', function() {
 	return gulp.src(glob.scripts)
 		.pipe($.plumber({errorHandler: handleErrors}))
-		//.pipe($.eslint({ fix: true }))
-		//.pipe($.eslint.formatEach())
-		//.pipe($.eslint.failOnError())
+		.pipe($.eslint({ fix: true }))
+		.pipe($.eslint.formatEach())
+		.pipe($.eslint.failOnError())
 		.pipe($.sourcemaps.init())
 		.pipe($.concat('hex-grid.min.js'))
 		.pipe($.uglify())

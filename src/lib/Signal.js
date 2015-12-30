@@ -1,6 +1,5 @@
 (function() {
     var SignalBinding = function (signal, listener, isOnce, listenerContext, priority) {
-
         /**
         * @property _listener - Handler function bound to the signal.
         * @private
@@ -29,11 +28,9 @@
         * @private
         */
         this._priority = priority || 0;
-
     };
 
     SignalBinding.prototype = {
-
         /**
         * If binding is active and should be executed.
         * @property {boolean} active
@@ -59,13 +56,11 @@
 
             var handlerReturn, params;
 
-            if (this.active && !!this._listener)
-            {
+            if (this.active && !!this._listener) {
                 params = this.params ? this.params.concat(paramsArr) : paramsArr;
                 handlerReturn = this._listener.apply(this.context, params);
 
-                if (this.isOnce)
-                {
+                if (this.isOnce) {
                     this.detach();
                 }
             }
@@ -110,7 +105,6 @@
         toString: function () {
             return '[SignalBinding isOnce:' + this.isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
         }
-
     };
 
     SignalBinding.prototype.constructor = SignalBinding;
@@ -131,7 +125,6 @@
     * @constructor
     */
     var Signal = function () {
-
         /**
         * @property {Array.<SignalBinding>} _bindings - Internal variable.
         * @private
@@ -157,7 +150,6 @@
     };
 
     Signal.prototype = {
-
         /**
         * If Signal should keep record of previously dispatched parameters and
         * automatically execute listener during `add()`/`addOnce()` if Signal was
@@ -187,12 +179,9 @@
         * @private
         */
         validateListener: function (listener, fnName) {
-
-            if (typeof listener !== 'function')
-            {
+            if (typeof listener !== 'function') {
                 throw new Error('Signal: listener is a required param of {fn}() and should be a Function.'.replace('{fn}', fnName));
             }
-
         },
 
         /**
@@ -205,32 +194,26 @@
         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
         */
         _registerListener: function (listener, isOnce, listenerContext, priority) {
-
             var prevIndex = this._indexOfListener(listener, listenerContext);
             var binding;
 
-            if (prevIndex !== -1)
-            {
+            if (prevIndex !== -1) {
                 binding = this._bindings[prevIndex];
 
-                if (binding.isOnce !== isOnce)
-                {
+                if (binding.isOnce !== isOnce) {
                     throw new Error('You cannot add' + (isOnce ? '' : 'Once') + '() then add' + (!isOnce ? '' : 'Once') + '() the same listener without removing the relationship first.');
                 }
             }
-            else
-            {
+            else {
                 binding = new SignalBinding(this, listener, isOnce, listenerContext, priority);
                 this._addBinding(binding);
             }
 
-            if (this.memorize && this._prevParams)
-            {
+            if (this.memorize && this._prevParams) {
                 binding.execute(this._prevParams);
             }
 
             return binding;
-
         },
 
         /**
@@ -239,7 +222,6 @@
         * @param {SignalBinding} binding - An Object representing the binding between the Signal and listener.
         */
         _addBinding: function (binding) {
-
             //  Simplified insertion sort
             var n = this._bindings.length;
 
@@ -249,7 +231,6 @@
             while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
 
             this._bindings.splice(n + 1, 0, binding);
-
         },
 
         /**
@@ -259,22 +240,18 @@
         * @return {number} The index of the listener within the private bindings array.
         */
         _indexOfListener: function (listener, context) {
-
             var n = this._bindings.length;
             var cur;
 
-            while (n--)
-            {
+            while (n--) {
                 cur = this._bindings[n];
 
-                if (cur._listener === listener && cur.context === context)
-                {
+                if (cur._listener === listener && cur.context === context) {
                     return n;
                 }
             }
 
             return -1;
-
         },
 
         /**
@@ -286,9 +263,7 @@
         * @return {boolean} If Signal has the specified listener.
         */
         has: function (listener, context) {
-
             return this._indexOfListener(listener, context) !== -1;
-
         },
 
         /**
@@ -301,11 +276,9 @@
         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
         */
         add: function (listener, listenerContext, priority) {
-
             this.validateListener(listener, 'add');
 
             return this._registerListener(listener, false, listenerContext, priority);
-
         },
 
         /**
@@ -318,11 +291,9 @@
         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
         */
         addOnce: function (listener, listenerContext, priority) {
-
             this.validateListener(listener, 'addOnce');
 
             return this._registerListener(listener, true, listenerContext, priority);
-
         },
 
         /**
@@ -334,19 +305,16 @@
         * @return {function} Listener handler function.
         */
         remove: function (listener, context) {
-
             this.validateListener(listener, 'remove');
 
             var i = this._indexOfListener(listener, context);
 
-            if (i !== -1)
-            {
+            if (i !== -1) {
                 this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
                 this._bindings.splice(i, 1);
             }
 
             return listener;
-
         },
 
         /**
@@ -356,32 +324,25 @@
         * @param {object} [context=null] - If specified only listeners for the given context will be removed.
         */
         removeAll: function (context) {
-
             if (typeof context === 'undefined') { context = null; }
 
             var n = this._bindings.length;
 
-            while (n--)
-            {
-                if (context)
-                {
-                    if (this._bindings[n].context === context)
-                    {
+            while (n--) {
+                if (context) {
+                    if (this._bindings[n].context === context) {
                         this._bindings[n]._destroy();
                         this._bindings.splice(n, 1);
                     }
                 }
-                else
-                {
+                else {
                     this._bindings[n]._destroy();
                 }
             }
 
-            if (!context)
-            {
+            if (!context) {
                 this._bindings.length = 0;
             }
-
         },
 
         /**
@@ -391,9 +352,7 @@
         * @return {number} Number of listeners attached to the Signal.
         */
         getNumListeners: function () {
-
             return this._bindings.length;
-
         },
 
         /**
@@ -404,9 +363,7 @@
         * @method Signal#halt
         */
         halt: function () {
-
             this._shouldPropagate = false;
-
         },
 
         /**
@@ -416,9 +373,7 @@
         * @param {any} [params] - Parameters that should be passed to each handler.
         */
         dispatch: function () {
-
-            if (!this.active)
-            {
+            if (!this.active) {
                 return;
             }
 
@@ -426,13 +381,11 @@
             var n = this._bindings.length;
             var bindings;
 
-            if (this.memorize)
-            {
+            if (this.memorize) {
                 this._prevParams = paramsArr;
             }
 
-            if (!n)
-            {
+            if (!n) {
                 //  Should come after memorize
                 return;
             }
@@ -446,7 +399,6 @@
                 n--;
             }
             while (bindings[n] && this._shouldPropagate && bindings[n].execute(paramsArr) !== false);
-
         },
 
         /**
@@ -456,9 +408,7 @@
         * @method Signal#forget
         */
         forget: function() {
-
             this._prevParams = null;
-
         },
 
         /**
@@ -468,12 +418,10 @@
         * @method Signal#dispose
         */
         dispose: function () {
-
             this.removeAll();
 
             delete this._bindings;
             delete this._prevParams;
-
         },
 
         /**
@@ -482,9 +430,7 @@
         * @return {string} String representation of the object.
         */
         toString: function () {
-
             return '[Signal active:'+ this.active +' numListeners:'+ this.getNumListeners() +']';
-
         }
 
     };

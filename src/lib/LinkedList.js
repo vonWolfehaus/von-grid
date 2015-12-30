@@ -91,7 +91,8 @@
 
 			if (!node) {
 				node = this.addNode(obj);
-			} else {
+			}
+			else {
 				if (node.free === false) return;
 
 				// reusing a node, so we clean it up
@@ -110,7 +111,8 @@
 				this.last = node;
 				node.next = null; // clear just in case
 				node.prev = null;
-			} else {
+			}
+			else {
 				if (!this.last) {
 					throw new Error("[LinkedList.add] No last in the list -- that shouldn't happen here");
 				}
@@ -332,7 +334,7 @@
 			console.log('====================' + msg + '=====================');
 			var a = this.first;
 			while (a) {
-				console.log("{" + a.obj.toString() + "} previous=" + ( a.prev ? a.prev.obj : "NULL"));
+				console.log("{" + a.obj.toString() + "} previous=" + (a.prev ? a.prev.obj : "NULL"));
 				a = a.next();
 			}
 			console.log("===================================");

@@ -1,17 +1,9 @@
 {
 	"root": true,
 	"extends": "eslint:recommended",
-	"ecmaFeatures": {
-		"arrowFunctions": true,
-	},
 	"globals": {
-		"riot": true,
-		"moment": true,
-		"page": true,
-		"componentHandler": true,
-		"Baobab", true,
-		"WildEmitter", true,
-		"moment", true
+		"hg": true,
+		"THREE": true
 	},
 	"rules": {
 		"arrow-spacing": [1, {"before": true, "after": true}],
@@ -24,7 +16,7 @@
 		"comma-style": 1,
 		"consistent-this": [1, "self"],
 		"eol-last": 2,
-		"func-style": [1, "declaration"],
+		"func-style": 0,
 		"indent": 0,
 		"key-spacing": 1,
 		"linebreak-style": [2, "unix"],
@@ -43,7 +35,7 @@
 		"no-unreachable": 2,
 		"no-label-var": 1,
 		"no-undef-init": 2,
-		"no-undefined": 1,
+		"no-undefined": 0,
 		"no-unused-vars": [1, {args: "none"}],
 		"no-use-before-define": 0,
 		"operator-linebreak": [1, "after"],
@@ -60,7 +52,6 @@
 		"spaced-comment": 0
 	},
 	"env": {
-		"browser": true,
-		"amd": true
+		"browser": true
 	}
 }

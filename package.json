@@ -3,9 +3,6 @@
   "description": "Hexagonal (and other) grid stuff with three.js",
   "repository": "https://github.com/vonWolfehaus/hex-grid",
   "license": "MIT",
-  "scripts": {
-    "start": "node server/serv.js"
-  },
   "devDependencies": {
     "browser-sync": "^2.2.3",
     "del": "^2.0.2",

@@ -273,14 +273,14 @@ hg.HexGrid.prototype = {
 		var ry = Math.round(h.y);
 		var rz = Math.round(h.z);
 
-		var x_diff = Math.abs(rx - h.x);
-		var y_diff = Math.abs(ry - h.y);
-		var z_diff = Math.abs(rz - h.z);
+		var xDiff = Math.abs(rx - h.x);
+		var yDiff = Math.abs(ry - h.y);
+		var zDiff = Math.abs(rz - h.z);
 
-		if (x_diff > y_diff && x_diff > z_diff) {
+		if (xDiff > yDiff && xDiff > zDiff) {
 			rx = -ry-rz;
 		}
-		else if (y_diff > z_diff) {
+		else if (yDiff > zDiff) {
 			ry = -rx-rz;
 		}
 		else {
@@ -292,8 +292,8 @@ hg.HexGrid.prototype = {
 	},
 
 	hexDistance: function(a, b) {
-		var ac = hexToCube(a);
-		var bc = hexToCube(b);
+		var ac = this.hexToCube(a);
+		var bc = this.hexToCube(b);
 		return this.cubeDistance(ac, bc);
 	},
 
@@ -309,7 +309,7 @@ hg.HexGrid.prototype = {
 
 	// create a flat, hexagon-shaped grid.
 	generate: function() {
-		var x, y, z, c, i, hex;
+		var x, y, z, c;
 		c = new THREE.Vector3();
 
 		this.meshes = [];
@@ -329,7 +329,7 @@ hg.HexGrid.prototype = {
 		xyz are hex cube coordinates
 		json = {
 			cells: [
-				{x, y, z, depth, mat_cache_id, custom_data},
+				{x, y, z, depth, matCacheId, customData},
 				...
 			],
 			materials: [
@@ -340,14 +340,14 @@ hg.HexGrid.prototype = {
 					imgURL: url
 				},
 				{
-					cache_id: 1, ...
+					cacheId: 1, ...
 				}
 				...
 			]
 		}*/
 	onLoad: function(json) {
 		console.log(json);
-		var i, c, v, hex, geo, mat;
+		var i, c, hex, geo, mat;
 		var cells = json.cells;
 
 		this.meshes = [];
@@ -376,7 +376,7 @@ hg.HexGrid.prototype = {
 
 			hex = new hg.Hex(this.cellSize, this.cellScale, geo, mat);
 			hex.depth = this.extrudeSettings.amount;
-			hex.userData.mapData = c.custom_data;
+			hex.userData.mapData = c.customData;
 
 			this.add(c, hex);
 		}
