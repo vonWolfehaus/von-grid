@@ -2,11 +2,11 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
-	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
-	
+
 	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
@@ -21,298 +21,294 @@
 </head>
 
 <body>
-	
-	<div id="view"></div>
-	
 
-<script type="text/javascript" src="../src/lib/three.min.js"></script>
-<!-- <script type="text/javascript" src="../src/lib/OrbitControls.js"></script> -->
-<script type="text/javascript" src="../src/lib/require.js"></script>
-<script type="text/javascript">
-/*
-	Hi! In this example I setup a regular board, choose a couple random spots, and put a start and end sprite on them, then have the pathfinder do its thing. There's a lot of sprite interaction logic so you can drag the end points around as well as place and remove obstacles.
-	
-	If you want to see the pathfinder in action on varied terrain, go change the Grid's generateCellView() function to use a height of `Math.floor(Math.random() * 40)+1` (for example), then comment out the cameraType just below here so it'll use a perspective camera instead, allowing you to see the differences in height.
-	
-	I also added an example heuristic filter that will discard neighbors that are too tall to "jump" to, forcing the algorithm to find a winding path through the valleys and canyons. It's also possible to not find a path in this scenario, in which case `null` is returned.
-*/
-requirejs.config({
-	baseUrl: '../src'
-});
-requirejs(['utils/Tools', 'graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'utils/Scene', 'utils/MouseCaster', '../examples/js/Sprite', 'utils/SelectionManager'],
-function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager) {
-	// setup the thing
-	var scene = new Scene({
-		element: document.getElementById('view'),
-		cameraType: 'OrthographicCamera',
-		cameraPosition: {x:0, y:200, z:0}
-	}, false);
-	
-	var grid = new HexGrid({
-		rings: 6,
-		cellSize: 10,
-		cellScale: 0.95
-	});
-	/*var grid = new SquareGrid({
-		width: 10,
-		height: 10,
-		cellSize: 15,
-		cellScale: 0.95
-	});*/
-	
-	var mouse = new MouseCaster(scene.container, scene.camera);
-	// we only want to scan while the mouse is held down
-	mouse.active = false;
-	
-	var board = new Board(grid, {
-		allowDiagonal: false,
-		// this is the fallback, but you can override it by passing a specific heuristic in board.findPath()
-		heuristicFilter: isCellTraversable
-	});
-	
-	scene.add(board.group);
-	scene.focusOn(board.group);
-	
-	// populate the board
-	var spriteConfig = {
-		container: board.group,
-		url: '../examples/img/water.png',
-		scale: 10,
-		offsetY: 6
-	};
-	
-	var a = board.getRandomCell();
-	var b = board.getRandomCell();
-	if (a === b) {
-		// they're on top of each other, so place one at a diagonal of the other
-		var neighbors = grid.getNeighbors(a, true);
-		// the diagonals are added to the list after all the others are, so we pick the last one
-		b = neighbors[neighbors.length-1];
-	}
-	
-	var startSprite = new Sprite(spriteConfig);
-	startSprite.activate();
-	board.placeEntityAtCell(startSprite, a);
-	
-	spriteConfig.url = '../examples/img/fire.png'
-	var endSprite = new Sprite(spriteConfig);
-	endSprite.activate();
-	board.placeEntityAtCell(endSprite, b);
-	
-	// path markers
-	spriteConfig.url = '../examples/img/marker.png'
-	spriteConfig.scale = 7;
-	var i;
-	var markers = [];
-	for (i = 0; i < 20; i++) {
-		markers[i] = new Sprite(spriteConfig);
-	}
-	
-	// obstacles
-	var obstacleConfig = {
-		container: board.group,
-		url: '../examples/img/obstacle.png',
-		scale: 10,
-		offsetY: 6,
-		obstacle: true
-	};
-	var obstacles = [];
-	var obstaclesUsed = [];
-	for (i = 0; i < 20; i++) {
-		obstacles[i] = new Sprite(obstacleConfig);
-	}
-	
-	// keep track of states
-	var movingPiece = null;
-	var lastCell = null;
-	
-	// handle interaction
-	mouse.signal.add(function(type, obj) {
-		switch (type) {
-			case MouseCaster.DOWN:
-				// force an update to get latest data from the mouse's raycast
-				mouse.active = true;
-				mouse.update();
-				obj = mouse.pickedObject;
-				// "pick up" the piece we selected, if any
-				movingPiece = obj;
-				if (obj) {
-					if (obj.objectType === Board.Cell) {
-						// if a cell was clicked, pick up the entity that was sitting on it, if any
-						movingPiece = obj.entity;
-						lastCell = obj;
-						
-						if (!movingPiece) {
-							// place obstacle on empty cells
-							placeObstacle(obj);
+	<div id="view"></div>
+
+	<script type="text/javascript" src="../lib/three.min.js"></script>
+	<!-- <script type="text/javascript" src="../lib/OrbitControls.js"></script> -->
+	<script type="text/javascript" src="../dist/hex-grid.min.js"></script>
+	<script type="text/javascript" src="js/Sprite.js"></script>
+	<script type="text/javascript">
+	/*
+		Hi! In this example I setup a regular board, choose a couple random spots, put a start and end sprite on them, then have the pathfinder do its thing. There's a lot of sprite interaction logic so you can drag the end points around as well as place and remove obstacles.
+
+		If you want to see the pathfinder in action on varied terrain, go change the Grid's generateCellView() function to use a height of `Math.floor(Math.random() * 40)+1` (for example), then comment out the cameraType just below here so it'll use a perspective camera instead, allowing you to see the differences in height.
+
+		I also added an example heuristic filter that will discard neighbors that are too tall to "jump" to, forcing the algorithm to find a winding path through the valleys and canyons. It's also possible to not find a path in this scenario, in which case `null` is returned.
+	*/
+	window.addEventListener('load', function(evt) {
+		// setup the thing
+		var scene = new hg.Scene({
+			element: document.getElementById('view'),
+			cameraType: 'OrthographicCamera',
+			cameraPosition: {x:0, y:200, z:0}
+		}, false);
+
+		var grid = new hg.HexGrid({
+			rings: 6,
+			cellSize: 10,
+			cellScale: 0.95
+		});
+		/*var grid = new SquareGrid({
+			width: 10,
+			height: 10,
+			cellSize: 15,
+			cellScale: 0.95
+		});*/
+
+		var mouse = new hg.MouseCaster(scene.container, scene.camera);
+		// we only want to scan while the mouse is held down
+		mouse.active = false;
+
+		var board = new hg.Board(grid, {
+			allowDiagonal: false,
+			// this is the fallback, but you can override it by passing a specific heuristic in board.findPath()
+			heuristicFilter: isCellTraversable
+		});
+
+		scene.add(board.group);
+		scene.focusOn(board.group);
+
+		// populate the board
+		var spriteConfig = {
+			container: board.group,
+			url: '../examples/img/water.png',
+			scale: 10,
+			offsetY: 6
+		};
+
+		var a = board.getRandomCell();
+		var b = board.getRandomCell();
+		if (a === b) {
+			// they're on top of each other, so place one at a diagonal of the other
+			var neighbors = grid.getNeighbors(a, true);
+			// the diagonals are added to the list after all the others are, so we pick the last one
+			b = neighbors[neighbors.length-1];
+		}
+
+		var startSprite = new Sprite(spriteConfig);
+		startSprite.activate();
+		board.placeEntityAtCell(startSprite, a);
+
+		spriteConfig.url = '../examples/img/fire.png'
+		var endSprite = new Sprite(spriteConfig);
+		endSprite.activate();
+		board.placeEntityAtCell(endSprite, b);
+
+		// path markers
+		spriteConfig.url = '../examples/img/marker.png'
+		spriteConfig.scale = 7;
+		var i;
+		var markers = [];
+		for (i = 0; i < 20; i++) {
+			markers[i] = new Sprite(spriteConfig);
+		}
+
+		// obstacles
+		var obstacleConfig = {
+			container: board.group,
+			url: '../examples/img/obstacle.png',
+			scale: 10,
+			offsetY: 6,
+			obstacle: true
+		};
+		var obstacles = [];
+		var obstaclesUsed = [];
+		for (i = 0; i < 20; i++) {
+			obstacles[i] = new Sprite(obstacleConfig);
+		}
+
+		// keep track of states
+		var movingPiece = null;
+		var lastCell = null;
+
+		// handle interaction
+		mouse.signal.add(function(type, obj) {
+			switch (type) {
+				case hg.MouseCaster.DOWN:
+					// force an update to get latest data from the mouse's raycast
+					mouse.active = true;
+					mouse.update();
+					obj = mouse.pickedObject;
+					// "pick up" the piece we selected, if any
+					movingPiece = obj;
+					if (obj) {
+						if (obj.objectType === hg.CEL) {
+							// if a cell was clicked, pick up the entity that was sitting on it, if any
+							movingPiece = obj.entity;
+							lastCell = obj;
+
+							if (!movingPiece) {
+								// place obstacle on empty cells
+								placeObstacle(obj);
+							}
+						}
+						else if (movingPiece !== startSprite && movingPiece !== endSprite && !movingPiece.obstacle) {
+							// place obstacle on cells with markers on them too
+							placeObstacle(obj.cell);
 						}
 					}
-					else if (movingPiece !== startSprite && movingPiece !== endSprite && !movingPiece.obstacle) {
-						// place obstacle on cells with markers on them too
-						placeObstacle(obj.cell);
+
+					if (movingPiece) {
+						// since we're moving the path around again, clear the old one visually
+						clearMarkers();
+
+						if (mouse.shift) {
+							removeObstacle(movingPiece);
+							movingPiece = null;
+							// map changed, so update the path
+							createPath();
+							break;
+						}
+
+						if (movingPiece.objectType === hg.ENT) {
+							lastCell = movingPiece.cell;
+						}
 					}
-				}
-				
-				if (movingPiece) {
-					// since we're moving the path around again, clear the old one visually
-					clearMarkers();
-					
-					if (mouse.shift) {
-						removeObstacle(movingPiece);
-						movingPiece = null;
-						// map changed, so update the path
+					break;
+
+				case hg.MouseCaster.UP:
+					// disable the mouse until the user clicks again
+					mouse.active = false;
+					if (movingPiece) {
+						// user was moving a piece around, so place it at the nearest cell
+						var c = findCellUnderMouse();
+						// update cell in case user moved obstacle
+						if (c && movingPiece.obstacle) {
+							movingPiece.cell.walkable = true;
+							c.walkable = false;
+						}
+						// or the last cell that we picked it up from, in case it was off the board/null
+						board.placeEntityAtCell(movingPiece, c || lastCell);
+						// now re-run the pathfinder
 						createPath();
-						break;
 					}
-					
-					if (movingPiece.objectType === Board.Entity) {
-						lastCell = movingPiece.cell;
-					}
-				}
-				break;
-				
-			case MouseCaster.UP:
-				// disable the mouse until the user clicks again
-				mouse.active = false;
-				if (movingPiece) {
-					// user was moving a piece around, so place it at the nearest cell
-					var c = findCellUnderMouse();
-					// update cell in case user moved obstacle
-					if (c && movingPiece.obstacle) {
-						movingPiece.cell.walkable = true;
-						c.walkable = false;
-					}
-					// or the last cell that we picked it up from, in case it was off the board/null
-					board.placeEntityAtCell(movingPiece, c || lastCell);
-					// now re-run the pathfinder
-					createPath();
-				}
-				movingPiece = null;
-				break;
-		}
-	}, this);
-	
-	// helpers
-	
-	function createPath() {
-		grid.traverse(deselectVisited);
-		var path = board.findPath(startSprite.cell, endSprite.cell);
-		// highlight the path with markers
-		if (path) {
-			for (var i = 0; i < path.length; i++) {
-				var s = markers[i];
-				if (!s) s = markers[i] = new Sprite(spriteConfig);
-				s.activate();
-				board.placeEntityAtCell(s, path[i]);
+					movingPiece = null;
+					break;
 			}
-			// see which cells were visited
-			grid.traverse(selectVisited);
-		}
-	}
-	
-	function findCellUnderMouse() {
-		var i, c;
-		var objects = mouse.allHits;
-		for (i = 0; i < objects.length; i++) {
-			c = objects[i].object.userData.structure;
-			if (c && c.objectType && c.objectType === Board.Cell) {
-				return c;
+		}, this);
+
+		// helpers
+
+		function createPath() {
+			grid.traverse(deselectVisited);
+			var path = board.findPath(startSprite.cell, endSprite.cell);
+			// highlight the path with markers
+			if (path) {
+				for (var i = 0; i < path.length; i++) {
+					var s = markers[i];
+					if (!s) s = markers[i] = new Sprite(spriteConfig);
+					s.activate();
+					board.placeEntityAtCell(s, path[i]);
+				}
+				// see which cells were visited
+				grid.traverse(selectVisited);
 			}
 		}
-		return null;
-	}
-	
-	function isCellTraversable(origin, next) {
-		// example of how to filter out neighbors that are too tall to traverse
-		// but allows the algorithm to "jump" down to whatever depth
-		if (next.depth - origin.depth > 10) {
-			return false; // no, filter out next
+
+		function findCellUnderMouse() {
+			var i, c;
+			var objects = mouse.allHits;
+			for (i = 0; i < objects.length; i++) {
+				c = objects[i].object.userData.structure;
+				if (c && c.objectType && c.objectType === hg.CEL) {
+					return c;
+				}
+			}
+			return null;
 		}
-		return true; // yes, keep next for consideration
-	}
-	
-	function selectVisited(c) {
-		if (c.visited) {
-			c.select();
+
+		function isCellTraversable(origin, next) {
+			// example of how to filter out neighbors that are too tall to traverse
+			// but allows the algorithm to "jump" down to whatever depth
+			if (next.depth - origin.depth > 10) {
+				return false; // no, filter out next
+			}
+			return true; // yes, keep next for consideration
 		}
-	}
-	
-	function deselectVisited(c) {
-		if (c.selected) {
-			c.deselect();
+
+		function selectVisited(c) {
+			if (c.visited) {
+				c.select();
+			}
 		}
-	}
-	
-	function clearMarkers() {
-		var i;
-		for (i = 0; i < markers.length; i++) {
-			markers[i].disable();
+
+		function deselectVisited(c) {
+			if (c.selected) {
+				c.deselect();
+			}
 		}
-	}
-	
-	function removeObstacle(obj) {
-		// poor man's object pool
-		var i = obstaclesUsed.indexOf(obj);
-		if (i !== -1) {
-			obstaclesUsed.splice(i, 1);
-			obstacles.push(obj);
-			obj.cell.walkable = true;
-			obj.cell.entity = null;
-			obj.cell = null;
-			obj.disable();
+
+		function clearMarkers() {
+			var i;
+			for (i = 0; i < markers.length; i++) {
+				markers[i].disable();
+			}
 		}
-	}
-	
-	function placeObstacle(cell) {
-		// poor man's object pool
-		var s = obstacles.pop();
-		if (!s) s = obstacles[obstacles.length] = new Sprite(obstacleConfig);
-		obstaclesUsed.push(s);
-		s.activate();
-		cell.walkable = false;
-		board.placeEntityAtCell(s, cell);
-		
-		// re-run the pathfinder with new obstacle
+
+		function removeObstacle(obj) {
+			// poor man's object pool
+			var i = obstaclesUsed.indexOf(obj);
+			if (i !== -1) {
+				obstaclesUsed.splice(i, 1);
+				obstacles.push(obj);
+				obj.cell.walkable = true;
+				obj.cell.entity = null;
+				obj.cell = null;
+				obj.disable();
+			}
+		}
+
+		function placeObstacle(cell) {
+			// poor man's object pool
+			var s = obstacles.pop();
+			if (!s) s = obstacles[obstacles.length] = new Sprite(obstacleConfig);
+			obstaclesUsed.push(s);
+			s.activate();
+			cell.walkable = false;
+			board.placeEntityAtCell(s, cell);
+
+			// re-run the pathfinder with new obstacle
+			createPath();
+		}
+
+		// start the thing
 		createPath();
-	}
-	
-	// start the thing
-	createPath();
-	update();
-	
-	function update() {
-		mouse.update();
-		if (movingPiece) {
-			movingPiece.position.copy(mouse.position);
-			movingPiece.position.y = 5 + movingPiece.offsetY;
+		update();
+
+		function update() {
+			mouse.update();
+			if (movingPiece) {
+				movingPiece.position.copy(mouse.position);
+				movingPiece.position.y = 5 + movingPiece.offsetY;
+			}
+			scene.render();
+			requestAnimationFrame(update);
 		}
-		scene.render();
-		requestAnimationFrame(update);
-	}
-	
-	function onMouseWheel(evt) {
-		// zooming an orthographic camera
-		evt.preventDefault();
-		evt.stopPropagation();
-		var delta = 0;
-		if (evt.wheelDelta !== undefined) { // WebKit / Opera / Explorer 9
-			delta = evt.wheelDelta;
+
+		function onMouseWheel(evt) {
+			// zooming an orthographic camera
+			evt.preventDefault();
+			evt.stopPropagation();
+			var delta = 0;
+			if (evt.wheelDelta !== undefined) { // WebKit / Opera / Explorer 9
+				delta = evt.wheelDelta;
+			}
+			else if (evt.detail !== undefined) { // Firefox
+				delta = -evt.detail;
+			}
+			if (delta > 0) {
+				scene.orthoZoom++;
+			}
+			else {
+				scene.orthoZoom--;
+			}
+			scene.updateOrthoZoom();
 		}
-		else if (evt.detail !== undefined) { // Firefox
-			delta = -evt.detail;
-		}
-		if (delta > 0) {
-			scene.orthoZoom++;
-		}
-		else {
-			scene.orthoZoom--;
-		}
-		scene.updateOrthoZoom();
-	}
-	
-	document.addEventListener('mousewheel', onMouseWheel, false );
-	document.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
-});
-</script>
+
+		document.addEventListener('mousewheel', onMouseWheel, false );
+		document.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
+	});
+	</script>
 </body>
 </html>

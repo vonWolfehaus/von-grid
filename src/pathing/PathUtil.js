@@ -1,8 +1,7 @@
 /*
     @source https://github.com/qiao/PathFinding.js/
 */
-
-define({
+hg.PathUtil = {
     /**
      * Backtrace according to the parent records and return the path.
      * (including both start and end nodes)
@@ -77,7 +76,7 @@ define({
             if (x0 === x1 && y0 === y1) {
                 break;
             }
-            
+
             e2 = 2 * err;
             if (e2 > -dy) {
                 err = err - dy;
@@ -242,4 +241,4 @@ define({
 
         return compressed;
     }
-});
+};

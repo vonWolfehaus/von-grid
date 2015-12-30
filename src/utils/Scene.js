@@ -1,11 +1,11 @@
-define(['utils/Tools'], function(Tools) {
 /*
 	Sets up and manages a THREEjs container, camera, and light, making it easy to get going.
 	Also provides camera control.
 
 	Assumes full screen.
  */
-var Scene = function(sceneConfig, controlConfig) {
+// 'utils/Tools'
+hg.Scene = function(sceneConfig, controlConfig) {
 	var sceneSettings = {
 		element: document.body,
 		alpha: true,
@@ -26,8 +26,8 @@ var Scene = function(sceneConfig, controlConfig) {
 		noZoom: false
 	};
 
-	Tools.merge(sceneSettings, sceneConfig);
-	Tools.merge(controlSettings, controlConfig);
+	hg.Tools.merge(sceneSettings, sceneConfig);
+	hg.Tools.merge(controlSettings, controlConfig);
 
 	this.renderer = new THREE.WebGLRenderer({
 		alpha: sceneSettings.alpha,
@@ -94,7 +94,7 @@ var Scene = function(sceneConfig, controlConfig) {
 	this.attachTo(sceneSettings.element);
 };
 
-Scene.prototype = {
+hg.Scene.prototype = {
 
 	attachTo: function(element) {
 		element.style.width = this.width + 'px';
@@ -135,7 +135,3 @@ Scene.prototype = {
 		this.camera.lookAt(obj.position);
 	}
 };
-
-return Scene;
-
-});

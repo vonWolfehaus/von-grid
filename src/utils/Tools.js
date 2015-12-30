@@ -1,22 +1,12 @@
-(function(global) {
-/*
-	Handy utility library.
-	@source https://github.com/vonWolfehaus/von-component/blob/master/src/Tools.js
-*/
-var Tools = {
-	PI: Math.PI,
-	TAU: Math.PI * 2,
-	DEG_TO_RAD: 0.0174532925,
-	RAD_TO_DEG: 57.2957795,
-	
+hg.Tools = {
 	clamp: function(val, min, max) {
 		return Math.max(min, Math.min(max, val));
 	},
-	
+
 	sign: function(val) {
 		return val && val / Math.abs(val);
 	},
-	
+
 	/**
 	 * If one value is passed, it will return something from -val to val.
 	 * Else it returns a value between the range specified by min, max.
@@ -27,7 +17,7 @@ var Tools = {
 		}
 		return Math.random() * (max - min) + min;
 	},
-	
+
 	// from min to (and including) max
 	randomInt: function(min, max) {
 		if (arguments.length === 1) {
@@ -35,11 +25,11 @@ var Tools = {
 		}
 		return (Math.random() * (max - min + 1) + min) | 0;
 	},
-	
+
 	normalize: function(v, min, max) {
 		return (v - min) / (max - min);
 	},
-	
+
 	getShortRotation: function(angle) {
 		angle %= this.TAU;
 		if (angle > this.PI) {
@@ -49,7 +39,7 @@ var Tools = {
 		}
 		return angle;
 	},
-	
+
 	generateID: function() {
 		return Math.random().toString(36).slice(2) + Date.now();
 	},
@@ -79,7 +69,7 @@ var Tools = {
 		// |obj| is a plain object, created by {} or constructed with new Object
 		return true;
 	},
-	
+
 	merge: function() {
 		var options, name, src, copy, copyIsArray, clone,
 			target = arguments[0] || {},
@@ -133,17 +123,17 @@ var Tools = {
 		// Return the modified object
 		return target;
 	},
-	
+
 	now: function() {
 		return window.nwf ? window.nwf.system.Performance.elapsedTime : window.performance.now();
 	},
-	
+
 	empty: function(node) {
 		while (node.lastChild) {
 			node.removeChild(node.lastChild);
 		}
 	},
-	
+
 	/*
 		@source: http://jsperf.com/radix-sort
 	 */
@@ -170,7 +160,7 @@ var Tools = {
 		this.radixSort(arr, idx_begin, idx_ones, bit-1);
 		this.radixSort(arr, idx_ones, idx_end, bit-1);
 	},
-	
+
 	randomizeRGB: function(base, range) {
 		var rgb = base.split(',');
 		var color = 'rgb(';
@@ -186,7 +176,7 @@ var Tools = {
 		color += ')';
 		return color;
 	},
-	
+
 	getJSON: function(url, callback, scope) {
 		var xhr;
 		if (typeof XMLHttpRequest !== 'undefined') {
@@ -200,7 +190,7 @@ var Tools = {
 					break;
 				} catch (err) { }
 			}
-		}	
+		}
 		xhr.onreadystatechange = function() {
 			if (this.readyState < 4 || this.status !== 200) {
 				console.warn('[Tools] Error - '+this.statusText +' - loading '+url);
@@ -212,9 +202,3 @@ var Tools = {
 		xhr.send('');
 	}
 };
-
-// UMD wrapper
-if (typeof exports === 'object') module.exports = Tools;
-else if (typeof define === 'function' && define.amd) define(function() { return Tools });
-else global.Tools = Tools;
-}(this));
