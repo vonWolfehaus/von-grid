@@ -3,28 +3,21 @@
 
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
-
-define(['utils/Loader', 'pathing/AStarFinder'], function(Loader, AStarFinder) {
-
-var Board = function(grid, finderConfig) {
+// 'utils/Loader', 'pathing/AStarFinder'
+hg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
 	// this.pieces = []; // haven't found a use for this yet
 	this.group = new THREE.Object3D();
 	this.grid = null;
-	this.finder = new AStarFinder(finderConfig);
+	this.finder = new hg.AStarFinder(finderConfig);
 	// need to keep a resource cache around, so this Loader does that, use it instead of THREE.ImageUtils
-	Loader.init();
+	hg.Loader.init();
 
 	this.setGrid(grid);
 };
 
-// useful enums for type checking. change to whatever fits your game. these are just examples
-Board.Cell = 'cell';
-Board.Entity = 'entity'; // dynamic things
-Board.Structure = 'structure'; // static things
-
-Board.prototype = {
+hg.Board.prototype = {
 
 	// smoothly animate a piece from its current position to the cell
 	moveEntityToCell: function(entity, cell) {
@@ -93,7 +86,3 @@ Board.prototype = {
 		this.group.add(newGrid.group);
 	}
 };
-
-return Board;
-
-});

@@ -3,10 +3,8 @@
 	[Cube coordinate system](http://www.redblobgames.com/grids/hexagons/).
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
-
-define(['utils/Loader', 'graphs/Hex', 'utils/Tools'], function(Loader, Hex, Tools) {
-
-var HexGrid = function(config) {
+// 'utils/Loader', 'graphs/Hex', 'utils/Tools'
+hg.HexGrid = function(config) {
 	if (!config) config = {};
 	var gridSettings = {
 		rings: 5, // creates a hexagon-shaped grid of this size
@@ -25,7 +23,7 @@ var HexGrid = function(config) {
 		}
 	};
 
-	Tools.merge(true, gridSettings, config);
+	hg.Tools.merge(true, gridSettings, config);
 
 	// number of cells (in radius); only used if the map is generated
 	this.size = gridSettings.rings;
@@ -35,7 +33,7 @@ var HexGrid = function(config) {
 	this.extrudeSettings = gridSettings.extrudeSettings;
 	this.extrudeSettings.amount = gridSettings.cellDepth;
 
-	this.rotationIncrement = 30 * Tools.DEG_TO_RAD;
+	this.rotationIncrement = 30 * hg.DEG_TO_RAD;
 	// holds the grid position of each cell in cube coordinates, to which our meshes are attached to in the Board entity
 	this.cells = {}; // it's a hash so we can have sparse maps
 	this.numCells = 0;
@@ -54,7 +52,7 @@ var HexGrid = function(config) {
 	var i, verts = [];
 	// create the skeleton of the hex
 	for (i = 0; i < 6; i++) {
-		verts.push(this.createVert(i, Hex.FLAT));
+		verts.push(this.createVert(i, hg.Hex.FLAT));
 	}
 	// copy the verts into a shape for the geometry to use
 	this.hexShape = new THREE.Shape();
@@ -78,7 +76,7 @@ var HexGrid = function(config) {
 
 	// build the grid depending on what was passed in
 	if (gridSettings.url) {
-		Tools.getJSON(gridSettings.url, this.onLoad, this);
+		hg.Tools.getJSON(gridSettings.url, this.onLoad, this);
 	}
 	else {
 		this.generate();
@@ -89,9 +87,9 @@ var HexGrid = function(config) {
 	this.hexHeight = c.height;
 };
 
-HexGrid.SQRT3 = Math.sqrt(3); // used often in conversions
+hg.HexGrid.SQRT3 = Math.sqrt(3); // used often in conversions
 
-HexGrid.prototype = {
+hg.HexGrid.prototype = {
 	/*
 		________________________________________________________________________
 		High-level functions that the Board interfaces with (all grids implement)
@@ -108,7 +106,7 @@ HexGrid.prototype = {
 	// "flat" version only; if you want a pointy version, rotate the camera by 30 degrees
 	pixelToCell: function(pos) {
 		var q = pos.x * ((2/3) / this.cellSize);
-		var r = ((-pos.x / 3) + (HexGrid.SQRT3/3) * pos.y) / this.cellSize;
+		var r = ((-pos.x / 3) + (hg.HexGrid.SQRT3/3) * pos.y) / this.cellSize;
 		this._vec3.set(q, r, 0);
 		return this.hexRound(this._vec3);
 	},
@@ -165,7 +163,7 @@ HexGrid.prototype = {
 	},
 
 	getRandomCell: function() {
-		var c, i = 0, x = Tools.randomInt(0, this.numCells);
+		var c, i = 0, x = hg.Tools.randomInt(0, this.numCells);
 		for (c in this.cells) {
 			if (i === x) {
 				return this.cells[c].w;
@@ -184,7 +182,7 @@ HexGrid.prototype = {
 			geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
 			this._geoCache[height] = geo;
 		}
-		var hex = new Hex(this.cellSize, this.cellScale, geo, material);
+		var hex = new hg.Hex(this.cellSize, this.cellScale, geo, material);
 		hex.depth = height;
 		return hex;
 	},
@@ -234,7 +232,7 @@ HexGrid.prototype = {
 	},
 
 	/*pixelToAxial: function(x, y) {
-		var q = (x * (HexGrid.SQRT3 / 3) - (y / 3)) / this.cellSize;
+		var q = (x * (hg.HexGrid.SQRT3 / 3) - (y / 3)) / this.cellSize;
 		var r = y * (2 / 3) / this.cellSize;
 		// var axial = this.hexRound(this._conversionVec.set(q, r, 0));
 		var axial = this.hexRound({x: q, y: r});
@@ -376,7 +374,7 @@ HexGrid.prototype = {
 				this._matCache[c.matConfig.mat_cache_id] = mat;
 			}*/
 
-			hex = new Hex(this.cellSize, this.cellScale, geo, mat);
+			hex = new hg.Hex(this.cellSize, this.cellScale, geo, mat);
 			hex.depth = this.extrudeSettings.amount;
 			hex.userData.mapData = c.custom_data;
 
@@ -385,7 +383,3 @@ HexGrid.prototype = {
 	}
 
 };
-
-return HexGrid;
-
-});

@@ -1,9 +1,4 @@
-define({
-	PI: Math.PI,
-	TAU: Math.PI * 2,
-	DEG_TO_RAD: 0.0174532925,
-	RAD_TO_DEG: 57.2957795,
-
+hg.Tools = {
 	clamp: function(val, min, max) {
 		return Math.max(min, Math.min(max, val));
 	},
@@ -206,4 +201,4 @@ define({
 		xhr.open('GET', url, true);
 		xhr.send('');
 	}
-});
+};

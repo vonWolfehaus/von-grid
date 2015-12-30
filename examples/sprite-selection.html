@@ -2,11 +2,11 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<meta http-equiv='X-UA-Compatible' content='IE=edge' />
-	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0' />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 	<meta name="author" content="Corey Birnbaum" />
 	<title>Grid</title>
-	
+
 	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
 	<style>
 		body {
@@ -21,112 +21,108 @@
 </head>
 
 <body>
-	
-	<div id="view"></div>
-	
 
-<script type="text/javascript" src="../src/lib/three.min.js"></script>
-<script type="text/javascript" src="../src/lib/OrbitControls.js"></script>
-<script type="text/javascript" src="../src/lib/require.js"></script>
-<script type="text/javascript">
-requirejs.config({
-	baseUrl: '../src'
-});
-requirejs(['utils/Tools', 'graphs/HexGrid', 'graphs/SquareGrid', 'Board', 'utils/Scene', 'utils/MouseCaster', '../examples/js/Sprite', 'utils/SelectionManager'],
-function(Tools, HexGrid, SquareGrid, Board, Scene, MouseCaster, Sprite, SelectionManager) {
-	// setup the thing
-	var scene = new Scene({
-		element: document.getElementById('view'),
-		cameraPosition: {x:0, y:150, z:150}
-	}, true);
-	
-	var grid = new HexGrid({
-		rings: 4,
-		cellSize: 10,
-		cellDepth: 2,
-		cellScale: 0.95,
-		extrudeSettings: {
-			// options passed directly to: http://threejs.org/docs/#Reference/Extras.Geometries/ExtrudeGeometry
-			// but don't use amount, instead use cellDepth
+	<div id="view"></div>
+
+	<script type="text/javascript" src="../lib/three.min.js"></script>
+	<script type="text/javascript" src="../lib/OrbitControls.js"></script>
+	<script type="text/javascript" src="../dist/hex-grid.min.js"></script>
+	<script type="text/javascript" src="js/Sprite.js"></script>
+	<script type="text/javascript">
+	window.addEventListener('load', function(evt) {
+		// setup the thing
+		var scene = new hg.Scene({
+			element: document.getElementById('view'),
+			cameraPosition: {x:0, y:150, z:150}
+		}, true);
+
+		var grid = new hg.HexGrid({
+			rings: 4,
+			cellSize: 10,
+			cellDepth: 2,
+			cellScale: 0.95,
+			extrudeSettings: {
+				// options passed directly to: http://threejs.org/docs/#Reference/Extras.Geometries/ExtrudeGeometry
+				// but don't use amount, instead use cellDepth
+			}
+		});
+		/*var grid = new SquareGrid({
+			width: 8,
+			height: 8,
+			cellSize: 15,
+			cellScale: 0.95
+			// same extrudeSettings as Hex
+		});*/
+
+		var mouse = new hg.MouseCaster(scene.container, scene.camera);
+		var selector = new hg.SelectionManager(mouse);
+		var board = new hg.Board(grid);
+
+		scene.add(board.group);
+		scene.focusOn(board.group);
+
+		// populate the board
+		var i, sprites = [];
+		var spriteConfig = {
+			container: board.group,
+			url: '../examples/img/water.png',
+			scale: 10,
+			offsetY: 6
+		};
+
+		for (i = 0; i < 5; i++) {
+			sprites[i] = new Sprite(spriteConfig);
+			sprites[i].activate(hg.Tools.randomInt(100), hg.Tools.randomInt(grid.extrudeSettings.amount + 15, 40), hg.Tools.randomInt(100));
 		}
-	});
-	/*var grid = new SquareGrid({
-		width: 8,
-		height: 8,
-		cellSize: 15,
-		cellScale: 0.95
-		// same extrudeSettings as Hex
-	});*/
-	
-	var mouse = new MouseCaster(scene.container, scene.camera);
-	var selector = new SelectionManager(mouse);
-	var board = new Board(grid);
-	
-	scene.add(board.group);
-	scene.focusOn(board.group);
-	
-	// populate the board
-	var i, sprites = [];
-	var spriteConfig = {
-		container: board.group,
-		url: '../examples/img/water.png',
-		scale: 10,
-		offsetY: 6
-	};
-	
-	for (i = 0; i < 5; i++) {
-		sprites[i] = new Sprite(spriteConfig);
-		sprites[i].activate(Tools.randomInt(100), Tools.randomInt(grid.extrudeSettings.amount + 15, 40), Tools.randomInt(100));
-	}
-	
-	// keep track of states
-	var currentPiece = 0;
-	var movingPiece = null;
-	
-	// handle interaction
-	selector.onSelect.add(function(obj) {
-		if (obj.objectType === Board.Cell) {
-			// select the sprite if one was already there
-			var e = obj.entity;
-			if (e) {
-				selector.select(e, false); // don't fire the signal when firing manually or you'll cause a stack overflow with recursion
-				movingPiece = e; // new move
+
+		// keep track of states
+		var currentPiece = 0;
+		var movingPiece = null;
+
+		// handle interaction
+		selector.onSelect.add(function(obj) {
+			if (obj.objectType === hg.CEL) {
+				// select the sprite if one was already there
+				var e = obj.entity;
+				if (e) {
+					selector.select(e, false); // don't fire the signal when firing manually or you'll cause a stack overflow with recursion
+					movingPiece = e; // new move
+				}
+				else {
+					if (movingPiece) {
+						moveEntityToCell(obj);
+						return;
+					}
+					// cycle through the sprites, placing them on the clicked cell
+					var p = sprites[currentPiece++];
+					if (currentPiece === sprites.length) {
+						currentPiece = 0;
+					}
+					board.placeEntityAtCell(p, obj);
+				}
 			}
 			else {
-				if (movingPiece) {
-					moveEntityToCell(obj);
-					return;
-				}
-				// cycle through the sprites, placing them on the clicked cell
-				var p = sprites[currentPiece++];
-				if (currentPiece === sprites.length) {
-					currentPiece = 0;
-				}
-				board.placeEntityAtCell(p, obj);
+				movingPiece = obj;
 			}
-		}
-		else {
-			movingPiece = obj;
-		}
-	}, this);
-	
-	/*selector.onDeselect.add(function(obj) {
-		
-	}, this);*/
+		}, this);
 
-	function moveEntityToCell(cell) {
-		board.placeEntityAtCell(movingPiece, cell);
-		movingPiece = null;
-	}
-	
-	// start the thing
-	update();
-	function update() {
-		mouse.update();
-		scene.render();
-		requestAnimationFrame(update);
-	}
-});
-</script>
+		/*selector.onDeselect.add(function(obj) {
+
+		}, this);*/
+
+		function moveEntityToCell(cell) {
+			board.placeEntityAtCell(movingPiece, cell);
+			movingPiece = null;
+		}
+
+		// start the thing
+		update();
+		function update() {
+			mouse.update();
+			scene.render();
+			requestAnimationFrame(update);
+		}
+	});
+	</script>
 </body>
 </html>

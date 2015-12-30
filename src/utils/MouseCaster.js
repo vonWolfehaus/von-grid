@@ -1,5 +1,3 @@
-define(['lib/Signal'], function(Signal) {
-
 /*
 	Translates mouse interactivity into 3D positions, so we can easily pick objects in the scene.
 
@@ -8,7 +6,7 @@ define(['lib/Signal'], function(Signal) {
 	group - any Object3D (Scene, Group, Mesh, Sprite, etc) that the mouse will cast against
 	camera - the camera to cast from
  */
-var MouseCaster = function(group, camera) {
+hg.MouseCaster = function(group, camera) {
 	this.down = false;
 	// the object that was just clicked on
 	this.pickedObject = null;
@@ -26,7 +24,7 @@ var MouseCaster = function(group, camera) {
 	// you can track exactly where the mouse is in the 3D scene by using the z component
 	this.position = new THREE.Vector3();
 	this.screenPosition = new THREE.Vector2();
-	this.signal = new Signal();
+	this.signal = new hg.Signal();
 	this.group = group;
 
 	// behind-the-scenes stuff you shouldn't worry about
@@ -42,14 +40,14 @@ var MouseCaster = function(group, camera) {
 };
 
 // statics to describe the events we dispatch
-MouseCaster.OVER = 'over';
-MouseCaster.OUT = 'out';
-MouseCaster.DOWN = 'down';
-MouseCaster.UP = 'up';
-MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
-MouseCaster.WHEEL = 'wheel';
+hg.MouseCaster.OVER = 'over';
+hg.MouseCaster.OUT = 'out';
+hg.MouseCaster.DOWN = 'down';
+hg.MouseCaster.UP = 'up';
+hg.MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
+hg.MouseCaster.WHEEL = 'wheel';
 
-MouseCaster.prototype = {
+hg.MouseCaster.prototype = {
 	update: function() {
 		if (!this.active) {
 			return;
@@ -68,7 +66,7 @@ MouseCaster.prototype = {
 				// the first object changed, meaning there's a different one, or none at all
 				if (this.pickedObject) {
 					// it's a new object, notify the old object is going away
-					this.signal.dispatch(MouseCaster.OUT, this.pickedObject);
+					this.signal.dispatch(hg.MouseCaster.OUT, this.pickedObject);
 				}
 				/*else {
 					// hit a new object when nothing was there previously
@@ -76,7 +74,7 @@ MouseCaster.prototype = {
 				this.pickedObject = obj;
 				this.selectedObject = null; // cancel click, otherwise it'll confuse the user
 
-				this.signal.dispatch(MouseCaster.OVER, this.pickedObject);
+				this.signal.dispatch(hg.MouseCaster.OVER, this.pickedObject);
 			}
 			this.position.copy(hit.point);
 			this.screenPosition.z = hit.distance;
@@ -85,7 +83,7 @@ MouseCaster.prototype = {
 			// there isn't anything under the mouse
 			if (this.pickedObject) {
 				// there was though, we just moved out
-				this.signal.dispatch(MouseCaster.OUT, this.pickedObject);
+				this.signal.dispatch(hg.MouseCaster.OUT, this.pickedObject);
 			}
 			this.pickedObject = null;
 			this.selectedObject = null;
@@ -110,7 +108,7 @@ MouseCaster.prototype = {
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
 		this.down = true;
-		this.signal.dispatch(MouseCaster.DOWN, this.pickedObject);
+		this.signal.dispatch(hg.MouseCaster.DOWN, this.pickedObject);
 	},
 
 	_onDocumentMouseUp: function(evt) {
@@ -122,11 +120,11 @@ MouseCaster.prototype = {
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
 		this.down = false;
-		this.signal.dispatch(MouseCaster.UP, this.pickedObject);
+		this.signal.dispatch(hg.MouseCaster.UP, this.pickedObject);
 		// console.log('up');
 		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
 			// console.log('click');
-			this.signal.dispatch(MouseCaster.CLICK, this.pickedObject);
+			this.signal.dispatch(hg.MouseCaster.CLICK, this.pickedObject);
 		}
 	},
 
@@ -157,10 +155,6 @@ MouseCaster.prototype = {
 			this.wheel--;
 		}
 		// console.log(this.wheel);
-		this.signal.dispatch(MouseCaster.WHEEL, this.wheel);
+		this.signal.dispatch(hg.MouseCaster.WHEEL, this.wheel);
 	}
 };
-
-return MouseCaster;
-
-});
