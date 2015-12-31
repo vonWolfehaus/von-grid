@@ -8,7 +8,7 @@ window.addEventListener('load', function(evt) {
 		console.log('Loading map from localStorage');
 	}
 
-	var timeTilAutoSave = 300; // timer runs per frame, 60fps
+	var timeTilAutoSave = 200; // timer runs per frame, 60fps
 	var saveTimer = 10;
 	var dirtyMap = false;
 
@@ -50,9 +50,9 @@ window.addEventListener('load', function(evt) {
 	});
 
 	// setup the thing
-
+	var canvas = document.getElementById('view');
 	var scene = new hg.Scene({
-		element: document.getElementById('view'),
+		element: canvas,
 		cameraPosition: {x:0, y:300, z:120}
 	}, {
 		noZoom: false
@@ -69,7 +69,7 @@ window.addEventListener('load', function(evt) {
 	});
 
 	var board = new hg.Board(grid);
-	var mouse = new hg.MouseCaster(board.group, scene.camera, document.getElementById('view'));
+	var mouse = new hg.MouseCaster(board.group, scene.camera, canvas);
 	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
 	mouse.signal.add(onMouse, this);
 
@@ -112,6 +112,7 @@ window.addEventListener('load', function(evt) {
 			cells: mapCells,
 			materials: mapMats
 		};
+		console.log('Created a new map');
 	}
 
 	update();
@@ -171,6 +172,7 @@ window.addEventListener('load', function(evt) {
 	function onMapChange(tile) {
 		dirtyMap = true;
 		saveTimer = timeTilAutoSave;
+		map.cells = grid.toJSON();
 	}
 
 	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js
@@ -195,6 +197,7 @@ window.addEventListener('load', function(evt) {
 	}
 
 	function loadMap(json) {
+		console.log(json);
 		board.group.remove(grid.group);
 		grid.load(json);
 		board.setGrid(grid);
