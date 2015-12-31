@@ -2,14 +2,15 @@ window.addEventListener('load', function(evt) {
 	// make ui
 	var namespace = 'vongrid.map';
 
-	var map = window.localStorage.getItem(namespace);
+	var map = window.localStorage[namespace];
 	if (map) {
 		map = JSON.parse(map);
+		console.log('Loading map from localStorage');
 	}
 
-	var timeTilAutoSave = 300;
+	var timeTilAutoSave = 300; // timer runs per frame, 60fps
 	var saveTimer = 10;
-	var dirtyMap = true;
+	var dirtyMap = false;
 
 	var saveBtn = document.getElementById('save-btn');
 	saveBtn.onmouseup = function(evt) {
@@ -68,7 +69,7 @@ window.addEventListener('load', function(evt) {
 	});
 
 	var board = new hg.Board(grid);
-	var mouse = new hg.MouseCaster(board.group, scene.camera);
+	var mouse = new hg.MouseCaster(board.group, scene.camera, document.getElementById('view'));
 	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
 	mouse.signal.add(onMouse, this);
 
@@ -125,8 +126,13 @@ window.addEventListener('load', function(evt) {
 			saveTimer--;
 			if (saveTimer === 0) {
 				dirtyMap = false;
-				window.localStorage.setItem(namespace, JSON.stringify(map));
-				console.log('Auto-saved new map data');
+				try {
+					window.localStorage[namespace] = JSON.stringify(map);
+					console.log('Auto-saved new map data');
+				}
+				catch (err) {
+					console.warn('Problem auto-saving map');
+				}
 			}
 		}
 		mouse.update();
@@ -190,9 +196,10 @@ window.addEventListener('load', function(evt) {
 
 	function loadMap(json) {
 		board.group.remove(grid.group);
-		grid.onLoad(json);
+		grid.load(json);
 		board.setGrid(grid);
 		scene.add(board.group);
+		console.log('Map load complete');
 	}
 
 	function saveMap() {

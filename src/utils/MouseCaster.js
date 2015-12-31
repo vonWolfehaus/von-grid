@@ -5,8 +5,9 @@
 
 	group - any Object3D (Scene, Group, Mesh, Sprite, etc) that the mouse will cast against
 	camera - the camera to cast from
+	[element] - optional element to attach mouse event to
  */
-hg.MouseCaster = function(group, camera) {
+hg.MouseCaster = function(group, camera, element) {
 	this.down = false;
 	// the object that was just clicked on
 	this.pickedObject = null;
@@ -32,11 +33,13 @@ hg.MouseCaster = function(group, camera) {
 	this._raycaster = new THREE.Raycaster();
 	this._preventDefault = false;
 
-	document.addEventListener('mousemove', this._onDocumentMouseMove.bind(this), false);
-	document.addEventListener('mousedown', this._onDocumentMouseDown.bind(this), false);
-	document.addEventListener('mouseup', this._onDocumentMouseUp.bind(this), false);
-	document.addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
-	document.addEventListener('DOMMouseScroll', this._onMouseWheel.bind(this), false); // firefox
+	element = element || document;
+
+	element.addEventListener('mousemove', this._onDocumentMouseMove.bind(this), false);
+	element.addEventListener('mousedown', this._onDocumentMouseDown.bind(this), false);
+	element.addEventListener('mouseup', this._onDocumentMouseUp.bind(this), false);
+	element.addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
+	element.addEventListener('DOMMouseScroll', this._onMouseWheel.bind(this), false); // firefox
 };
 
 // statics to describe the events we dispatch

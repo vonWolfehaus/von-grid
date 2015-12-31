@@ -61,7 +61,7 @@ gulp.task('scripts', function() {
 */
 /*
 gulp.task('styles', function() {
-	return gulp.src(styles)
+	return gulp.src(glob.styles)
 		.pipe($.plumber({errorHandler: handleErrors}))
 		.pipe($.sourcemaps.init())
 		.pipe($.stylus({
@@ -81,43 +81,33 @@ gulp.task('styles', function() {
 // Defines the list of resources to watch for changes.
 function watch() {
 	gulp.watch(glob.scripts, ['scripts', reload]);
-	gulp.watch(glob.styles, ['styles', reload]);
+	//gulp.watch(glob.styles, ['styles', reload]);
+}
+
+function serve(dir) {
+	browserSync.init({
+		notify: false,
+		server: {
+			baseDir: ['./', './'+dir],
+			index: './'+dir+'/index.html'
+		}
+	});
+
+	browserSync.watch(dir+'/**/*.*').on('change', reload);
+	browserSync.watch(dist+'/**/*.*').on('change', reload);
+	gulp.watch(glob.scripts, ['scripts']);
 }
 
 gulp.task('watch', function() {
 	watch();
 });
 
-// Serves the editor
 gulp.task('editor', function() {
-	// watch and compile frontend
-	browserSync.init({
-		notify: false,
-		server: {
-			baseDir: ['./', './editor'],
-			index: './editor/index.html'
-		}
-	});
-
-	browserSync.watch('editor/**/*.*').on('change', browserSync.reload);
-
-	watch();
+	serve('editor');
 });
 
-// Serves the examples
 gulp.task('examples', function() {
-	// watch and compile frontend
-	browserSync.init({
-		notify: false,
-		server: {
-			baseDir: ['./', './examples'],
-			index: './examples/index.html'
-		}
-	});
-
-	browserSync.watch('examples/**/*.*').on('change', browserSync.reload);
-
-	watch();
+	serve('examples');
 });
 
 /*----------------------------------------------------------------------

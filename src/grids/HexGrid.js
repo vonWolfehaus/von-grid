@@ -76,7 +76,7 @@ hg.HexGrid = function(config) {
 
 	// build the grid depending on what was passed in
 	if (gridSettings.url) {
-		hg.Tools.getJSON(gridSettings.url, this.onLoad, this);
+		hg.Tools.getJSON(gridSettings.url, this.load, this);
 	}
 	else {
 		this.generate();
@@ -346,7 +346,7 @@ hg.HexGrid.prototype = {
 				...
 			]
 		}*/
-	onLoad: function(json) {
+	load: function(json) {
 		var i, c, hex, geo, mat;
 		var cells = json.cells;
 
