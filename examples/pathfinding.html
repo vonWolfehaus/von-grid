@@ -38,13 +38,13 @@
 	*/
 	window.addEventListener('load', function(evt) {
 		// setup the thing
-		var scene = new hg.Scene({
+		var scene = new vg.Scene({
 			element: document.getElementById('view'),
 			cameraType: 'OrthographicCamera',
 			cameraPosition: {x:0, y:200, z:0}
 		}, false);
 
-		var grid = new hg.HexGrid({
+		var grid = new vg.HexGrid({
 			rings: 6,
 			cellSize: 10,
 			cellScale: 0.95
@@ -56,11 +56,11 @@
 			cellScale: 0.95
 		});*/
 
-		var mouse = new hg.MouseCaster(scene.container, scene.camera);
+		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		// we only want to scan while the mouse is held down
 		mouse.active = false;
 
-		var board = new hg.Board(grid, {
+		var board = new vg.Board(grid, {
 			allowDiagonal: false,
 			// this is the fallback, but you can override it by passing a specific heuristic in board.findPath()
 			heuristicFilter: isCellTraversable
@@ -125,7 +125,7 @@
 		// handle interaction
 		mouse.signal.add(function(type, obj) {
 			switch (type) {
-				case hg.MouseCaster.DOWN:
+				case vg.MouseCaster.DOWN:
 					// force an update to get latest data from the mouse's raycast
 					mouse.active = true;
 					mouse.update();
@@ -133,7 +133,7 @@
 					// "pick up" the piece we selected, if any
 					movingPiece = obj;
 					if (obj) {
-						if (obj.objectType === hg.CEL) {
+						if (obj.objectType === vg.CEL) {
 							// if a cell was clicked, pick up the entity that was sitting on it, if any
 							movingPiece = obj.entity;
 							lastCell = obj;
@@ -161,13 +161,13 @@
 							break;
 						}
 
-						if (movingPiece.objectType === hg.ENT) {
+						if (movingPiece.objectType === vg.ENT) {
 							lastCell = movingPiece.cell;
 						}
 					}
 					break;
 
-				case hg.MouseCaster.UP:
+				case vg.MouseCaster.UP:
 					// disable the mouse until the user clicks again
 					mouse.active = false;
 					if (movingPiece) {
@@ -211,7 +211,7 @@
 			var objects = mouse.allHits;
 			for (i = 0; i < objects.length; i++) {
 				c = objects[i].object.userData.structure;
-				if (c && c.objectType && c.objectType === hg.CEL) {
+				if (c && c.objectType && c.objectType === vg.CEL) {
 					return c;
 				}
 			}

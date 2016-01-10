@@ -1,4 +1,4 @@
-# Hexagonal (and other) grid systems
+# 3D hex/square tile system
 
 ![screenshot](hex-grid.jpg)
 
@@ -11,19 +11,20 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 ## Features
 
 - Simple API for attaching objects to the grid through `Board.js`
-- **A* pathfinding**
+- **A* pathfinding** with or without weighted nodes, and a `walkable` flag
 - Make maps with `editor/index.html` (save/load with `.json` files)
 - Varied height
 - Sparse maps
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
 - Square grid ~~that can be used interchangeably~~(currently working but lots of disparities as I build the editor)
+- Include only the hex grid by downloading `dist/hex-grid.js`, or all grid types with `von-grid.js`, etc
 
 #### Roadmap
 
-- Textured tile support (UV creation)
 - Vastly improved editor
 - Abstract graph
+- Arbitrary tile model support
 
 ## Usage
 
@@ -32,15 +33,15 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 ![screenshot](hex-grid-basic.jpg)
 
 ```javascript
-var scene = new hg.Scene({ // I made a very handy util for creating three.js scenes quickly
+var scene = new vg.Scene({ // I made a very handy util for creating three.js scenes quickly
 	cameraPosition: {x:0, y:150, z:150}
 }, true); // add orbit controls
 
-var grid = new hg.HexGrid({
+var grid = new vg.HexGrid({
 	rings: 4
 });
 
-var board = new hg.Board(grid);
+var board = new vg.Board(grid);
 
 scene.add(board.group);
 scene.focusOn(board.group);

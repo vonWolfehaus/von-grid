@@ -10,11 +10,14 @@ var path = require('path');
 var pkg = require('./package.json');
 //var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
 
-var dist = './dist';
-var src = './src';
+var dist = 'dist';
+var src = 'src';
 
 var glob = {
-	scripts: [src+'/hg.js', src+'/**/*.js'],
+	scripts: [src+'/vg.js', src+'/**/*.js'],
+	hexScripts: [src+'/vg.js', src+'/**/*.js', '!src/grids/Square.js', '!src/grids/SquareGrid.js'],
+	sqrScripts: [src+'/vg.js', src+'/**/*.js', '!src/grids/Hex.js', '!src/grids/HexGrid.js'],
+	editorScripts: ['editor/ui/**/*.js', 'editor/modules/**/*.js'],
 	styles: src+'/**/*.styl'
 };
 
@@ -25,7 +28,7 @@ var glob = {
 
 gulp.task('default', ['clean'], function() {
 	runSequence(
-		['scripts']
+		['all', 'hex', 'sqr']
 	);
 });
 
@@ -33,8 +36,15 @@ gulp.task('clean', del.bind(null, [dist]));
 
 gulp.task('dev', ['clean'], function() {
 	runSequence(
-		['scripts'],
-		['editor']
+		['all'],
+		['watch']
+	);
+});
+
+gulp.task('dev-ed', ['clean'], function() {
+	runSequence(
+		['all', 'scripts-editor'],
+		['serve-editor']
 	);
 });
 
@@ -42,17 +52,55 @@ gulp.task('dev', ['clean'], function() {
 	SCRIPTS
 */
 
-gulp.task('scripts', function() {
+gulp.task('all', function() {
 	return gulp.src(glob.scripts)
 		.pipe($.plumber({errorHandler: handleErrors}))
 		.pipe($.eslint({ fix: true }))
 		.pipe($.eslint.formatEach())
 		.pipe($.eslint.failOnError())
 		.pipe($.sourcemaps.init())
+		.pipe($.concat('von-grid.min.js'))
+		.pipe($.uglify())
+		.pipe($.sourcemaps.write('.'))
+		.pipe(gulp.dest(dist))
+		.pipe(browserSync.stream());
+});
+
+gulp.task('hex', function() {
+	return gulp.src(glob.hexScripts)
+		.pipe($.plumber({errorHandler: handleErrors}))
+		.pipe($.sourcemaps.init())
 		.pipe($.concat('hex-grid.min.js'))
 		.pipe($.uglify())
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest(dist))
+		.pipe(browserSync.stream());
+});
+
+gulp.task('sqr', function() {
+	return gulp.src(glob.sqrScripts)
+		.pipe($.plumber({errorHandler: handleErrors}))
+		.pipe($.sourcemaps.init())
+		.pipe($.concat('sqr-grid.min.js'))
+		.pipe($.uglify())
+		.pipe($.sourcemaps.write('.'))
+		.pipe(gulp.dest(dist))
+		.pipe(browserSync.stream());
+});
+
+gulp.task('scripts-editor', function() {
+	return gulp.src(glob.editorScripts)
+		.pipe($.plumber({errorHandler: handleErrors}))
+		.pipe($.sortAmd())
+		//.pipe($.eslint({ fix: true }))
+		//.pipe($.eslint.formatEach())
+		//.pipe($.eslint.failOnError())
+		.pipe($.addSrc.prepend('./editor/lib/define.min.js'))
+		.pipe($.sourcemaps.init())
+		.pipe($.concat('app.js'))
+		//.pipe($.uglify())
+		.pipe($.sourcemaps.write('.'))
+		.pipe(gulp.dest('editor'))
 		.pipe(browserSync.stream());
 });
 
@@ -80,7 +128,7 @@ gulp.task('styles', function() {
 
 // Defines the list of resources to watch for changes.
 function watch() {
-	gulp.watch(glob.scripts, ['scripts', reload]);
+	gulp.watch(glob.scripts, ['all', reload]);
 	//gulp.watch(glob.styles, ['styles', reload]);
 }
 
@@ -93,20 +141,22 @@ function serve(dir) {
 		}
 	});
 
-	browserSync.watch(dir+'/**/*.*').on('change', reload);
+	//browserSync.watch(dir+'/**/*.*').on('change', reload);
 	browserSync.watch(dist+'/**/*.*').on('change', reload);
-	gulp.watch(glob.scripts, ['scripts']);
+	gulp.watch(glob.scripts, ['all']);
 }
 
 gulp.task('watch', function() {
 	watch();
 });
 
-gulp.task('editor', function() {
+gulp.task('serve-editor', function() {
+	gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
 	serve('editor');
 });
 
-gulp.task('examples', function() {
+gulp.task('serve-examples', function() {
+	//gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
 	serve('examples');
 });
 

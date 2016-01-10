@@ -14,11 +14,11 @@ var Sprite = function(settings) {
 	this.obstacle = false;
 
 	// attribute override
-	hg.Tools.merge(this, settings);
+	vg.Tools.merge(this, settings);
 
 	// other objects like the SelectionManager expect these on all objects that are added to the scene
 	this.active = false;
-	this.uniqueId = hg.Tools.generateID();
+	this.uniqueId = vg.Tools.generateID();
 	this.objectType = 'entity'; // Board.Entity
 	this.cell = null;
 

@@ -1,9 +1,9 @@
 // 'utils/Tools', 'lib/LinkedList', 'utils/MouseCaster', 'lib/Signal'
-hg.SelectionManager = function(mouse) {
+vg.SelectionManager = function(mouse) {
 	this.mouse = mouse;
 
-	this.onSelect = new hg.Signal();
-	this.onDeselect = new hg.Signal();
+	this.onSelect = new vg.Signal();
+	this.onDeselect = new vg.Signal();
 
 	this.selected = null;
 	// deselect if player clicked on the same thing twice
@@ -16,7 +16,7 @@ hg.SelectionManager = function(mouse) {
 	this.mouse.signal.add(this.onMouse, this);
 }
 
-hg.SelectionManager.prototype = {
+vg.SelectionManager.prototype = {
 	select: function(obj, fireSignal) {
 		if (!obj) return;
 		fireSignal = fireSignal || true;
@@ -56,13 +56,13 @@ hg.SelectionManager.prototype = {
 
 	onMouse: function(type, obj) {
 		switch (type) {
-			case hg.MouseCaster.DOWN:
+			case vg.MouseCaster.DOWN:
 				if (!obj) {
 					this.clearSelection();
 				}
 				break;
 
-			case hg.MouseCaster.CLICK:
+			case vg.MouseCaster.CLICK:
 				this.select(obj);
 				break;
 		}

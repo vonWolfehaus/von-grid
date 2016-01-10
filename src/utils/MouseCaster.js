@@ -7,11 +7,12 @@
 	camera - the camera to cast from
 	[element] - optional element to attach mouse event to
  */
-hg.MouseCaster = function(group, camera, element) {
-	this.down = false;
+vg.MouseCaster = function(group, camera, element) {
+	this.down = false; // left click
+	this.rightDown = false;
 	// the object that was just clicked on
 	this.pickedObject = null;
-	// the object currently being "held"
+	// the object currently being 'held'
 	this.selectedObject = null;
 	// store the results of the last cast
 	this.allHits = null;
@@ -25,7 +26,7 @@ hg.MouseCaster = function(group, camera, element) {
 	// you can track exactly where the mouse is in the 3D scene by using the z component
 	this.position = new THREE.Vector3();
 	this.screenPosition = new THREE.Vector2();
-	this.signal = new hg.Signal();
+	this.signal = new vg.Signal();
 	this.group = group;
 
 	// behind-the-scenes stuff you shouldn't worry about
@@ -43,14 +44,14 @@ hg.MouseCaster = function(group, camera, element) {
 };
 
 // statics to describe the events we dispatch
-hg.MouseCaster.OVER = 'over';
-hg.MouseCaster.OUT = 'out';
-hg.MouseCaster.DOWN = 'down';
-hg.MouseCaster.UP = 'up';
-hg.MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
-hg.MouseCaster.WHEEL = 'wheel';
+vg.MouseCaster.OVER = 'over';
+vg.MouseCaster.OUT = 'out';
+vg.MouseCaster.DOWN = 'down';
+vg.MouseCaster.UP = 'up';
+vg.MouseCaster.CLICK = 'click'; // only fires if the user clicked down and up while on the same object
+vg.MouseCaster.WHEEL = 'wheel';
 
-hg.MouseCaster.prototype = {
+vg.MouseCaster.prototype = {
 	update: function() {
 		if (!this.active) {
 			return;
@@ -69,7 +70,7 @@ hg.MouseCaster.prototype = {
 				// the first object changed, meaning there's a different one, or none at all
 				if (this.pickedObject) {
 					// it's a new object, notify the old object is going away
-					this.signal.dispatch(hg.MouseCaster.OUT, this.pickedObject);
+					this.signal.dispatch(vg.MouseCaster.OUT, this.pickedObject);
 				}
 				/*else {
 					// hit a new object when nothing was there previously
@@ -77,7 +78,7 @@ hg.MouseCaster.prototype = {
 				this.pickedObject = obj;
 				this.selectedObject = null; // cancel click, otherwise it'll confuse the user
 
-				this.signal.dispatch(hg.MouseCaster.OVER, this.pickedObject);
+				this.signal.dispatch(vg.MouseCaster.OVER, this.pickedObject);
 			}
 			this.position.copy(hit.point);
 			this.screenPosition.z = hit.distance;
@@ -86,7 +87,7 @@ hg.MouseCaster.prototype = {
 			// there isn't anything under the mouse
 			if (this.pickedObject) {
 				// there was though, we just moved out
-				this.signal.dispatch(hg.MouseCaster.OUT, this.pickedObject);
+				this.signal.dispatch(vg.MouseCaster.OUT, this.pickedObject);
 			}
 			this.pickedObject = null;
 			this.selectedObject = null;
@@ -100,6 +101,7 @@ hg.MouseCaster.prototype = {
 	},
 
 	_onDocumentMouseDown: function(evt) {
+		evt = evt || window.event;
 		evt.preventDefault();
 		if (this._preventDefault) {
 			this._preventDefault = false;
@@ -110,8 +112,11 @@ hg.MouseCaster.prototype = {
 		}
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
-		this.down = true;
-		this.signal.dispatch(hg.MouseCaster.DOWN, this.pickedObject);
+
+		this.down = evt.which === 1;
+		this.rightDown = evt.which === 3;
+
+		this.signal.dispatch(vg.MouseCaster.DOWN, this.pickedObject);
 	},
 
 	_onDocumentMouseUp: function(evt) {
@@ -122,13 +127,14 @@ hg.MouseCaster.prototype = {
 		}
 		this.shift = evt.shiftKey;
 		this.ctrl = evt.ctrlKey;
-		this.down = false;
-		this.signal.dispatch(hg.MouseCaster.UP, this.pickedObject);
-		// console.log('up');
+
+		this.signal.dispatch(vg.MouseCaster.UP, this.pickedObject);
 		if (this.selectedObject && this.pickedObject && this.selectedObject.uniqueID === this.pickedObject.uniqueID) {
-			// console.log('click');
-			this.signal.dispatch(hg.MouseCaster.CLICK, this.pickedObject);
+			this.signal.dispatch(vg.MouseCaster.CLICK, this.pickedObject);
 		}
+
+		this.down = evt.which === 1 ? false : this.down;
+		this.rightDown = evt.which === 3 ? false : this.rightDown;
 	},
 
 	_onDocumentMouseMove: function(evt) {
@@ -158,6 +164,6 @@ hg.MouseCaster.prototype = {
 			this.wheel--;
 		}
 		// console.log(this.wheel);
-		this.signal.dispatch(hg.MouseCaster.WHEEL, this.wheel);
+		this.signal.dispatch(vg.MouseCaster.WHEEL, this.wheel);
 	}
 };

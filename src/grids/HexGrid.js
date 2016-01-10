@@ -4,7 +4,7 @@
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 // 'utils/Loader', 'graphs/Hex', 'utils/Tools'
-hg.HexGrid = function(config) {
+vg.HexGrid = function(config) {
 	if (!config) config = {};
 	var gridSettings = {
 		rings: 5, // creates a hexagon-shaped grid of this size
@@ -23,7 +23,7 @@ hg.HexGrid = function(config) {
 		}
 	};
 
-	hg.Tools.merge(true, gridSettings, config);
+	vg.Tools.merge(true, gridSettings, config);
 
 	// number of cells (in radius); only used if the map is generated
 	this.size = gridSettings.rings;
@@ -33,7 +33,7 @@ hg.HexGrid = function(config) {
 	this.extrudeSettings = gridSettings.extrudeSettings;
 	this.extrudeSettings.amount = gridSettings.cellDepth;
 
-	this.rotationIncrement = 30 * hg.DEG_TO_RAD;
+	this.rotationIncrement = 30 * vg.DEG_TO_RAD;
 	// holds the grid position of each cell in cube coordinates, to which our meshes are attached to in the Board entity
 	this.cells = {}; // it's a hash so we can have sparse maps
 	this.numCells = 0;
@@ -52,7 +52,7 @@ hg.HexGrid = function(config) {
 	var i, verts = [];
 	// create the skeleton of the hex
 	for (i = 0; i < 6; i++) {
-		verts.push(this.createVert(i, hg.Hex.FLAT));
+		verts.push(this.createVert(i, vg.Hex.FLAT));
 	}
 	// copy the verts into a shape for the geometry to use
 	this.hexShape = new THREE.Shape();
@@ -76,7 +76,7 @@ hg.HexGrid = function(config) {
 
 	// build the grid depending on what was passed in
 	if (gridSettings.url) {
-		hg.Tools.getJSON(gridSettings.url, this.load, this);
+		vg.Tools.getJSON(gridSettings.url, this.load, this);
 	}
 	else {
 		this.generate();
@@ -87,9 +87,9 @@ hg.HexGrid = function(config) {
 	this.hexHeight = c.height;
 };
 
-hg.HexGrid.SQRT3 = Math.sqrt(3); // used often in conversions
+vg.HexGrid.SQRT3 = Math.sqrt(3); // used often in conversions
 
-hg.HexGrid.prototype = {
+vg.HexGrid.prototype = {
 	/*
 		________________________________________________________________________
 		High-level functions that the Board interfaces with (all grids implement)
@@ -103,10 +103,14 @@ hg.HexGrid.prototype = {
 		pos.z = -p.y;
 	},
 
+	getTileAtCell: function(c) {
+		return this.cells[this.cubeToHash(c)];
+	},
+
 	// "flat" version only; if you want a pointy version, rotate the camera by 30 degrees
 	pixelToCell: function(pos) {
 		var q = pos.x * ((2/3) / this.cellSize);
-		var r = ((-pos.x / 3) + (hg.HexGrid.SQRT3/3) * pos.y) / this.cellSize;
+		var r = ((-pos.x / 3) + (vg.HexGrid.SQRT3/3) * pos.y) / this.cellSize;
 		this._vec3.set(q, r, 0);
 		return this.hexRound(this._vec3);
 	},
@@ -163,7 +167,7 @@ hg.HexGrid.prototype = {
 	},
 
 	getRandomCell: function() {
-		var c, i = 0, x = hg.Tools.randomInt(0, this.numCells);
+		var c, i = 0, x = vg.Tools.randomInt(0, this.numCells);
 		for (c in this.cells) {
 			if (i === x) {
 				return this.cells[c].w;
@@ -182,7 +186,7 @@ hg.HexGrid.prototype = {
 			geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
 			this._geoCache[height] = geo;
 		}
-		var hex = new hg.Hex(this.cellSize, this.cellScale, geo, material);
+		var hex = new vg.Hex(this.cellSize, this.cellScale, geo, material);
 		hex.depth = height;
 		return hex;
 	},
@@ -223,6 +227,97 @@ hg.HexGrid.prototype = {
 		// TODO
 	},
 
+	// create a flat, hexagon-shaped grid.
+	generate: function() {
+		var x, y, z, c;
+		c = new THREE.Vector3();
+
+		this.meshes = [];
+
+		for (x = -this.size; x < this.size+1; x++) {
+			for (y = -this.size; y < this.size+1; y++) {
+				z = -x-y;
+				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
+					c.set(x, y, z);
+					this.add(c);
+				}
+			}
+		}
+	},
+
+	/* load a grid from a parsed json object.
+		xyz are hex cube coordinates
+		json = {
+			cells: [
+				{x, y, z, depth, matCacheId, customData},
+				...
+			],
+			materials: [
+				{
+					cache_id: 0,
+					type: 'MeshLambertMaterial',
+					color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
+					imgURL: url
+				},
+				{
+					cacheId: 1, ...
+				}
+				...
+			]
+		}*/
+	load: function(json) {
+		var i, c, hex, geo, mat;
+		var cells = json.cells;
+
+		this.meshes = [];
+		this.group = new THREE.Object3D();
+		this.cells = {};
+		this.numCells = 0;
+
+		// create Hex instances and place them on the grid, and add them to the group for easy management
+		for (i = 0; i < cells.length; i++) {
+			c = cells[i];
+
+			geo = this._geoCache[c.depth];
+			if (!geo) {
+				this.extrudeSettings.amount = c.depth;
+				geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+				this._geoCache[c.depth] = geo;
+			}
+
+			/*mat = this._matCache[c.matConfig.mat_cache_id];
+			if (!mat) { // MaterialLoader? we currently only support basic stuff though. maybe later
+				mat.map = Loader.loadTexture(c.matConfig.imgURL);
+				delete c.matConfig.imgURL;
+				mat = new THREE[c.matConfig.type](c.matConfig);
+				this._matCache[c.matConfig.mat_cache_id] = mat;
+			}*/
+
+			hex = new vg.Hex(this.cellSize, this.cellScale, geo, mat);
+			hex.depth = this.extrudeSettings.amount;
+			hex.userData.mapData = c.customData;
+
+			this.add(c, hex);
+		}
+	},
+
+	toJSON: function() {
+		var tiles = [];
+		var c, k;
+		for (k in this.cells) {
+			c = this.cells[k];
+			tiles.push({
+				x: c.x,
+				y: c.y,
+				z: c.z,
+				depth: c.w.depth,
+				matCacheId: 0,
+				customData: c.w.userData.mapData
+			});
+		}
+		return tiles;
+	},
+
 	/*
 		________________________________________________________________________
 		Hexagon-specific conversion math
@@ -233,7 +328,7 @@ hg.HexGrid.prototype = {
 	},
 
 	/*pixelToAxial: function(x, y) {
-		var q = (x * (hg.HexGrid.SQRT3 / 3) - (y / 3)) / this.cellSize;
+		var q = (x * (vg.HexGrid.SQRT3 / 3) - (y / 3)) / this.cellSize;
 		var r = y * (2 / 3) / this.cellSize;
 		// var axial = this.hexRound(this._conversionVec.set(q, r, 0));
 		var axial = this.hexRound({x: q, y: r});
@@ -306,96 +401,5 @@ hg.HexGrid.prototype = {
 		var angle = ((2 * Math.PI) / 6) * i;
 		angle += type; // 0 if flat-topped, or 30deg if pointy
 		return new THREE.Vector3((this.cellSize * Math.cos(angle)), (this.cellSize * Math.sin(angle)), 0);
-	},
-
-	// create a flat, hexagon-shaped grid.
-	generate: function() {
-		var x, y, z, c;
-		c = new THREE.Vector3();
-
-		this.meshes = [];
-
-		for (x = -this.size; x < this.size+1; x++) {
-			for (y = -this.size; y < this.size+1; y++) {
-				z = -x-y;
-				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
-					c.set(x, y, z);
-					this.add(c);
-				}
-			}
-		}
-	},
-
-	/* load a grid from a parsed json object.
-		xyz are hex cube coordinates
-		json = {
-			cells: [
-				{x, y, z, depth, matCacheId, customData},
-				...
-			],
-			materials: [
-				{
-					cache_id: 0,
-					type: 'MeshLambertMaterial',
-					color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
-					imgURL: url
-				},
-				{
-					cacheId: 1, ...
-				}
-				...
-			]
-		}*/
-	load: function(json) {
-		var i, c, hex, geo, mat;
-		var cells = json.cells;
-
-		this.meshes = [];
-		this.group = new THREE.Object3D();
-		this.cells = {};
-		this.numCells = 0;
-
-		// create Hex instances and place them on the grid, and add them to the group for easy management
-		for (i = 0; i < cells.length; i++) {
-			c = cells[i];
-
-			geo = this._geoCache[c.depth];
-			if (!geo) {
-				this.extrudeSettings.amount = c.depth;
-				geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
-				this._geoCache[c.depth] = geo;
-			}
-
-			/*mat = this._matCache[c.matConfig.mat_cache_id];
-			if (!mat) { // MaterialLoader? we currently only support basic stuff though. maybe later
-				mat.map = Loader.loadTexture(c.matConfig.imgURL);
-				delete c.matConfig.imgURL;
-				mat = new THREE[c.matConfig.type](c.matConfig);
-				this._matCache[c.matConfig.mat_cache_id] = mat;
-			}*/
-
-			hex = new hg.Hex(this.cellSize, this.cellScale, geo, mat);
-			hex.depth = this.extrudeSettings.amount;
-			hex.userData.mapData = c.customData;
-
-			this.add(c, hex);
-		}
-	},
-
-	toJSON: function() {
-		var tiles = [];
-		var c, k;
-		for (k in this.cells) {
-			c = this.cells[k];
-			tiles.push({
-				x: c.x,
-				y: c.y,
-				z: c.z,
-				depth: c.w.depth,
-				matCacheId: 0,
-				customData: c.w.userData.mapData
-			});
-		}
-		return tiles;
 	}
 };

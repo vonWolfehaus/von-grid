@@ -345,5 +345,5 @@
 
 	LinkedList.prototype.constructor = LinkedList;
 
-	hg.LinkedList = LinkedList;
+	vg.LinkedList = LinkedList;
 }());

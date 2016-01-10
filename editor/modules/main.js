@@ -1,16 +1,23 @@
 window.addEventListener('load', function(evt) {
-	// make ui
-	var namespace = 'vongrid.map';
+	var data = require('data');
+	var tower = require('tower');
+	var nexus = require('nexus');
+	var Input = require('Input');
+	var keyboard = require('keyboard');
+	var motor = require('motor');
+	var EditorPlane = require('EditorPlane');
 
-	var map = window.localStorage[namespace];
-	if (map) {
-		map = JSON.parse(map);
-		console.log('Loading map from localStorage');
-	}
+
+	data.load();
+	var map = data.get('map');
 
 	var timeTilAutoSave = 200; // timer runs per frame, 60fps
 	var saveTimer = 10;
 	var dirtyMap = false;
+	var shiftDown = false;
+	var paintMode = false;
+	var deleteMode = false;
+	var addMode = false;
 
 	var saveBtn = document.getElementById('save-btn');
 	saveBtn.onmouseup = function(evt) {
@@ -49,34 +56,41 @@ window.addEventListener('load', function(evt) {
 		return false;
 	});
 
+	keyboard.on();
+	motor.on();
+
 	// setup the thing
 	var canvas = document.getElementById('view');
-	var scene = new hg.Scene({
+	var scene = new vg.Scene({
 		element: canvas,
 		cameraPosition: {x:0, y:300, z:120}
-	}, {
-		noZoom: false
-	});
+	}, true);
 
 	// listen to the orbit controls to disable the raycaster while user adjusts the view
 	scene.controls.addEventListener('wheel', onControlWheel);
 
-	var grid = new hg.HexGrid({
+	var grid = new vg.HexGrid({
 		rings: 1,
 		cellSize: 10,
 		cellDepth: 5,
 		cellScale: 0.95
 	});
+	var board = new vg.Board(grid);
+	var mouse = new vg.MouseCaster(board.group, scene.camera, canvas);
 
-	var board = new hg.Board(grid);
-	var mouse = new hg.MouseCaster(board.group, scene.camera, canvas);
-	// disable orbit controls if user hovers over a cell so they can adjust the height with the mouse wheel
-	mouse.signal.add(onMouse, this);
-
+	var input = new Input(board.group, mouse);
 	var plane = new EditorPlane(board.group, grid, mouse);
+
+	nexus.input = input;
+	nexus.plane = plane;
+	nexus.board = board;
+	nexus.grid = grid;
+	nexus.scene = scene;
+	nexus.mouse = mouse;
+
 	plane.addHoverMeshToGroup(scene.container);
 
-	plane.mapChanged.add(onMapChange, this);
+	tower.tileAction.add(onMapChange, this);
 
 	scene.add(board.group);
 	scene.focusOn(board.group);
@@ -112,10 +126,10 @@ window.addEventListener('load', function(evt) {
 			cells: mapCells,
 			materials: mapMats
 		};
+		data.set('map', map);
 		console.log('Created a new map');
 	}
 
-	update();
 	function update() {
 		if (wheelTimer < 10) {
 			wheelTimer++;
@@ -127,20 +141,15 @@ window.addEventListener('load', function(evt) {
 			saveTimer--;
 			if (saveTimer === 0) {
 				dirtyMap = false;
-				try {
-					window.localStorage[namespace] = JSON.stringify(map);
-					console.log('Auto-saved new map data');
-				}
-				catch (err) {
-					console.warn('Problem auto-saving map');
-				}
+				data.save();
 			}
 		}
 		mouse.update();
+		input.update();
 		plane.update();
 		scene.render();
-		requestAnimationFrame(update);
-	}
+	};
+	motor.add(update);
 
 	var wheelTimer = 10;
 	function onControlWheel() {
@@ -148,56 +157,13 @@ window.addEventListener('load', function(evt) {
 		wheelTimer = 0;
 	}
 
-	function onMouse(type, obj) {
-		switch (type) {
-			case hg.MouseCaster.OVER:
-				if (obj) {
-					scene.controls.noZoom = true;
-				}
-				break;
-			case hg.MouseCaster.OUT:
-				if (obj) {
-					scene.controls.noZoom = false;
-				}
-				break;
-			case hg.MouseCaster.WHEEL:
-				if (mouse.wheel < 1) {
-					// prevent wheel from going negative since cells can't extrude inside-out (well, shouldn't)
-					mouse.wheel = 1;
-				}
-				break;
-		}
-	}
-
-	function onMapChange(tile) {
+	function onMapChange() {
 		dirtyMap = true;
 		saveTimer = timeTilAutoSave;
 		map.cells = grid.toJSON();
 	}
 
-	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js
-	var link = document.createElement('a');
-	link.style.display = 'none';
-	document.body.appendChild(link); // Firefox workaround
-
-	function exportString(output, filename) {
-		var blob = new Blob([output], {type: 'text/plain'});
-		var objectURL = URL.createObjectURL(blob);
-
-		link.href = objectURL;
-		link.download = filename || 'data.json';
-		link.target = '_blank';
-
-		var evt = document.createEvent('MouseEvents');
-		evt.initMouseEvent(
-			'click', true, false, window, 0, 0, 0, 0, 0,
-			false, false, false, false, 0, null
-		);
-		link.dispatchEvent(evt);
-	}
-
 	function loadMap(json) {
-		console.log(json);
 		board.group.remove(grid.group);
 		grid.load(json);
 		board.setGrid(grid);
@@ -218,5 +184,26 @@ window.addEventListener('load', function(evt) {
 		}
 
 		exportString(output, 'hex-map.json');
+	}
+
+	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js
+	var link = document.createElement('a');
+	link.style.display = 'none';
+	document.body.appendChild(link);
+
+	function exportString(output, filename) {
+		var blob = new Blob([output], {type: 'text/plain'});
+		var objectURL = URL.createObjectURL(blob);
+
+		link.href = objectURL;
+		link.download = filename || 'data.json';
+		link.target = '_blank';
+
+		var evt = document.createEvent('MouseEvents');
+		evt.initMouseEvent(
+			'click', true, false, window, 0, 0, 0, 0, 0,
+			false, false, false, false, 0, null
+		);
+		link.dispatchEvent(evt);
 	}
 });

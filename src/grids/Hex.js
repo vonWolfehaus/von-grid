@@ -2,7 +2,7 @@
 	Grid cell that constructs its geometry for rendering and holds gameplay properties.
 */
 // 'utils/Tools'
-hg.Hex = function(size, scale, geometry, material) {
+vg.Hex = function(size, scale, geometry, material) {
 	this.material = material;
 	this.geo = geometry;
 
@@ -10,8 +10,8 @@ hg.Hex = function(size, scale, geometry, material) {
 	this.width = this.size * 2;
 	this.height = Math.sqrt(3)/2 * this.width;
 	this.depth = size;
-	this.uniqueID = hg.Tools.generateID();
-	this.objectType = hg.CEL;
+	this.uniqueID = vg.Tools.generateID();
+	this.objectType = vg.CEL;
 	this.gridPos = null; // reference to cube coordinate (a Vec3) in grid that this view represents
 	this.entity = null;
 	this.userData = {};
@@ -27,7 +27,7 @@ hg.Hex = function(size, scale, geometry, material) {
 	this.visited = false;
 	this.parent = null;
 
-	var color = hg.Tools.randomizeRGB('30, 30, 30', 10);
+	var color = vg.Tools.randomizeRGB('30, 30, 30', 10);
 
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({ // shiny!
@@ -48,7 +48,7 @@ hg.Hex = function(size, scale, geometry, material) {
 	this.position = this.mesh.position;
 	this.rotation = this.mesh.rotation;
 	// rotate it to face "up" (Y+)
-	this.rotation.x = -90 * hg.DEG_TO_RAD;
+	this.rotation.x = -90 * vg.DEG_TO_RAD;
 	this.mesh.scale.set(scale, scale, scale);
 
 	if (this.material.emissive) {
@@ -59,10 +59,10 @@ hg.Hex = function(size, scale, geometry, material) {
 	}
 };
 
-hg.Hex.FLAT = 0;
-hg.Hex.POINTY = 30 * hg.DEG_TO_RAD;
+vg.Hex.FLAT = 0;
+vg.Hex.POINTY = 30 * vg.DEG_TO_RAD;
 
-hg.Hex.prototype = {
+vg.Hex.prototype = {
 	select: function() {
 		if (this.material.emissive) {
 			this.material.emissive.setHex(this.highlight);

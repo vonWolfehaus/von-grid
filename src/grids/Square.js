@@ -2,15 +2,15 @@
 	Grid cell that constructs its geometry for rendering and holds gameplay properties.
  */
 // 'utils/Tools'
-hg.Square = function(size, scale, geometry, material) {
-	this.type = hg.Square.FLAT;
+vg.Square = function(size, scale, geometry, material) {
+	this.type = vg.Square.FLAT;
 	this.material = material;
 	this.geo = geometry;
 
 	this.size = size;
 	this.depth = size;
-	this.uniqueID = hg.Tools.generateID();
-	this.objectType = hg.CEL;
+	this.uniqueID = vg.Tools.generateID();
+	this.objectType = vg.CEL;
 	this.gridPos = null; // reference to cell object (a Vec3) in grid that this view represents
 	this.entity = null; // reference to cell object in grid that this view represents
 
@@ -27,7 +27,7 @@ hg.Square = function(size, scale, geometry, material) {
 	this.visited = false;
 	this.parent = null;
 
-	var color = hg.Tools.randomizeRGB('30, 30, 30', 10);
+	var color = vg.Tools.randomizeRGB('30, 30, 30', 10);
 
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({
@@ -54,10 +54,10 @@ hg.Square = function(size, scale, geometry, material) {
 	this._emissive = this.material.emissive.getHex();
 };
 
-hg.Square.FLAT = 0;
-hg.Square.POINTY = 45 * 0.0174532925;
+vg.Square.FLAT = 0;
+vg.Square.POINTY = 45 * 0.0174532925;
 
-hg.Square.prototype = {
+vg.Square.prototype = {
 	select: function() {
 		this.material.emissive.setHex(this.highlight);
 		this.selected = true;

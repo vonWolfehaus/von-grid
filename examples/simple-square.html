@@ -26,23 +26,23 @@
 
 	<script type="text/javascript" src="../lib/three.min.js"></script>
 	<script type="text/javascript" src="../lib/OrbitControls.js"></script>
-	<script type="text/javascript" src="../dist/hex-grid.min.js"></script>
+	<script type="text/javascript" src="../dist/sqr-grid.min.js"></script>
 	<script type="text/javascript">
 	window.addEventListener('load', function(evt) {
 
-		var scene = new hg.Scene({
+		var scene = new vg.Scene({
 			element: document.getElementById('view'),
 			cameraPosition: {x:0, y:150, z:150}
 		}, true);
 
-		var grid = new hg.SquareGrid({
+		var grid = new vg.SquareGrid({
 			width: 5,
 			height: 8,
 			cellSize: 10,
 			cellScale: 0.95
 		});
 
-		var board = new hg.Board(grid);
+		var board = new vg.Board(grid);
 
 		scene.add(board.group);
 		scene.focusOn(board.group);

@@ -3,18 +3,18 @@
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 // 'utils/Tools', 'lib/LinkedList'
-hg.AStarFinder = function(finderConfig) {
+vg.AStarFinder = function(finderConfig) {
 	finderConfig = finderConfig || {};
 
 	this.allowDiagonal = false;
 	this.heuristicFilter = null;
 
-	hg.Tools.merge(this, finderConfig);
+	vg.Tools.merge(this, finderConfig);
 
-	this.list = new hg.LinkedList();
+	this.list = new vg.LinkedList();
 };
 
-hg.AStarFinder.prototype = {
+vg.AStarFinder.prototype = {
 	/*
 		Find and return the path.
 		@return Array<Cell> The path, including both start and end positions. Null if it failed.
@@ -41,7 +41,7 @@ hg.AStarFinder.prototype = {
 
 			// if reached the end position, construct the path and return it
 			if (current === endNode) {
-				return hg.PathUtil.backtrace(endNode);
+				return vg.PathUtil.backtrace(endNode);
 			}
 
 			// cycle through each neighbor of the current current
@@ -66,7 +66,7 @@ hg.AStarFinder.prototype = {
 
 					// check neighbor if it's the end current as well--often cuts steps by a significant amount
 					if (neighbor === endNode) {
-						return hg.PathUtil.backtrace(endNode);
+						return vg.PathUtil.backtrace(endNode);
 					}
 
 					this.list.add(neighbor);

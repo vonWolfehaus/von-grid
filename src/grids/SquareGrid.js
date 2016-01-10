@@ -2,13 +2,13 @@
 	2D square graph. Handles grid cell management (placement math for eg pathfinding, range-finding, etc), exposes generalized interface.
  */
 // 'graphs/Square', 'utils/Tools'
-hg.SquareGrid = function(config) {
+vg.SquareGrid = function(config) {
 	var x, z, c;
 	if (!config) config = {};
 	var gridSettings = {
 		width: 5,
 		height: 5,
-		type: hg.Square.FLAT,
+		type: vg.Square.FLAT,
 		cellSize: 10,
 		cellScale: 0.95,
 		extrudeSettings: {
@@ -21,15 +21,15 @@ hg.SquareGrid = function(config) {
 		}
 	};
 
-	hg.Tools.merge(true, gridSettings, config);
+	vg.Tools.merge(true, gridSettings, config);
 
 	this.width = gridSettings.width;
 	this.height = gridSettings.height;
 	this.cellSize = gridSettings.cellSize;
 	this.cellScale = gridSettings.cellScale;
-	this.type = gridSettings.type || hg.Square.FLAT;
+	this.type = gridSettings.type || vg.Square.FLAT;
 
-	this.rotationIncrement = hg.Square.POINTY;
+	this.rotationIncrement = vg.Square.POINTY;
 	// holds the grid position of each cell, to which our meshes are attached to in the Board entity
 	this.cells = {};
 	this.numCells = 0;
@@ -69,7 +69,7 @@ hg.SquareGrid = function(config) {
 	// create Square instances and place them on the grid, and add them to the group for easy management
 	this.meshes = [];
 	for (i in this.cells) {
-		box = new hg.Square(this.cellSize, this.cellScale, this.boxGeo, this.boxMat);
+		box = new vg.Square(this.cellSize, this.cellScale, this.boxGeo, this.boxMat);
 		cell = this.cells[i];
 		cell.w = box;
 		box.depth = gridSettings.extrudeSettings.amount;
@@ -92,7 +92,7 @@ hg.SquareGrid = function(config) {
 	this._vec3 = new THREE.Vector3();
 };
 
-hg.SquareGrid.prototype = {
+vg.SquareGrid.prototype = {
 	/*
 		High-level functions that the Board interfaces with (all grids implement).
 	 */
@@ -157,7 +157,7 @@ hg.SquareGrid.prototype = {
 	},
 
 	getRandomCell: function() {
-		var c, i = 0, x = hg.Tools.randomInt(0, this.numCells);
+		var c, i = 0, x = vg.Tools.randomInt(0, this.numCells);
 		for (c in this.cells) {
 			if (i === x) {
 				return this.cells[c].w;

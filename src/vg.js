@@ -1,5 +1,5 @@
-var hg = { // eslint-disable-line
-	VERSION: '0.8.0',
+var vg = { // eslint-disable-line
+	VERSION: '0.8.1',
 
 	PI: Math.PI,
 	TAU: Math.PI * 2,

@@ -1,7 +1,7 @@
 /*
 	@source https://github.com/qiao/PathFinding.js/
 */
-hg.PathUtil = {
+vg.PathUtil = {
 	/**
 	 * Backtrace according to the parent records and return the path.
 	 * (including both start and end nodes)

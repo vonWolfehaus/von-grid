@@ -1,4 +1,4 @@
-hg.Loader = {
+vg.Loader = {
 	manager: null,
 	imageLoader: null,
 	crossOrigin: false,

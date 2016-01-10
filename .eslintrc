@@ -2,7 +2,7 @@
 	"root": true,
 	"extends": "eslint:recommended",
 	"globals": {
-		"hg": true,
+		"vg": true,
 		"THREE": true
 	},
 	"rules": {

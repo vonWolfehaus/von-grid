@@ -5,7 +5,7 @@
 	Assumes full screen.
  */
 // 'utils/Tools'
-hg.Scene = function(sceneConfig, controlConfig) {
+vg.Scene = function(sceneConfig, controlConfig) {
 	var sceneSettings = {
 		element: document.body,
 		alpha: true,
@@ -26,8 +26,8 @@ hg.Scene = function(sceneConfig, controlConfig) {
 		noZoom: false
 	};
 
-	hg.Tools.merge(sceneSettings, sceneConfig);
-	hg.Tools.merge(controlSettings, controlConfig);
+	vg.Tools.merge(sceneSettings, sceneConfig);
+	if (typeof controlConfig !== 'boolean') vg.Tools.merge(controlSettings, controlConfig);
 
 	this.renderer = new THREE.WebGLRenderer({
 		alpha: sceneSettings.alpha,
@@ -94,7 +94,7 @@ hg.Scene = function(sceneConfig, controlConfig) {
 	this.attachTo(sceneSettings.element);
 };
 
-hg.Scene.prototype = {
+vg.Scene.prototype = {
 
 	attachTo: function(element) {
 		element.style.width = this.width + 'px';

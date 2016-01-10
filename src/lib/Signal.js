@@ -437,5 +437,5 @@
 
     Signal.prototype.constructor = Signal;
 
-    hg.Signal = Signal;
+    vg.Signal = Signal;
 }());
