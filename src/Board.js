@@ -19,12 +19,7 @@ vg.Board = function(grid, finderConfig) {
 
 vg.Board.prototype = {
 
-	// smoothly animate a piece from its current position to the cell
-	moveEntityToCell: function(entity, cell) {
-
-	},
-
-	// immediately snap a piece to a cell; doesn't have to be a member of the board, merely copies position
+	// immediately snap a piece to a cell; merely copies position
 	placeEntityAtCell: function(entity, cell) {
 		this.grid.cellToPixel(cell, entity.position);
 		entity.position.y += entity.offsetY;
@@ -37,23 +32,18 @@ vg.Board.prototype = {
 		cell.entity = entity;
 	},
 
+	placeAtCell: function(vec, cell) {
+		// var c = this.grid.pixelToCell(vec);
+		// this.grid.cellToPixel(cell, vec);
+		// console.log(cell);
+	},
+
 	findPath: function(startCell, endCell, heuristic) {
 		return this.finder.findPath(startCell, endCell, heuristic, this.grid);
 	},
 
 	getRandomCell: function() {
 		return this.grid.getRandomCell();
-	},
-
-	// rotate the board either left (-1, default) or right (1)
-	rotate: function(direction, animate) {
-		animate = animate || false;
-		if (animate) {
-			// todo?
-		}
-		else {
-			this.group.rotation.y += (this.grid.rotationIncrement * (direction || -1)) * 2;
-		}
 	},
 
 	// i think it's better to grab cells from the grid, then check the entities on them instead

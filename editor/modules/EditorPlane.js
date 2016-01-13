@@ -19,10 +19,11 @@ define('EditorPlane', function() {
 
 		this.generatePlane(500, 500);
 
-		this.hoverMesh = this.grid.generateCellView(2, new THREE.MeshBasicMaterial({
+		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
 			color: 0xffe419,
-			transparent: true,
-			opacity: 0.5,
+			// transparent: true,
+			// opacity: 0.5,
+			// emissive: new THREE.Color(0xffe419),
 			side: THREE.DoubleSide
 		}));
 
@@ -92,19 +93,29 @@ define('EditorPlane', function() {
 		},*/
 
 		addHoverMeshToGroup: function(group) {
-			if (this.hoverMesh.mesh.parent) {
-				this.hoverMesh.mesh.parent.remove(this.hoverMesh.mesh);
+			if (this.hoverMesh.parent) {
+				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			group.add(this.hoverMesh.mesh);
+			group.add(this.hoverMesh);
 		},
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
-				this.hoverMesh.placeAt(this.grid.pixelToCell(this.nexus.input.gridPixelPos));
-				this.hoverMesh.mesh.visible = true;
+				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				this.hoverMesh.position.y++; // bring it on top so polygons don't overlap
+				// this.hoverMesh.position.copy(this.grid.pixelToAxial(this.nexus.input.editorWorldPos));
+				// this.hoverMesh.position.copy(this.grid.project(this.nexus.input.editorWorldPos, 1));
+				// this.grid.pixelToCell(this.hoverMesh.position); // ????
+				// this.hoverMesh.position.y = this.nexus.input.editorWorldPos.z;
+				// this.hoverMesh.position.z = -this.nexus.input.editorWorldPos.y;
+
+				// this.hoverMesh.position.copy(this.nexus.input.editorWorldPos);
+				// this.nexus.board.placeAtCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				// this.hoverMesh.placeAt(this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				this.hoverMesh.visible = true;
 			}
 			else {
-				this.hoverMesh.mesh.visible = false;
+				this.hoverMesh.visible = false;
 			}
 		}
 	};

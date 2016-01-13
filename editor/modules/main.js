@@ -2,11 +2,11 @@ window.addEventListener('load', function(evt) {
 	var data = require('data');
 	var tower = require('tower');
 	var nexus = require('nexus');
-	var Input = require('Input');
 	var keyboard = require('keyboard');
 	var motor = require('motor');
-	var EditorPlane = require('EditorPlane');
 
+	var Input = require('Input');
+	var EditorPlane = require('EditorPlane');
 
 	data.load();
 	var map = data.get('map');

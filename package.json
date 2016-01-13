@@ -10,6 +10,7 @@
     "gulp-add-src": "^0.2.0",
     "gulp-autoprefixer": "^3.0.2",
     "gulp-concat": "^2.4.1",
+    "gulp-doxx": "0.0.5",
     "gulp-eslint": "^1.1.0",
     "gulp-flatten": "^0.2.0",
     "gulp-if": "^2.0.0",

@@ -19,7 +19,7 @@ define('Editor', function() {
 	motor.add(update);
 
 	function update() {
-		currentGridCell = nexus.grid.pixelToCell(nexus.input.gridPixelPos);
+		currentGridCell = nexus.grid.pixelToCell(nexus.input.editorWorldPos);
 		if (nexus.mouse.down && keyboard.shift && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// only check if the user's mouse is over the editor plane
 			if (!currentGridCell.equals(prevGridCell)) {
@@ -41,7 +41,7 @@ define('Editor', function() {
 					var dif = (nexus.input.overCell.depth / heightStep) - data;
 					nexus.mouse.wheel = (overCell.depth / heightStep) + (dif > 0 ? -1 : 1);
 
-					cell = nexus.grid.generateCellView(nexus.mouse.wheel * heightStep);
+					cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
 					nexus.grid.add(gridPos, cell);
 					lastHeight = nexus.mouse.wheel;
 
@@ -89,7 +89,7 @@ define('Editor', function() {
 	function addTile() {
 		if (!currentGridCell || nexus.grid.getTileAtCell(currentGridCell)) return;
 		nexus.mouse.wheel = lastHeight;
-		var cell = nexus.grid.generateCellView(nexus.mouse.wheel * heightStep);
+		var cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
 		nexus.grid.add(currentGridCell, cell);
 
 		tower.tileAction.dispatch(tower.CELL_ADD, cell, heightStep);

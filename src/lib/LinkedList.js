@@ -7,17 +7,17 @@
 
 	To add an item use:
 	<pre><code>
-	  list.add(newItem);
+		list.add(newItem);
 	</code></pre>
 	<p>
 	You can iterate using the first and next members, such as:
 	<pre><code>
-	  var node = list.first;
-	  while (node)
-	  {
-	      node.object().DOSOMETHING();
-	      node = node.next();
-	  }
+		var node = list.first;
+		while (node)
+		{
+			node.object().DOSOMETHING();
+			node = node.next();
+		}
 	</code></pre>
  */
 (function() {

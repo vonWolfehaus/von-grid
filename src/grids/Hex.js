@@ -8,10 +8,10 @@ vg.Hex = function(size, scale, geometry, material) {
 
 	this.size = size;
 	this.width = this.size * 2;
-	this.height = Math.sqrt(3)/2 * this.width;
+	this.height = (vg.SQRT3 * 0.5) * this.width;
 	this.depth = size;
 	this.uniqueID = vg.Tools.generateID();
-	this.objectType = vg.CEL;
+	this.objectType = vg.TILE;
 	this.gridPos = null; // reference to cube coordinate (a Vec3) in grid that this view represents
 	this.entity = null;
 	this.userData = {};
@@ -31,8 +31,7 @@ vg.Hex = function(size, scale, geometry, material) {
 
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({ // shiny!
-			color: color,
-			// ambient: color
+			color: color
 		});
 	}
 
@@ -58,9 +57,6 @@ vg.Hex = function(size, scale, geometry, material) {
 		this._emissive = null;
 	}
 };
-
-vg.Hex.FLAT = 0;
-vg.Hex.POINTY = 30 * vg.DEG_TO_RAD;
 
 vg.Hex.prototype = {
 	select: function() {
