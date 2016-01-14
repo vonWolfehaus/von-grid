@@ -94,6 +94,9 @@ window.addEventListener('load', function(evt) {
 	nexus.scene = scene;
 	nexus.mouse = mouse;
 
+	var boardSize = 20; // TODO: get from settings
+	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
+	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
 
 	tower.tileAction.add(onMapChange, this);
@@ -490,17 +493,15 @@ define('EditorPlane', function() {
 		this.geometry = null;
 		this.mesh = null;
 		this.material = new THREE.MeshBasicMaterial({
-			color: 0xeeeeee,
+			color: 0xffffff,
 			side: THREE.DoubleSide
 		});
 
 		this.scene = scene;
 		this.grid = grid;
 
-		this.generatePlane(500, 500);
-
 		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
-			color: 0xffe419,
+			color: 0x19AEFF,
 			// transparent: true,
 			// opacity: 0.5,
 			// emissive: new THREE.Color(0xffe419),
@@ -547,6 +548,7 @@ define('EditorPlane', function() {
 			this.geometry = new THREE.PlaneBufferGeometry(width, width, 1, 1);
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
+			this.mesh.position.y -= 0.5;
 			this.scene.add(this.mesh);
 		},
 
@@ -582,16 +584,7 @@ define('EditorPlane', function() {
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
 				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
-				this.hoverMesh.position.y++; // bring it on top so polygons don't overlap
-				// this.hoverMesh.position.copy(this.grid.pixelToAxial(this.nexus.input.editorWorldPos));
-				// this.hoverMesh.position.copy(this.grid.project(this.nexus.input.editorWorldPos, 1));
-				// this.grid.pixelToCell(this.hoverMesh.position); // ????
-				// this.hoverMesh.position.y = this.nexus.input.editorWorldPos.z;
-				// this.hoverMesh.position.z = -this.nexus.input.editorWorldPos.y;
-
-				// this.hoverMesh.position.copy(this.nexus.input.editorWorldPos);
-				// this.nexus.board.placeAtCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
-				// this.hoverMesh.placeAt(this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				this.hoverMesh.position.y += 0.5;
 				this.hoverMesh.visible = true;
 			}
 			else {
@@ -737,7 +730,7 @@ define('Editor', function() {
 					var gridPos = overCell.gridPos;
 					nexus.grid.remove(overCell);
 
-					var dif = (nexus.input.overCell.depth / heightStep) - data;
+					var dif = lastHeight - data;
 					nexus.mouse.wheel = (overCell.depth / heightStep) + (dif > 0 ? -1 : 1);
 
 					cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);

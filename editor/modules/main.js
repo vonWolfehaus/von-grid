@@ -88,6 +88,9 @@ window.addEventListener('load', function(evt) {
 	nexus.scene = scene;
 	nexus.mouse = mouse;
 
+	var boardSize = 20; // TODO: get from settings
+	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
+	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
 
 	tower.tileAction.add(onMapChange, this);

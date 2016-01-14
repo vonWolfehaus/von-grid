@@ -25,10 +25,13 @@ vg.HexGrid = function(config) {
 
 	vg.Tools.merge(true, gridSettings, config);
 
+	this.type = vg.HEX;
+
 	// number of cells (in radius); only used if the map is generated
 	this.size = gridSettings.rings;
 	this.cellSize = gridSettings.cellSize;
 	this.cellScale = gridSettings.cellScale;
+	this.cellSides = 6;
 
 	this.extrudeSettings = gridSettings.extrudeSettings;
 	this.extrudeSettings.amount = gridSettings.cellDepth;
@@ -40,7 +43,7 @@ vg.HexGrid = function(config) {
 	// holds the Hex instances data that is displayed; still working on a decent naming convention, sorry
 	this.meshes = [];
 
-	this.hexShape = null;
+	this.cellShape = null;
 	this.cellWidth = this.cellSize * 2;
 	this.cellHeight = (vg.SQRT3 * 0.5) * this.cellWidth;
 	this.hashDelimeter = '.';
@@ -52,17 +55,21 @@ vg.HexGrid = function(config) {
 	var i, verts = [];
 	// create the skeleton of the hex
 	for (i = 0; i < 6; i++) {
-		verts.push(this.createVert(i, vg.Hex.FLAT));
+		verts.push(this.createVert(i));
 	}
 	// copy the verts into a shape for the geometry to use
-	this.hexShape = new THREE.Shape();
-	this.hexShape.moveTo(verts[0].x, verts[0].y);
+	this.cellShape = new THREE.Shape();
+	this.cellShape.moveTo(verts[0].x, verts[0].y);
 	for (i = 1; i < 6; i++) {
-		this.hexShape.lineTo(verts[i].x, verts[i].y);
+		this.cellShape.lineTo(verts[i].x, verts[i].y);
 	}
-	this.hexShape.lineTo(verts[0].x, verts[0].y);
+	this.cellShape.lineTo(verts[0].x, verts[0].y);
 
-	this.hexShapeGeo = new THREE.ShapeGeometry(this.hexShape);
+	this.cellGeo = new THREE.Geometry();
+	this.cellGeo.vertices = verts;
+	this.cellGeo.verticesNeedUpdate = true;
+
+	this.cellShapeGeo = new THREE.ShapeGeometry(this.cellShape);
 
 	// pre-computed permutations
 	this._directions = [new THREE.Vector3(+1, -1, 0), new THREE.Vector3(+1, 0, -1), new THREE.Vector3(0, +1, -1),
@@ -132,7 +139,7 @@ vg.HexGrid.prototype = {
 	setPositionToCell: function(pos, cell) {
 		pos.x = cell.x * this.cellWidth * 0.75;
 		pos.y = 0;
-		pos.z = (cell.z - cell.y) * this.cellHeight * 0.5;
+		pos.z = (cell.z - cell.y) * this.cellHeight;
 	},
 
 	getTileAtCell: function(c) {
@@ -213,7 +220,7 @@ vg.HexGrid.prototype = {
 		this.extrudeSettings.amount = height;
 		var geo = this._geoCache[height];
 		if (!geo) {
-			geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+			geo = new THREE.ExtrudeGeometry(this.cellShape, this.extrudeSettings);
 			this._geoCache[height] = geo;
 		}
 		var hex = new vg.Hex(this.cellSize, this.cellScale, geo, material);
@@ -225,13 +232,13 @@ vg.HexGrid.prototype = {
 		if (!material) {
 			material = new THREE.MeshBasicMaterial({color: 0x24b4ff});
 		}
-		var mesh = new THREE.Mesh(this.hexShapeGeo, material);
+		var mesh = new THREE.Mesh(this.cellShapeGeo, material);
 		this._vec3.set(1, 0, 0);
 		mesh.rotateOnAxis(this._vec3, vg.PI/2);
 		return mesh;
 	},
 
-	// create a flat, hexagon-shaped grid.
+	// create a flat, hexagon-shaped grid
 	generate: function() {
 		var x, y, z, c;
 		c = new THREE.Vector3();
@@ -249,7 +256,7 @@ vg.HexGrid.prototype = {
 		}
 	},
 
-	createVert: function(i, type) {
+	createVert: function(i) {
 		var angle = (vg.TAU / 6) * i;
 		return new THREE.Vector3((this.cellSize * Math.cos(angle)), (this.cellSize * Math.sin(angle)), 0);
 	},
@@ -324,7 +331,7 @@ vg.HexGrid.prototype = {
 			geo = this._geoCache[c.depth];
 			if (!geo) {
 				this.extrudeSettings.amount = c.depth;
-				geo = new THREE.ExtrudeGeometry(this.hexShape, this.extrudeSettings);
+				geo = new THREE.ExtrudeGeometry(this.cellShape, this.extrudeSettings);
 				this._geoCache[c.depth] = geo;
 			}
 

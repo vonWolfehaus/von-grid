@@ -10,6 +10,7 @@ vg.Board = function(grid, finderConfig) {
 	// this.pieces = []; // haven't found a use for this yet
 	this.group = new THREE.Object3D();
 	this.grid = null;
+	this.overlay = null;
 	this.finder = new vg.AStarFinder(finderConfig);
 	// need to keep a resource cache around, so this Loader does that, use it instead of THREE.ImageUtils
 	vg.Loader.init();
@@ -75,5 +76,54 @@ vg.Board.prototype = {
 		}
 		this.grid = newGrid;
 		this.group.add(newGrid.group);
+	},
+
+	generateOverlay: function(size) {
+		var mat = new THREE.LineBasicMaterial({
+			color: 0x000000,
+			opacity: 0.3
+		});
+
+		if (this.overlay) {
+			this.group.remove(this.overlay);
+		}
+
+		this.overlay = new THREE.Object3D();
+		var vec = new THREE.Vector3();
+		var x, y, z;
+
+		if (this.grid.type === vg.HEX) {
+			for (x = -size; x < size+1; x++) {
+				for (y = -size; y < size+1; y++) {
+					z = -x-y;
+					if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
+						vec.set(x, y, z);
+						var line = new THREE.Line(this.grid.cellGeo, mat);
+						this.grid.setPositionToCell(line.position, vec);
+						line.rotation.x = 90 * vg.DEG_TO_RAD;
+						this.overlay.add(line);
+					}
+				}
+			}
+		}
+		else if (this.grid.type === vg.SQR) {
+			/*for (x = -size; x < size+1; x++) {
+				for (y = -size; y < size+1; y++) {
+					if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
+						vec.set(x, y, z);
+						var line = new THREE.Line(this.grid.cellGeo, mat);
+						this.grid.setPositionToCell(line.position, vec);
+						line.rotation.x = 90 * vg.DEG_TO_RAD;
+						this.overlay.add(line);
+					}
+				}
+			}*/
+		}
+		else {
+			console.warn('The board cannot generate '+this.grid.type+'-type grid overlays');
+		}
+
+
+		this.group.add(this.overlay);
 	}
 };

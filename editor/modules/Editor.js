@@ -38,7 +38,7 @@ define('Editor', function() {
 					var gridPos = overCell.gridPos;
 					nexus.grid.remove(overCell);
 
-					var dif = (nexus.input.overCell.depth / heightStep) - data;
+					var dif = lastHeight - data;
 					nexus.mouse.wheel = (overCell.depth / heightStep) + (dif > 0 ? -1 : 1);
 
 					cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);

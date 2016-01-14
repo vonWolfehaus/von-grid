@@ -1,5 +1,5 @@
 var vg = { // eslint-disable-line
-	VERSION: '0.8.1',
+	VERSION: '0.1.1',
 
 	PI: Math.PI,
 	TAU: Math.PI * 2,
@@ -11,4 +11,8 @@ var vg = { // eslint-disable-line
 	TILE: 'tile', // visual representation of a grid cell
 	ENT: 'entity', // dynamic things
 	STR: 'structure', // static things
+
+	HEX: 'hex',
+	SQR: 'square',
+	ABS: 'abstract'
 };
