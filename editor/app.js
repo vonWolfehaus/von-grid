@@ -501,7 +501,7 @@ define('EditorPlane', function() {
 		this.grid = grid;
 
 		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
-			color: 0x19AEFF,
+			color: 0x1aaeff,
 			// transparent: true,
 			// opacity: 0.5,
 			// emissive: new THREE.Color(0xffe419),
@@ -548,7 +548,7 @@ define('EditorPlane', function() {
 			this.geometry = new THREE.PlaneBufferGeometry(width, width, 1, 1);
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
-			this.mesh.position.y -= 0.5;
+			this.mesh.position.y -= 0.1;
 			this.scene.add(this.mesh);
 		},
 
@@ -584,7 +584,7 @@ define('EditorPlane', function() {
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
 				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
-				this.hoverMesh.position.y += 0.5;
+				this.hoverMesh.position.y += 0.1;
 				this.hoverMesh.visible = true;
 			}
 			else {

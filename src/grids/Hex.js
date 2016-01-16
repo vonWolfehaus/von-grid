@@ -17,7 +17,7 @@ vg.Hex = function(size, scale, geometry, material) {
 	this.userData = {};
 
 	this.selected = false;
-	this.highlight = '0x16A8F7';
+	this.highlight = '0x0084cc';
 
 	// path options
 	this.walkable = true;
