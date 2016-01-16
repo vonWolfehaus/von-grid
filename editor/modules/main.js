@@ -2,11 +2,11 @@ window.addEventListener('load', function(evt) {
 	var data = require('data');
 	var tower = require('tower');
 	var nexus = require('nexus');
-	var Input = require('Input');
 	var keyboard = require('keyboard');
 	var motor = require('motor');
-	var EditorPlane = require('EditorPlane');
 
+	var Input = require('Input');
+	var EditorPlane = require('EditorPlane');
 
 	data.load();
 	var map = data.get('map');
@@ -88,6 +88,9 @@ window.addEventListener('load', function(evt) {
 	nexus.scene = scene;
 	nexus.mouse = mouse;
 
+	var boardSize = 20; // TODO: get from settings
+	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
+	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
 
 	tower.tileAction.add(onMapChange, this);

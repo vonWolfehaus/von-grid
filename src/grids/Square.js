@@ -10,7 +10,7 @@ vg.Square = function(size, scale, geometry, material) {
 	this.size = size;
 	this.depth = size;
 	this.uniqueID = vg.Tools.generateID();
-	this.objectType = vg.CEL;
+	this.objectType = vg.TILE;
 	this.gridPos = null; // reference to cell object (a Vec3) in grid that this view represents
 	this.entity = null; // reference to cell object in grid that this view represents
 
@@ -31,8 +31,7 @@ vg.Square = function(size, scale, geometry, material) {
 
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({
-			color: color,
-			// ambient: color
+			color: color
 		});
 	}
 

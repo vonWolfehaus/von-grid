@@ -13,7 +13,7 @@ define('Input', function() {
 		this.mouseDelta = new THREE.Vector3();
 		this.mousePanMinDistance = 0.1;
 		this.heightStep = 5;
-		this.gridPixelPos = new THREE.Vector3(); // current grid position of mouse
+		this.editorWorldPos = new THREE.Vector3(); // current grid position of mouse
 
 		this.overCell = null;
 
@@ -34,9 +34,9 @@ define('Input', function() {
 			var hit = this.mouse.allHits[0];
 			if (hit) {
 				// flip things around a little to fit to our rotated grid
-				this.gridPixelPos.x = hit.point.x;
-				this.gridPixelPos.y = -hit.point.z;
-				this.gridPixelPos.z = hit.point.y;
+				this.editorWorldPos.x = hit.point.x;
+				this.editorWorldPos.y = -hit.point.z;
+				this.editorWorldPos.z = hit.point.y;
 			}
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 			var dy = this.mouseDelta.y - this.mouse.screenPosition.y;

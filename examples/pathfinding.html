@@ -32,7 +32,7 @@
 	/*
 		Hi! In this example I setup a regular board, choose a couple random spots, put a start and end sprite on them, then have the pathfinder do its thing. There's a lot of sprite interaction logic so you can drag the end points around as well as place and remove obstacles.
 
-		If you want to see the pathfinder in action on varied terrain, go change the Grid's generateCellView() function to use a height of `Math.floor(Math.random() * 40)+1` (for example), then comment out the cameraType just below here so it'll use a perspective camera instead, allowing you to see the differences in height.
+		If you want to see the pathfinder in action on varied terrain, go change the Grid's generateTile() function to use a height of `Math.floor(Math.random() * 40)+1` (for example), then comment out the cameraType just below here so it'll use a perspective camera instead, allowing you to see the differences in height.
 
 		I also added an example heuristic filter that will discard neighbors that are too tall to "jump" to, forcing the algorithm to find a winding path through the valleys and canyons. It's also possible to not find a path in this scenario, in which case `null` is returned.
 	*/

@@ -10,19 +10,18 @@ define('EditorPlane', function() {
 		this.geometry = null;
 		this.mesh = null;
 		this.material = new THREE.MeshBasicMaterial({
-			color: 0xeeeeee,
+			color: 0xffffff,
 			side: THREE.DoubleSide
 		});
 
 		this.scene = scene;
 		this.grid = grid;
 
-		this.generatePlane(500, 500);
-
-		this.hoverMesh = this.grid.generateCellView(2, new THREE.MeshBasicMaterial({
-			color: 0xffe419,
-			transparent: true,
-			opacity: 0.5,
+		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
+			color: 0x1aaeff,
+			// transparent: true,
+			// opacity: 0.5,
+			// emissive: new THREE.Color(0xffe419),
 			side: THREE.DoubleSide
 		}));
 
@@ -66,6 +65,7 @@ define('EditorPlane', function() {
 			this.geometry = new THREE.PlaneBufferGeometry(width, width, 1, 1);
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
+			this.mesh.position.y -= 0.1;
 			this.scene.add(this.mesh);
 		},
 
@@ -92,19 +92,20 @@ define('EditorPlane', function() {
 		},*/
 
 		addHoverMeshToGroup: function(group) {
-			if (this.hoverMesh.mesh.parent) {
-				this.hoverMesh.mesh.parent.remove(this.hoverMesh.mesh);
+			if (this.hoverMesh.parent) {
+				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			group.add(this.hoverMesh.mesh);
+			group.add(this.hoverMesh);
 		},
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
-				this.hoverMesh.placeAt(this.grid.pixelToCell(this.nexus.input.gridPixelPos));
-				this.hoverMesh.mesh.visible = true;
+				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				this.hoverMesh.position.y += 0.1;
+				this.hoverMesh.visible = true;
 			}
 			else {
-				this.hoverMesh.mesh.visible = false;
+				this.hoverMesh.visible = false;
 			}
 		}
 	};

@@ -8,11 +8,11 @@ window.addEventListener('load', function(evt) {
 	var data = require('data');
 	var tower = require('tower');
 	var nexus = require('nexus');
-	var Input = require('Input');
 	var keyboard = require('keyboard');
 	var motor = require('motor');
-	var EditorPlane = require('EditorPlane');
 
+	var Input = require('Input');
+	var EditorPlane = require('EditorPlane');
 
 	data.load();
 	var map = data.get('map');
@@ -94,6 +94,9 @@ window.addEventListener('load', function(evt) {
 	nexus.scene = scene;
 	nexus.mouse = mouse;
 
+	var boardSize = 20; // TODO: get from settings
+	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
+	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
 
 	tower.tileAction.add(onMapChange, this);
@@ -400,7 +403,7 @@ define('Input', function() {
 		this.mouseDelta = new THREE.Vector3();
 		this.mousePanMinDistance = 0.1;
 		this.heightStep = 5;
-		this.gridPixelPos = new THREE.Vector3(); // current grid position of mouse
+		this.editorWorldPos = new THREE.Vector3(); // current grid position of mouse
 
 		this.overCell = null;
 
@@ -421,9 +424,9 @@ define('Input', function() {
 			var hit = this.mouse.allHits[0];
 			if (hit) {
 				// flip things around a little to fit to our rotated grid
-				this.gridPixelPos.x = hit.point.x;
-				this.gridPixelPos.y = -hit.point.z;
-				this.gridPixelPos.z = hit.point.y;
+				this.editorWorldPos.x = hit.point.x;
+				this.editorWorldPos.y = -hit.point.z;
+				this.editorWorldPos.z = hit.point.y;
 			}
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 			var dy = this.mouseDelta.y - this.mouse.screenPosition.y;
@@ -490,19 +493,18 @@ define('EditorPlane', function() {
 		this.geometry = null;
 		this.mesh = null;
 		this.material = new THREE.MeshBasicMaterial({
-			color: 0xeeeeee,
+			color: 0xffffff,
 			side: THREE.DoubleSide
 		});
 
 		this.scene = scene;
 		this.grid = grid;
 
-		this.generatePlane(500, 500);
-
-		this.hoverMesh = this.grid.generateCellView(2, new THREE.MeshBasicMaterial({
-			color: 0xffe419,
-			transparent: true,
-			opacity: 0.5,
+		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
+			color: 0x1aaeff,
+			// transparent: true,
+			// opacity: 0.5,
+			// emissive: new THREE.Color(0xffe419),
 			side: THREE.DoubleSide
 		}));
 
@@ -546,6 +548,7 @@ define('EditorPlane', function() {
 			this.geometry = new THREE.PlaneBufferGeometry(width, width, 1, 1);
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
+			this.mesh.position.y -= 0.1;
 			this.scene.add(this.mesh);
 		},
 
@@ -572,19 +575,20 @@ define('EditorPlane', function() {
 		},*/
 
 		addHoverMeshToGroup: function(group) {
-			if (this.hoverMesh.mesh.parent) {
-				this.hoverMesh.mesh.parent.remove(this.hoverMesh.mesh);
+			if (this.hoverMesh.parent) {
+				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			group.add(this.hoverMesh.mesh);
+			group.add(this.hoverMesh);
 		},
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
-				this.hoverMesh.placeAt(this.grid.pixelToCell(this.nexus.input.gridPixelPos));
-				this.hoverMesh.mesh.visible = true;
+				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				this.hoverMesh.position.y += 0.1;
+				this.hoverMesh.visible = true;
 			}
 			else {
-				this.hoverMesh.mesh.visible = false;
+				this.hoverMesh.visible = false;
 			}
 		}
 	};
@@ -603,10 +607,14 @@ define('motor', function() {
 	function on() {
 		_brake = false;
 		window.requestAnimationFrame(_update);
+		window.addEventListener('focus', onFocus, false);
+		window.addEventListener('blur', onBlur, false);
 	}
 
 	function off() {
 		_brake = true;
+		window.removeEventListener('focus', onFocus, false);
+		window.removeEventListener('blur', onBlur, false);
 	}
 
 	// in order to be able to ID functions we have to hash them to generate unique-ish keys for us to find them with later
@@ -654,6 +662,15 @@ define('motor', function() {
 		return -1;
 	}
 
+	function onFocus(evt) {
+		_brake = false;
+		_update();
+	}
+
+	function onBlur(evt) {
+		_brake = true;
+	}
+
 	function _hashStr(str) {
 		var hash = 0, i, chr, len;
 		if (str.length === 0) return hash;
@@ -694,7 +711,7 @@ define('Editor', function() {
 	motor.add(update);
 
 	function update() {
-		currentGridCell = nexus.grid.pixelToCell(nexus.input.gridPixelPos);
+		currentGridCell = nexus.grid.pixelToCell(nexus.input.editorWorldPos);
 		if (nexus.mouse.down && keyboard.shift && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// only check if the user's mouse is over the editor plane
 			if (!currentGridCell.equals(prevGridCell)) {
@@ -713,10 +730,10 @@ define('Editor', function() {
 					var gridPos = overCell.gridPos;
 					nexus.grid.remove(overCell);
 
-					var dif = (nexus.input.overCell.depth / heightStep) - data;
+					var dif = lastHeight - data;
 					nexus.mouse.wheel = (overCell.depth / heightStep) + (dif > 0 ? -1 : 1);
 
-					cell = nexus.grid.generateCellView(nexus.mouse.wheel * heightStep);
+					cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
 					nexus.grid.add(gridPos, cell);
 					lastHeight = nexus.mouse.wheel;
 
@@ -764,7 +781,7 @@ define('Editor', function() {
 	function addTile() {
 		if (!currentGridCell || nexus.grid.getTileAtCell(currentGridCell)) return;
 		nexus.mouse.wheel = lastHeight;
-		var cell = nexus.grid.generateCellView(nexus.mouse.wheel * heightStep);
+		var cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
 		nexus.grid.add(currentGridCell, cell);
 
 		tower.tileAction.dispatch(tower.CELL_ADD, cell, heightStep);

@@ -9,10 +9,14 @@ define('motor', function() {
 	function on() {
 		_brake = false;
 		window.requestAnimationFrame(_update);
+		window.addEventListener('focus', onFocus, false);
+		window.addEventListener('blur', onBlur, false);
 	}
 
 	function off() {
 		_brake = true;
+		window.removeEventListener('focus', onFocus, false);
+		window.removeEventListener('blur', onBlur, false);
 	}
 
 	// in order to be able to ID functions we have to hash them to generate unique-ish keys for us to find them with later
@@ -58,6 +62,15 @@ define('motor', function() {
 			}
 		}
 		return -1;
+	}
+
+	function onFocus(evt) {
+		_brake = false;
+		_update();
+	}
+
+	function onBlur(evt) {
+		_brake = true;
 	}
 
 	function _hashStr(str) {
