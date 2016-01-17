@@ -69,7 +69,7 @@ vg.HexTile.prototype = {
 	},
 
 	deselect: function() {
-		if (this._emissive && this.material.emissive) {
+		if (this._emissive !== null && this.material.emissive) {
 			this.material.emissive.setHex(this._emissive);
 		}
 		this.selected = false;
@@ -87,7 +87,7 @@ vg.HexTile.prototype = {
 		if (this.cell.tile) this.cell.tile = null;
 		this.position = null;
 		this.rotation = null;
-		this.mesh.parent.remove(this.mesh);
+		if (this.mesh.parent) this.mesh.parent.remove(this.mesh);
 		this.mesh.userData.structure = null;
 		this.mesh = null;
 		this.cell = null;

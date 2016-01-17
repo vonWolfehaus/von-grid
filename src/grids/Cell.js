@@ -42,5 +42,9 @@ vg.Cell.prototype = {
 		this.r += cell.r;
 		this.s += cell.s;
 		return this;
+	},
+
+	equals: function(cell) {
+		return this.q === cell.q && this.r === cell.r && this.s === cell.s && this.h === cell.h;
 	}
 };

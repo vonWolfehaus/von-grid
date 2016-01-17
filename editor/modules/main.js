@@ -71,9 +71,7 @@ window.addEventListener('load', function(evt) {
 
 	var grid = new vg.HexGrid({
 		rings: 1,
-		cellSize: 10,
-		cellDepth: 5,
-		cellScale: 0.95
+		cellSize: 10
 	});
 	var board = new vg.Board(grid);
 	var mouse = new vg.MouseCaster(board.group, scene.camera, canvas);
@@ -102,33 +100,8 @@ window.addEventListener('load', function(evt) {
 		loadMap(map);
 	}
 	else {
-		var mapCells = [];
-		var cell, mat;
-		for (var c in grid.cells) {
-			cell = grid.cells[c];
-			mapCells.push({
-				x: cell.x,
-				y: cell.y,
-				z: cell.z,
-				depth: cell.w.depth,
-				matCacheId: 0,
-				customData: cell.w.userData.mapData
-			});
-		}
-		var mapMats = [];
-		for (var i = 0; i < grid._matCache.length; i++) {
-			mat = grid._matCache[i];
-			/*mapMats.push({
-				cache_id: i,
-				type: mat.type,
-				// color, ambient, emissive, reflectivity, refractionRatio, wrapAround,
-				imgURL: // get this value from the ui
-			});*/
-		}
-		map = {
-			cells: mapCells,
-			materials: mapMats
-		};
+		board.generateTilemap();
+		map = grid.toJSON();
 		data.set('map', map);
 		console.log('Created a new map');
 	}
@@ -140,13 +113,13 @@ window.addEventListener('load', function(evt) {
 				mouse.active = true;
 			}
 		}
-		if (dirtyMap) {
+		/*if (dirtyMap) {
 			saveTimer--;
 			if (saveTimer === 0) {
 				dirtyMap = false;
 				data.save();
 			}
-		}
+		}*/
 		mouse.update();
 		input.update();
 		plane.update();
@@ -163,11 +136,10 @@ window.addEventListener('load', function(evt) {
 	function onMapChange() {
 		dirtyMap = true;
 		saveTimer = timeTilAutoSave;
-		map.cells = grid.toJSON();
+		map = grid.toJSON();
 	}
 
 	function loadMap(json) {
-		board.group.remove(grid.group);
 		grid.load(json);
 		board.setGrid(grid);
 		scene.add(board.group);
@@ -177,7 +149,7 @@ window.addEventListener('load', function(evt) {
 	function saveMap() {
 		var output = null;
 
-		map.cells = grid.toJSON();
+		map = grid.toJSON();
 
 		try {
 			output = JSON.stringify(map, null, '\t');

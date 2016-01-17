@@ -36,14 +36,14 @@ gulp.task('clean', del.bind(null, [dist]));
 
 gulp.task('dev', ['clean'], function() {
 	runSequence(
-		['all'],
+		['all', 'hex', 'sqr'],
 		['watch']
 	);
 });
 
 gulp.task('dev-ed', ['clean'], function() {
 	runSequence(
-		['all', 'scripts-editor'],
+		['all', 'scripts-editor', 'hex', 'sqr'],
 		['serve-editor']
 	);
 });
@@ -128,7 +128,7 @@ gulp.task('styles', function() {
 
 // Defines the list of resources to watch for changes.
 function watch() {
-	gulp.watch(glob.scripts, ['all', reload]);
+	gulp.watch(glob.scripts, ['all', 'hex', 'sqr', reload]);
 	//gulp.watch(glob.styles, ['styles', reload]);
 }
 

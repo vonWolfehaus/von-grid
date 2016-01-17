@@ -14,6 +14,7 @@ define('Editor', function() {
 	var lastHeight = 5;
 	var currentGridCell = null;
 	var prevGridCell = new THREE.Vector3();
+	var _cel = new vg.Cell();
 
 	tower.userAction.add(onUserAction, this);
 	motor.add(update);
@@ -23,41 +24,39 @@ define('Editor', function() {
 		if (nexus.mouse.down && keyboard.shift && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// only check if the user's mouse is over the editor plane
 			if (!currentGridCell.equals(prevGridCell)) {
-				addTile();
+				addCell(currentGridCell);
 			}
 			prevGridCell.copy(currentGridCell);
 		}
 	}
 
-	function onUserAction(type, overCell, data) {
+	function onUserAction(type, overTile, data) {
 		var hit = nexus.mouse.allHits[0]
-		var cell;
 		switch (type) {
 			case vg.MouseCaster.WHEEL:
-				if (keyboard.shift && overCell) {
-					var gridPos = overCell.gridPos;
-					nexus.grid.remove(overCell);
+				if (keyboard.shift && overTile) {
+					_cel.copy(overTile.cell);
+					_cel.tile = null;
 
 					var dif = lastHeight - data;
-					nexus.mouse.wheel = (overCell.depth / heightStep) + (dif > 0 ? -1 : 1);
+					nexus.mouse.wheel = (overTile.cell.h / heightStep) + (dif > 0 ? -1 : 1);
 
-					cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
-					nexus.grid.add(gridPos, cell);
+					nexus.board.removeTile(overTile);
+
+					var cell = addCell(_cel);
 					lastHeight = nexus.mouse.wheel;
 
-					overCell = cell;
-
-					tower.tileAction.dispatch(tower.CELL_CHANGE_HEIGHT, cell, heightStep);
+					tower.tileAction.dispatch(tower.CELL_CHANGE_HEIGHT, cell.tile, heightStep);
 				}
 				break;
 
 			case vg.MouseCaster.OVER:
 				if (keyboard.shift) {
-					if (overCell && nexus.mouse.rightDown) {
-						removeTile(overCell);
+					if (overTile && nexus.mouse.rightDown) {
+						removeTile(overTile);
 					}
-					else if (!overCell && nexus.mouse.down) {
-						addTile();
+					else if (!overTile && nexus.mouse.down) {
+						addCell(currentGridCell);
 					}
 				}
 				break;
@@ -67,45 +66,46 @@ define('Editor', function() {
 				break;
 
 			case vg.MouseCaster.DOWN:
-				if (keyboard.shift && nexus.mouse.down && data && !overCell) {
-					// if shift is down then she's painting, so add a cell immediately
-					addTile();
+				if (keyboard.shift && nexus.mouse.down && data && !overTile) {
+					// if shift is down then she's painting, so add a tile immediately
+					addCell(currentGridCell);
 				}
 				break;
 
 			case vg.MouseCaster.UP:
-				if (nexus.mouse.down && data && !overCell) {
-					// create a new cell, if one isn't already there
-					addTile();
+				if (nexus.mouse.down && data && !overTile) {
+					// create a new tile, if one isn't already there
+					addCell(currentGridCell);
 				}
-				else if (nexus.mouse.rightDown && overCell) {
-					// remove a cell if it's there and right mouse is down
-					removeTile(overCell);
+				else if (nexus.mouse.rightDown && overTile) {
+					// remove a tile if it's there and right mouse is down
+					removeTile(overTile);
 				}
 				break;
 		}
 	}
 
-	function addTile() {
-		console.log(currentGridCell)
-		console.log(nexus.grid.getTileAtCell(currentGridCell))
-		if (!currentGridCell || nexus.grid.getTileAtCell(currentGridCell)) return;
-		nexus.mouse.wheel = lastHeight;
-		var cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);
-		nexus.grid.add(currentGridCell, cell);
+	function addCell(cell) {
+		if (!cell || cell.tile) return;
 
-		tower.tileAction.dispatch(tower.CELL_ADD, cell, heightStep);
+		var newCell = new vg.Cell();
+		newCell.copy(cell);
+		newCell.h = nexus.mouse.wheel * heightStep;
+
+		var newTile = nexus.grid.generateTile(newCell, 0.95);
+
+		nexus.board.addTile(newTile);
+
+		tower.tileAction.dispatch(tower.CELL_ADD, newTile, heightStep);
+
+		return newCell;
 	}
 
-	function removeTile(overCell) {
-		nexus.grid.remove(overCell);
+	function removeTile(overTile) {
+		nexus.board.removeTile(overTile);
 
-		tower.tileAction.dispatch(tower.CELL_REMOVE, overCell);
+		tower.tileAction.dispatch(tower.CELL_REMOVE, overTile);
 	}
-
-	/*document.oncontextmenu = function() {
-		return false;
-	};*/
 
 	return {
 

@@ -7,9 +7,10 @@ vg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
 	this.tiles = [];
-	this.tileGroup = new THREE.Object3D();
+	this.tileGroup = new THREE.Object3D(); // only for tiles
 
-	this.group = new THREE.Object3D();
+	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup
+
 	this.grid = null;
 	this.overlay = null;
 	this.finder = new vg.AStarFinder(finderConfig);
@@ -33,6 +34,23 @@ vg.Board.prototype = {
 		// set new situation
 		entity.tile = tile;
 		tile.entity = entity;
+	},
+
+	addTile: function(tile) {
+		var i = this.tiles.indexOf(tile);
+		if (i === -1) this.tiles.push(tile);
+		else return;
+
+		this.tileGroup.add(tile.mesh);
+		this.grid.add(tile.cell, tile);
+	},
+
+	removeTile: function(tile) {
+		var i = this.tiles.indexOf(tile);
+		if (i !== -1) this.tiles.splice(i, 1);
+		this.tileGroup.remove(tile.mesh);
+		tile.cell.tile = null;
+		this.grid.remove(tile.cell);
 	},
 
 	getRandomTile: function() {
@@ -64,11 +82,17 @@ vg.Board.prototype = {
 
 	setGrid: function(newGrid) {
 		if (this.grid) {
-			this.group.remove(this.grid.group);
+			this.group.remove(this.tileGroup);
 			this.grid.dispose();
+
+			this.tiles.forEach(function(t) {
+				t.dispose();
+			});
 		}
 		this.grid = newGrid;
-		this.group.add(newGrid.group);
+		this.tiles = [];
+		this.tileGroup = new THREE.Object3D();
+		this.group.add(this.tileGroup);
 	},
 
 	generateOverlay: function(size) {
@@ -90,8 +114,12 @@ vg.Board.prototype = {
 
 	generateTilemap: function(config) {
 		var tiles = this.grid.generateTiles(config);
+		this.tiles.forEach(function(t) {
+			t.dispose();
+		});
+		this.tiles = tiles;
+		this.tileGroup = new THREE.Object3D();
 		for (var i = 0; i < tiles.length; i++) {
-			this.tiles.push(tiles[i]);
 			this.tileGroup.add(tiles[i].mesh)
 		}
 		this.group.add(this.tileGroup);

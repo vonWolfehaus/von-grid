@@ -21,9 +21,6 @@ define('EditorPlane', function() {
 
 		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
 			color: 0x1aaeff,
-			// transparent: true,
-			// opacity: 0.5,
-			// emissive: new THREE.Color(0xffe419),
 			side: THREE.DoubleSide
 		}));
 
