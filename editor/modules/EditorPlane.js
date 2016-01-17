@@ -1,5 +1,7 @@
 /*
 	2D plane that the user moves mouse around on in order to build maps. Provides a working plane to navigate, and a visual aid for tile placement.
+
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 define('EditorPlane', function() {
 

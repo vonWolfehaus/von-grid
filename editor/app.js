@@ -779,6 +779,8 @@ define('Editor', function() {
 	}
 
 	function addTile() {
+		console.log(currentGridCell)
+		console.log(nexus.grid.getTileAtCell(currentGridCell))
 		if (!currentGridCell || nexus.grid.getTileAtCell(currentGridCell)) return;
 		nexus.mouse.wheel = lastHeight;
 		var cell = nexus.grid.generateTile(nexus.mouse.wheel * heightStep);

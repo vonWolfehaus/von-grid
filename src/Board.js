@@ -1,13 +1,14 @@
 /*
-	Interface to the grid. Holds data about what's occupying cells, and a general interface from entities to cells.
+	Interface to the grid. Holds data about the visual representation of the cells (tiles).
 
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
-// 'utils/Loader', 'pathing/AStarFinder'
 vg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
-	// this.pieces = []; // haven't found a use for this yet
+	this.tiles = [];
+	this.tileGroup = new THREE.Object3D();
+
 	this.group = new THREE.Object3D();
 	this.grid = null;
 	this.overlay = null;
@@ -19,8 +20,27 @@ vg.Board = function(grid, finderConfig) {
 };
 
 vg.Board.prototype = {
+	setEntityOnTile: function(entity, tile) {
+		// snap an entity's position to a tile; merely copies position
+		var pos = this.grid.cellToPixel(tile.cell);
+		entity.position.copy(pos);
+		// adjust for any offset after the entity was set directly onto the tile
+		entity.position.y += entity.heightOffset || 0;
+		// remove entity from old tile
+		if (entity.tile) {
+			entity.tile.entity = null;
+		}
+		// set new situation
+		entity.tile = tile;
+		tile.entity = entity;
+	},
 
-	// immediately snap a piece to a cell; merely copies position
+	getRandomTile: function() {
+		var i = vg.Tools.randomInt(0, this.tiles.length);
+		return this.tiles[i];
+	},
+
+	// DEPRECATED
 	placeEntityAtCell: function(entity, cell) {
 		this.grid.cellToPixel(cell, entity.position);
 		entity.position.y += entity.offsetY;
@@ -33,41 +53,14 @@ vg.Board.prototype = {
 		cell.entity = entity;
 	},
 
-	placeAtCell: function(vec, cell) {
-		// var c = this.grid.pixelToCell(vec);
-		// this.grid.cellToPixel(cell, vec);
-		// console.log(cell);
-	},
-
-	findPath: function(startCell, endCell, heuristic) {
-		return this.finder.findPath(startCell, endCell, heuristic, this.grid);
-	},
-
+	// DEPRECATED
 	getRandomCell: function() {
 		return this.grid.getRandomCell();
 	},
 
-	// i think it's better to grab cells from the grid, then check the entities on them instead
-	/*addPieceAt: function(entity, cell) {
-		this.pieces.push(entity);
-
-		entity.disable();
-		entity.container = this.group;
-		entity.placeEntityAtCell(entity, cell);
+	findPath: function(startTile, endTile, heuristic) {
+		return this.finder.findPath(startTile.cell, endTile.cell, heuristic, this.grid);
 	},
-
-	removePiece: function(entity) {
-		var i = this.pieces.indexOf(entity);
-		this.pieces.splice(i, 1);
-
-		entity.disable();
-	},
-
-	clear: function() {
-		this.pieces.length = 0;
-		// does not dig into children of children because they'll be removed when their parent is removed anyway
-		this.group.children.length = 0;
-	},*/
 
 	setGrid: function(newGrid) {
 		if (this.grid) {
@@ -89,41 +82,22 @@ vg.Board.prototype = {
 		}
 
 		this.overlay = new THREE.Object3D();
-		var vec = new THREE.Vector3();
-		var x, y, z;
 
-		if (this.grid.type === vg.HEX) {
-			for (x = -size; x < size+1; x++) {
-				for (y = -size; y < size+1; y++) {
-					z = -x-y;
-					if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
-						vec.set(x, y, z);
-						var line = new THREE.Line(this.grid.cellGeo, mat);
-						this.grid.setPositionToCell(line.position, vec);
-						line.rotation.x = 90 * vg.DEG_TO_RAD;
-						this.overlay.add(line);
-					}
-				}
-			}
-		}
-		else if (this.grid.type === vg.SQR) {
-			/*for (x = -size; x < size+1; x++) {
-				for (y = -size; y < size+1; y++) {
-					if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
-						vec.set(x, y, z);
-						var line = new THREE.Line(this.grid.cellGeo, mat);
-						this.grid.setPositionToCell(line.position, vec);
-						line.rotation.x = 90 * vg.DEG_TO_RAD;
-						this.overlay.add(line);
-					}
-				}
-			}*/
-		}
-		else {
-			console.warn('The board cannot generate '+this.grid.type+'-type grid overlays');
-		}
-
+		this.grid.generateOverlay(size, this.overlay, mat);
 
 		this.group.add(this.overlay);
+	},
+
+	generateTilemap: function(config) {
+		var tiles = this.grid.generateTiles(config);
+		for (var i = 0; i < tiles.length; i++) {
+			this.tiles.push(tiles[i]);
+			this.tileGroup.add(tiles[i].mesh)
+		}
+		this.group.add(this.tileGroup);
+	},
+
+	reset: function() {
+		// TODO
 	}
 };

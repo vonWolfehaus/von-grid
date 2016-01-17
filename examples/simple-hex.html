@@ -34,13 +34,16 @@
 			cameraPosition: {x:0, y:150, z:150}
 		}, true);
 
+		// this constructs the cells in grid coordinate space
 		var grid = new vg.HexGrid({
 			rings: 4,
-			cellSize: 10,
-			cellScale: 0.95
+			cellSize: 10 // this is important for cell to world-space conversions so be sure it's accurate for your custom tiles
 		});
 
 		var board = new vg.Board(grid);
+
+		// this will generate extruded hexagonal tiles
+		board.generateTilemap();
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
