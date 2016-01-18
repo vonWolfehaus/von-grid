@@ -10,8 +10,8 @@ vg.PathUtil = {
 	 */
 	backtrace: function(node) {
 		var path = [node];
-		while (node.parent) {
-			node = node.parent;
+		while (node._parent) {
+			node = node._parent;
 			path.push(node);
 		}
 		return path.reverse();

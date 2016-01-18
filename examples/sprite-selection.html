@@ -38,25 +38,19 @@
 
 		var grid = new vg.HexGrid({
 			rings: 4,
-			cellSize: 10,
-			cellDepth: 2,
-			cellScale: 0.95,
-			extrudeSettings: {
-				// options passed directly to: http://threejs.org/docs/#Reference/Extras.Geometries/ExtrudeGeometry
-				// but don't use amount, instead use cellDepth
-			}
+			cellSize: 10
 		});
 		/*var grid = new SquareGrid({
 			width: 8,
 			height: 8,
-			cellSize: 15,
-			cellScale: 0.95
-			// same extrudeSettings as Hex
+			cellSize: 15
 		});*/
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var selector = new vg.SelectionManager(mouse);
 		var board = new vg.Board(grid);
+
+		board.generateTilemap();
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
@@ -67,7 +61,7 @@
 			container: board.group,
 			url: '../examples/img/water.png',
 			scale: 10,
-			offsetY: 6
+			heightOffset: 6
 		};
 
 		for (i = 0; i < 5; i++) {
@@ -81,7 +75,7 @@
 
 		// handle interaction
 		selector.onSelect.add(function(obj) {
-			if (obj.objectType === vg.CEL) {
+			if (obj.objectType === vg.TILE) {
 				// select the sprite if one was already there
 				var e = obj.entity;
 				if (e) {
@@ -93,12 +87,13 @@
 						moveEntityToCell(obj);
 						return;
 					}
-					// cycle through the sprites, placing them on the clicked cell
+					// cycle through the sprites, placing them on the clicked tile
 					var p = sprites[currentPiece++];
 					if (currentPiece === sprites.length) {
 						currentPiece = 0;
 					}
-					board.placeEntityAtCell(p, obj);
+					board.setEntityOnTile(p, obj);
+
 				}
 			}
 			else {
@@ -110,8 +105,8 @@
 
 		}, this);*/
 
-		function moveEntityToCell(cell) {
-			board.placeEntityAtCell(movingPiece, cell);
+		function moveEntityToCell(tile) {
+			board.setEntityOnTile(movingPiece, tile);
 			movingPiece = null;
 		}
 

@@ -440,9 +440,9 @@ vg.HexGrid.prototype = {
 
 	axialToCube: function(h) {
 		return {
-			x: h.q,
-			y: h.r,
-			z: -h.q - h.r
+			q: h.q,
+			r: h.r,
+			s: -h.q - h.r
 		};
 		// return this._conversionVec.set(h.x, h.y, -h.x - h.y);
 	},
@@ -495,6 +495,6 @@ vg.HexGrid.prototype = {
 	},
 
 	cubeDistance: function(a, b) {
-		return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+		return Math.max(Math.abs(a.q - b.q), Math.abs(a.r - b.r), Math.abs(a.s - b.s));
 	}
 };

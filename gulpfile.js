@@ -141,7 +141,6 @@ function serve(dir) {
 		}
 	});
 
-	//browserSync.watch(dir+'/**/*.*').on('change', reload);
 	browserSync.watch(dist+'/**/*.*').on('change', reload);
 	gulp.watch(glob.scripts, ['all']);
 }
@@ -157,6 +156,7 @@ gulp.task('serve-editor', function() {
 
 gulp.task('serve-examples', function() {
 	//gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
+	browserSync.watch('examples/**/*.*').on('change', reload);
 	serve('examples');
 });
 

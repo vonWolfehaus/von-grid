@@ -29,15 +29,15 @@ vg.AStarFinder.prototype = {
 
 		// push the start current into the open list
 		this.list.add(startNode);
-
+		
 		// while the open list is not empty
 		while (this.list.length > 0) {
 			// sort so lowest cost is first
 			this.list.sort(this.compare);
 
-			// pop the position of current which has the minimum `calcCost` value.
+			// pop the position of current which has the minimum `_calcCost` value.
 			current = this.list.shift();
-			current.visited = true;
+			current._visited = true;
 
 			// if reached the end position, construct the path and return it
 			if (current === endNode) {
@@ -53,16 +53,16 @@ vg.AStarFinder.prototype = {
 					continue;
 				}
 
-				costSoFar = current.calcCost + grid.distance(current, neighbor);
+				costSoFar = current._calcCost + grid.distance(current, neighbor);
 
 				// check if the neighbor has not been inspected yet, or can be reached with smaller cost from the current current
-				if (!neighbor.visited || costSoFar < neighbor.calcCost) {
-					neighbor.visited = true;
-					neighbor.parent = current;
-					neighbor.calcCost = costSoFar;
-					// priority is the most important property, since it makes the algorithm "greedy" and seek the goal.
+				if (!neighbor._visited || costSoFar < neighbor._calcCost) {
+					neighbor._visited = true;
+					neighbor._parent = current;
+					neighbor._calcCost = costSoFar;
+					// _priority is the most important property, since it makes the algorithm "greedy" and seek the goal.
 					// otherwise it behaves like a brushfire/breadth-first.
-					neighbor.priority = costSoFar + grid.distance(endNode, neighbor);
+					neighbor._priority = costSoFar + grid.distance(endNode, neighbor);
 
 					// check neighbor if it's the end current as well--often cuts steps by a significant amount
 					if (neighbor === endNode) {
@@ -73,12 +73,12 @@ vg.AStarFinder.prototype = {
 				}
 			} // end for each neighbor
 		} // end while not open list empty
-
+		console.log(this.list.length);
 		// failed to find the path
 		return null;
 	},
 
 	compare: function(nodeA, nodeB) {
-		return nodeA.priority - nodeB.priority;
+		return nodeA._priority - nodeB._priority;
 	}
 };

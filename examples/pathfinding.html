@@ -46,14 +46,13 @@
 
 		var grid = new vg.HexGrid({
 			rings: 6,
-			cellSize: 10,
-			cellScale: 0.95
+			tileSize: 10
 		});
 		/*var grid = new SquareGrid({
 			width: 10,
 			height: 10,
-			cellSize: 15,
-			cellScale: 0.95
+			tileSize: 15,
+			tileScale: 0.95
 		});*/
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
@@ -66,6 +65,8 @@
 			heuristicFilter: isCellTraversable
 		});
 
+		board.generateTilemap();
+
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
@@ -74,11 +75,11 @@
 			container: board.group,
 			url: '../examples/img/water.png',
 			scale: 10,
-			offsetY: 6
+			heightOffset: 6
 		};
 
-		var a = board.getRandomCell();
-		var b = board.getRandomCell();
+		var a = board.getRandomTile();
+		var b = board.getRandomTile();
 		if (a === b) {
 			// they're on top of each other, so place one at a diagonal of the other
 			var neighbors = grid.getNeighbors(a, true);
@@ -88,12 +89,12 @@
 
 		var startSprite = new Sprite(spriteConfig);
 		startSprite.activate();
-		board.placeEntityAtCell(startSprite, a);
+		board.setEntityOnTile(startSprite, a);
 
 		spriteConfig.url = '../examples/img/fire.png'
 		var endSprite = new Sprite(spriteConfig);
 		endSprite.activate();
-		board.placeEntityAtCell(endSprite, b);
+		board.setEntityOnTile(endSprite, b);
 
 		// path markers
 		spriteConfig.url = '../examples/img/marker.png'
@@ -109,7 +110,7 @@
 			container: board.group,
 			url: '../examples/img/obstacle.png',
 			scale: 10,
-			offsetY: 6,
+			heightOffset: 6,
 			obstacle: true
 		};
 		var obstacles = [];
@@ -120,7 +121,7 @@
 
 		// keep track of states
 		var movingPiece = null;
-		var lastCell = null;
+		var lastTile = null;
 
 		// handle interaction
 		mouse.signal.add(function(type, obj) {
@@ -133,19 +134,19 @@
 					// "pick up" the piece we selected, if any
 					movingPiece = obj;
 					if (obj) {
-						if (obj.objectType === vg.CEL) {
-							// if a cell was clicked, pick up the entity that was sitting on it, if any
+						if (obj.objectType === vg.TILE) {
+							// if a tile was clicked, pick up the entity that was sitting on it, if any
 							movingPiece = obj.entity;
-							lastCell = obj;
+							lastTile = obj;
 
 							if (!movingPiece) {
-								// place obstacle on empty cells
+								// place obstacle on empty tiles
 								placeObstacle(obj);
 							}
 						}
 						else if (movingPiece !== startSprite && movingPiece !== endSprite && !movingPiece.obstacle) {
-							// place obstacle on cells with markers on them too
-							placeObstacle(obj.cell);
+							// place obstacle on tiles with markers on them too
+							placeObstacle(obj.tile);
 						}
 					}
 
@@ -162,7 +163,7 @@
 						}
 
 						if (movingPiece.objectType === vg.ENT) {
-							lastCell = movingPiece.cell;
+							lastTile = movingPiece.tile;
 						}
 					}
 					break;
@@ -171,15 +172,15 @@
 					// disable the mouse until the user clicks again
 					mouse.active = false;
 					if (movingPiece) {
-						// user was moving a piece around, so place it at the nearest cell
-						var c = findCellUnderMouse();
-						// update cell in case user moved obstacle
-						if (c && movingPiece.obstacle) {
-							movingPiece.cell.walkable = true;
-							c.walkable = false;
+						// user was moving a piece around, so place it at the nearest tile
+						var t = findTileUnderMouse();
+						// update tile in case user moved obstacle
+						if (t && movingPiece.obstacle) {
+							movingPiece.tile.cell.walkable = true;
+							t.cell.walkable = false;
 						}
-						// or the last cell that we picked it up from, in case it was off the board/null
-						board.placeEntityAtCell(movingPiece, c || lastCell);
+						// or the last tile that we picked it up from, in case it was off the board/null
+						board.setEntityOnTile(movingPiece, t || lastTile);
 						// now re-run the pathfinder
 						createPath();
 					}
@@ -192,27 +193,28 @@
 
 		function createPath() {
 			grid.traverse(deselectVisited);
-			var path = board.findPath(startSprite.cell, endSprite.cell);
+			var path = board.findPath(startSprite.tile, endSprite.tile);
 			// highlight the path with markers
+			console.log(path)
 			if (path) {
 				for (var i = 0; i < path.length; i++) {
 					var s = markers[i];
 					if (!s) s = markers[i] = new Sprite(spriteConfig);
 					s.activate();
-					board.placeEntityAtCell(s, path[i]);
+					board.setEntityOnTile(s, path[i]);
 				}
-				// see which cells were visited
+				// see which tiles were visited
 				grid.traverse(selectVisited);
 			}
 		}
 
-		function findCellUnderMouse() {
-			var i, c;
+		function findTileUnderMouse() {
+			var i, t;
 			var objects = mouse.allHits;
 			for (i = 0; i < objects.length; i++) {
-				c = objects[i].object.userData.structure;
-				if (c && c.objectType && c.objectType === vg.CEL) {
-					return c;
+				t = objects[i].object.userData.structure;
+				if (t && t.objectType && t.objectType === vg.TILE) {
+					return t;
 				}
 			}
 			return null;
@@ -221,21 +223,21 @@
 		function isCellTraversable(origin, next) {
 			// example of how to filter out neighbors that are too tall to traverse
 			// but allows the algorithm to "jump" down to whatever depth
-			if (next.depth - origin.depth > 10) {
+			if (next.h - origin.h > 10) {
 				return false; // no, filter out next
 			}
 			return true; // yes, keep next for consideration
 		}
 
-		function selectVisited(c) {
-			if (c.visited) {
-				c.select();
+		function selectVisited(t) {
+			if (t.cell._visited) {
+				t.select();
 			}
 		}
 
-		function deselectVisited(c) {
-			if (c.selected) {
-				c.deselect();
+		function deselectVisited(t) {
+			if (t.selected) {
+				t.deselect();
 			}
 		}
 
@@ -252,21 +254,21 @@
 			if (i !== -1) {
 				obstaclesUsed.splice(i, 1);
 				obstacles.push(obj);
-				obj.cell.walkable = true;
-				obj.cell.entity = null;
-				obj.cell = null;
+				obj.tile.cell.walkable = true;
+				obj.tile.entity = null;
+				obj.tile = null;
 				obj.disable();
 			}
 		}
 
-		function placeObstacle(cell) {
+		function placeObstacle(tile) {
 			// poor man's object pool
 			var s = obstacles.pop();
 			if (!s) s = obstacles[obstacles.length] = new Sprite(obstacleConfig);
 			obstaclesUsed.push(s);
 			s.activate();
-			cell.walkable = false;
-			board.placeEntityAtCell(s, cell);
+			tile.cell.walkable = false;
+			board.setEntityOnTile(s, tile);
 
 			// re-run the pathfinder with new obstacle
 			createPath();
@@ -280,7 +282,7 @@
 			mouse.update();
 			if (movingPiece) {
 				movingPiece.position.copy(mouse.position);
-				movingPiece.position.y = 5 + movingPiece.offsetY;
+				movingPiece.position.y = 5 + movingPiece.heightOffset;
 			}
 			scene.render();
 			requestAnimationFrame(update);
