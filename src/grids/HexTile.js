@@ -84,7 +84,7 @@ vg.HexTile.prototype = {
 	},*/
 
 	dispose: function() {
-		if (this.cell.tile) this.cell.tile = null;
+		if (this.cell && this.cell.tile) this.cell.tile = null;
 		this.cell = null;
 		this.position = null;
 		this.rotation = null;

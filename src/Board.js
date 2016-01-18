@@ -65,6 +65,7 @@ vg.Board.prototype = {
 		var tiles = this.tileGroup.children;
 		for (var i = 0; i < tiles.length; i++) {
 			this.tileGroup.remove(tiles[i].mesh);
+			tiles[i].dispose();
 		}
 	},
 
@@ -116,14 +117,11 @@ vg.Board.prototype = {
 	},
 
 	generateTilemap: function(config) {
-		this.tiles.forEach(function(t) {
-			t.dispose();
-		});
+		this.reset();
 
 		var tiles = this.grid.generateTiles(config);
 		this.tiles = tiles;
 
-		if (this.tileGroup) this.group.remove(this.tileGroup);
 		this.tileGroup = new THREE.Object3D();
 		for (var i = 0; i < tiles.length; i++) {
 			this.tileGroup.add(tiles[i].mesh);
@@ -133,7 +131,8 @@ vg.Board.prototype = {
 	},
 
 	reset: function() {
-		// TODO
+		// removes all tiles from the scene, but leaves the grid intact
+		this.removeAllTiles();
 		if (this.tileGroup) this.group.remove(this.tileGroup);
 	}
 };

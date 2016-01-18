@@ -266,6 +266,7 @@ vg.HexGrid.prototype = {
 			c.h = settings.extrudeSettings.amount;
 			t = this.generateTile(c, settings.scale, settings.material);
 			t.position.copy(this.cellToPixel(c));
+			t.position.y = 0;
 			tiles.push(t);
 		}
 		return tiles;

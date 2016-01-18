@@ -35,15 +35,22 @@ define('Editor', function() {
 		switch (type) {
 			case vg.MouseCaster.WHEEL:
 				if (keyboard.shift && overTile) {
+					if (!overTile.cell) {
+						overTile.dispose();
+						return;
+					}
 					_cel.copy(overTile.cell);
 					_cel.tile = null;
 
 					var dif = lastHeight - data;
+					var last = _cel.h;
 					_cel.h += dif > 0 ? -heightStep : heightStep;
 					if (_cel.h < 1) _cel.h = 1;
-					nexus.mouse.wheel = (_cel.h / heightStep) + (dif > 0 ? -1 : 1);
+					
+					nexus.mouse.wheel = Math.round((_cel.h / heightStep) + (dif > 0 ? -1 : 1));
 					lastHeight = nexus.mouse.wheel;
 
+					if (last === _cel.h) return;
 					removeTile(overTile);
 
 					var cell = addCell(_cel);
