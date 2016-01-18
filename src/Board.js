@@ -60,6 +60,14 @@ vg.Board.prototype = {
 		tile.dispose();
 	},
 
+	removeAllTiles: function() {
+		if (!this.tileGroup) return;
+		var tiles = this.tileGroup.children;
+		for (var i = 0; i < tiles.length; i++) {
+			this.tileGroup.remove(tiles[i].mesh);
+		}
+	},
+
 	getTileAtCell: function(cell) {
 		var h = this.grid.cellToHash(cell);
 		return cell.tile || (typeof this.grid.cells[h] !== 'undefined' ? this.grid.cells[h].tile : null);
@@ -70,36 +78,19 @@ vg.Board.prototype = {
 		return this.tiles[i];
 	},
 
-	// DEPRECATED
-	placeEntityAtCell: function(entity, cell) {
-		this.grid.cellToPixel(cell, entity.position);
-		entity.position.y += entity.offsetY;
-		// remove entity from old cell
-		if (entity.cell) {
-			entity.cell.entity = null;
-		}
-		// set new situation
-		entity.cell = cell;
-		cell.entity = entity;
-	},
-
-	// DEPRECATED
-	getRandomCell: function() {
-		return this.grid.getRandomCell();
-	},
-
 	findPath: function(startTile, endTile, heuristic) {
 		return this.finder.findPath(startTile.cell, endTile.cell, heuristic, this.grid);
 	},
 
 	setGrid: function(newGrid) {
-		if (this.grid) {
-			this.group.remove(this.tileGroup);
-			this.grid.dispose();
-
+		this.group.remove(this.tileGroup);
+		if (this.grid && newGrid !== this.grid) {
+			this.removeAllTiles();
 			this.tiles.forEach(function(t) {
+				this.grid.remove(t.cell);
 				t.dispose();
 			});
+			this.grid.dispose();
 		}
 		this.grid = newGrid;
 		this.tiles = [];
@@ -135,7 +126,7 @@ vg.Board.prototype = {
 		if (this.tileGroup) this.group.remove(this.tileGroup);
 		this.tileGroup = new THREE.Object3D();
 		for (var i = 0; i < tiles.length; i++) {
-			this.tileGroup.add(tiles[i].mesh)
+			this.tileGroup.add(tiles[i].mesh);
 		}
 
 		this.group.add(this.tileGroup);

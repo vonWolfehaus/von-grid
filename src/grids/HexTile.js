@@ -20,6 +20,9 @@ vg.HexTile = function(config) {
 	}
 
 	this.cell = settings.cell;
+	if (this.cell.tile && this.cell.tile !== this) this.cell.tile.dispose(); // remove whatever was there
+	this.cell.tile = this;
+
 	this.uniqueID = vg.Tools.generateID();
 
 	this.geometry = settings.geometry;
@@ -43,9 +46,6 @@ vg.HexTile = function(config) {
 	// create references so we can control orientation through this (Hex), instead of drilling down
 	this.position = this.mesh.position;
 	this.rotation = this.mesh.rotation;
-
-	if (this.cell.tile) this.cell.tile.dispose(); // remove whatever was there
-	this.cell.tile = this;
 
 	// rotate it to face "up" (the threejs coordinate space is Y+)
 	this.rotation.x = -90 * vg.DEG_TO_RAD;
