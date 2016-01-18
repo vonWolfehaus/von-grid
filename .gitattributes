@@ -1,0 +1,18 @@
+# Enforce unix line ending
+* text eol=lf
+
+# Explicitly declare text files you want to always be normalized and converted to native line endings on checkout.
+*.css text
+*.html text
+*.js text
+*.xml text
+*.json text
+*.md text
+.gitignore -text
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.eot binary
+*.ttf binary
+*.woff binary
