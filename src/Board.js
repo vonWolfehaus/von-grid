@@ -7,9 +7,9 @@ vg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
 	this.tiles = [];
-	this.tileGroup = new THREE.Object3D(); // only for tiles
+	this.tileGroup = null; // only for tiles
 
-	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup
+	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup, never trashed
 
 	this.grid = null;
 	this.overlay = null;
@@ -41,16 +41,28 @@ vg.Board.prototype = {
 		if (i === -1) this.tiles.push(tile);
 		else return;
 
+		this.grid.setPositionToCell(tile.position, tile.cell);
+
 		this.tileGroup.add(tile.mesh);
-		this.grid.add(tile.cell, tile);
+		this.grid.add(tile.cell);
+
+		tile.cell.tile = tile;
 	},
 
 	removeTile: function(tile) {
+		if (!tile) return; // was already removed somewhere
 		var i = this.tiles.indexOf(tile);
-		if (i !== -1) this.tiles.splice(i, 1);
-		this.tileGroup.remove(tile.mesh);
-		tile.cell.tile = null;
 		this.grid.remove(tile.cell);
+
+		if (i !== -1) this.tiles.splice(i, 1);
+		// this.tileGroup.remove(tile.mesh);
+
+		tile.dispose();
+	},
+
+	getTileAtCell: function(cell) {
+		var h = this.grid.cellToHash(cell);
+		return cell.tile || (typeof this.grid.cells[h] !== 'undefined' ? this.grid.cells[h].tile : null);
 	},
 
 	getRandomTile: function() {
@@ -113,19 +125,24 @@ vg.Board.prototype = {
 	},
 
 	generateTilemap: function(config) {
-		var tiles = this.grid.generateTiles(config);
 		this.tiles.forEach(function(t) {
 			t.dispose();
 		});
+
+		var tiles = this.grid.generateTiles(config);
 		this.tiles = tiles;
+
+		if (this.tileGroup) this.group.remove(this.tileGroup);
 		this.tileGroup = new THREE.Object3D();
 		for (var i = 0; i < tiles.length; i++) {
 			this.tileGroup.add(tiles[i].mesh)
 		}
+
 		this.group.add(this.tileGroup);
 	},
 
 	reset: function() {
 		// TODO
+		if (this.tileGroup) this.group.remove(this.tileGroup);
 	}
 };

@@ -81,7 +81,6 @@ window.addEventListener('load', function(evt) {
 	});
 	var board = new vg.Board(grid);
 	var mouse = new vg.MouseCaster(board.group, scene.camera, canvas);
-
 	var input = new Input(board.group, mouse);
 	var plane = new EditorPlane(board.group, grid, mouse);
 
@@ -94,12 +93,13 @@ window.addEventListener('load', function(evt) {
 
 	var boardSize = 20; // TODO: get from settings
 	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
-	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
+
+	board.generateOverlay(boardSize);
 
 	tower.tileAction.add(onMapChange, this);
 
-	scene.add(board.group);
+	// scene.add(board.group);
 	scene.focusOn(board.group);
 
 	if (map) {
@@ -119,13 +119,13 @@ window.addEventListener('load', function(evt) {
 				mouse.active = true;
 			}
 		}
-		/*if (dirtyMap) {
+		if (dirtyMap) {
 			saveTimer--;
 			if (saveTimer === 0) {
 				dirtyMap = false;
 				data.save();
 			}
-		}*/
+		}
 		mouse.update();
 		input.update();
 		plane.update();
@@ -148,6 +148,7 @@ window.addEventListener('load', function(evt) {
 	function loadMap(json) {
 		grid.load(json);
 		board.setGrid(grid);
+		board.generateTilemap();
 		scene.add(board.group);
 		console.log('Map load complete');
 	}
@@ -356,9 +357,9 @@ define('tower', {
 	saveMap: new vg.Signal(),
 	loadMap: new vg.Signal(),
 
-	CELL_CHANGE_HEIGHT: 'cell.change.height',
-	CELL_ADD: 'cell.add',
-	CELL_REMOVE: 'cell.remove',
+	TILE_CHANGE_HEIGHT: 'cell.change.height',
+	TILE_ADD: 'cell.add',
+	TILE_REMOVE: 'cell.remove',
 });
 /*
 	Translates the MouseCaster's events into more relevant data that the editor uses.
@@ -377,7 +378,7 @@ define('Input', function() {
 		this.heightStep = 5;
 		this.editorWorldPos = new THREE.Vector3(); // current grid position of mouse
 
-		this.overCell = null;
+		this.overTile = null;
 
 		this._travel = 0;
 
@@ -412,27 +413,27 @@ define('Input', function() {
 			}
 			switch (type) {
 				case vg.MouseCaster.WHEEL:
-					tower.userAction.dispatch(vg.MouseCaster.WHEEL, this.overCell, obj);
+					tower.userAction.dispatch(vg.MouseCaster.WHEEL, this.overTile, obj);
 					break;
 
 				case vg.MouseCaster.OVER:
 					if (obj) {
-						this.overCell = obj.select();
+						this.overTile = obj.select();
 					}
-					tower.userAction.dispatch(vg.MouseCaster.OVER, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.OVER, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.OUT:
 					if (obj) {
 						obj.deselect();
-						this.overCell = null;
+						this.overTile = null;
 					}
-					tower.userAction.dispatch(vg.MouseCaster.OUT, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.OUT, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.DOWN:
 					this.mouseDelta.copy(this.mouse.screenPosition);
-					tower.userAction.dispatch(vg.MouseCaster.DOWN, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.DOWN, this.overTile, hit);
 					this._travel = 0;
 					break;
 
@@ -440,11 +441,11 @@ define('Input', function() {
 					if (this._travel > this.mousePanMinDistance) {
 						break;
 					}
-					tower.userAction.dispatch(vg.MouseCaster.UP, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.UP, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.CLICK:
-					tower.userAction.dispatch(vg.MouseCaster.CLICK, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.CLICK, this.overTile, hit);
 					break;
 			}
 		}
@@ -671,10 +672,10 @@ define('Editor', function() {
 	var motor = require('motor');
 
 	// TODO: get these values from UI
-	var heightStep = 5;
+	var heightStep = 3;
 
 	// PRIVATE
-	var lastHeight = 5;
+	var lastHeight = 1;
 	var currentGridCell = null;
 	var prevGridCell = new THREE.Vector3();
 	var _cel = new vg.Cell();
@@ -702,14 +703,17 @@ define('Editor', function() {
 					_cel.tile = null;
 
 					var dif = lastHeight - data;
-					nexus.mouse.wheel = (overTile.cell.h / heightStep) + (dif > 0 ? -1 : 1);
-
-					nexus.board.removeTile(overTile);
-
-					var cell = addCell(_cel);
+					_cel.h += dif > 0 ? -heightStep : heightStep;
+					if (_cel.h < 1) _cel.h = 1;
+					nexus.mouse.wheel = (_cel.h / heightStep) + (dif > 0 ? -1 : 1);
 					lastHeight = nexus.mouse.wheel;
 
-					tower.tileAction.dispatch(tower.CELL_CHANGE_HEIGHT, cell.tile, heightStep);
+					removeTile(overTile);
+
+					var cell = addCell(_cel);
+					cell.tile.select();
+
+					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, cell.tile);
 				}
 				break;
 
@@ -730,7 +734,7 @@ define('Editor', function() {
 
 			case vg.MouseCaster.DOWN:
 				if (keyboard.shift && nexus.mouse.down && data && !overTile) {
-					// if shift is down then she's painting, so add a tile immediately
+					// if shift is down then they're painting, so add a tile immediately
 					addCell(currentGridCell);
 				}
 				break;
@@ -749,17 +753,17 @@ define('Editor', function() {
 	}
 
 	function addCell(cell) {
-		if (!cell || cell.tile) return;
+		if (!cell || nexus.board.getTileAtCell(cell)) return;
 
 		var newCell = new vg.Cell();
 		newCell.copy(cell);
-		newCell.h = nexus.mouse.wheel * heightStep;
+		newCell.h = Math.abs(nexus.mouse.wheel * heightStep);
 
 		var newTile = nexus.grid.generateTile(newCell, 0.95);
 
 		nexus.board.addTile(newTile);
 
-		tower.tileAction.dispatch(tower.CELL_ADD, newTile, heightStep);
+		tower.tileAction.dispatch(tower.TILE_ADD, newTile);
 
 		return newCell;
 	}
@@ -767,7 +771,7 @@ define('Editor', function() {
 	function removeTile(overTile) {
 		nexus.board.removeTile(overTile);
 
-		tower.tileAction.dispatch(tower.CELL_REMOVE, overTile);
+		tower.tileAction.dispatch(tower.TILE_REMOVE, overTile);
 	}
 
 	return {

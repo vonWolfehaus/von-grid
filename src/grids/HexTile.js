@@ -49,7 +49,7 @@ vg.HexTile = function(config) {
 
 	// rotate it to face "up" (the threejs coordinate space is Y+)
 	this.rotation.x = -90 * vg.DEG_TO_RAD;
-	this.mesh.scale.set(settings.scale, settings.scale, settings.scale);
+	this.mesh.scale.set(settings.scale, settings.scale, 1);
 
 	if (this.material.emissive) {
 		this._emissive = this.material.emissive.getHex();
@@ -85,15 +85,16 @@ vg.HexTile.prototype = {
 
 	dispose: function() {
 		if (this.cell.tile) this.cell.tile = null;
+		this.cell = null;
 		this.position = null;
 		this.rotation = null;
 		if (this.mesh.parent) this.mesh.parent.remove(this.mesh);
 		this.mesh.userData.structure = null;
 		this.mesh = null;
-		this.cell = null;
 		this.material = null;
 		this.userData = null;
 		this.entity = null;
 		this.geometry = null;
+		this._emissive = null;
 	}
 };

@@ -8,10 +8,10 @@ define('Editor', function() {
 	var motor = require('motor');
 
 	// TODO: get these values from UI
-	var heightStep = 5;
+	var heightStep = 3;
 
 	// PRIVATE
-	var lastHeight = 5;
+	var lastHeight = 1;
 	var currentGridCell = null;
 	var prevGridCell = new THREE.Vector3();
 	var _cel = new vg.Cell();
@@ -39,14 +39,17 @@ define('Editor', function() {
 					_cel.tile = null;
 
 					var dif = lastHeight - data;
-					nexus.mouse.wheel = (overTile.cell.h / heightStep) + (dif > 0 ? -1 : 1);
-
-					nexus.board.removeTile(overTile);
-
-					var cell = addCell(_cel);
+					_cel.h += dif > 0 ? -heightStep : heightStep;
+					if (_cel.h < 1) _cel.h = 1;
+					nexus.mouse.wheel = (_cel.h / heightStep) + (dif > 0 ? -1 : 1);
 					lastHeight = nexus.mouse.wheel;
 
-					tower.tileAction.dispatch(tower.CELL_CHANGE_HEIGHT, cell.tile, heightStep);
+					removeTile(overTile);
+
+					var cell = addCell(_cel);
+					cell.tile.select();
+
+					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, cell.tile);
 				}
 				break;
 
@@ -67,7 +70,7 @@ define('Editor', function() {
 
 			case vg.MouseCaster.DOWN:
 				if (keyboard.shift && nexus.mouse.down && data && !overTile) {
-					// if shift is down then she's painting, so add a tile immediately
+					// if shift is down then they're painting, so add a tile immediately
 					addCell(currentGridCell);
 				}
 				break;
@@ -86,17 +89,17 @@ define('Editor', function() {
 	}
 
 	function addCell(cell) {
-		if (!cell || cell.tile) return;
+		if (!cell || nexus.board.getTileAtCell(cell)) return;
 
 		var newCell = new vg.Cell();
 		newCell.copy(cell);
-		newCell.h = nexus.mouse.wheel * heightStep;
+		newCell.h = Math.abs(nexus.mouse.wheel * heightStep);
 
 		var newTile = nexus.grid.generateTile(newCell, 0.95);
 
 		nexus.board.addTile(newTile);
 
-		tower.tileAction.dispatch(tower.CELL_ADD, newTile, heightStep);
+		tower.tileAction.dispatch(tower.TILE_ADD, newTile);
 
 		return newCell;
 	}
@@ -104,7 +107,7 @@ define('Editor', function() {
 	function removeTile(overTile) {
 		nexus.board.removeTile(overTile);
 
-		tower.tileAction.dispatch(tower.CELL_REMOVE, overTile);
+		tower.tileAction.dispatch(tower.TILE_REMOVE, overTile);
 	}
 
 	return {

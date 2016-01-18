@@ -15,7 +15,7 @@ define('Input', function() {
 		this.heightStep = 5;
 		this.editorWorldPos = new THREE.Vector3(); // current grid position of mouse
 
-		this.overCell = null;
+		this.overTile = null;
 
 		this._travel = 0;
 
@@ -50,27 +50,27 @@ define('Input', function() {
 			}
 			switch (type) {
 				case vg.MouseCaster.WHEEL:
-					tower.userAction.dispatch(vg.MouseCaster.WHEEL, this.overCell, obj);
+					tower.userAction.dispatch(vg.MouseCaster.WHEEL, this.overTile, obj);
 					break;
 
 				case vg.MouseCaster.OVER:
 					if (obj) {
-						this.overCell = obj.select();
+						this.overTile = obj.select();
 					}
-					tower.userAction.dispatch(vg.MouseCaster.OVER, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.OVER, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.OUT:
 					if (obj) {
 						obj.deselect();
-						this.overCell = null;
+						this.overTile = null;
 					}
-					tower.userAction.dispatch(vg.MouseCaster.OUT, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.OUT, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.DOWN:
 					this.mouseDelta.copy(this.mouse.screenPosition);
-					tower.userAction.dispatch(vg.MouseCaster.DOWN, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.DOWN, this.overTile, hit);
 					this._travel = 0;
 					break;
 
@@ -78,11 +78,11 @@ define('Input', function() {
 					if (this._travel > this.mousePanMinDistance) {
 						break;
 					}
-					tower.userAction.dispatch(vg.MouseCaster.UP, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.UP, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.CLICK:
-					tower.userAction.dispatch(vg.MouseCaster.CLICK, this.overCell, hit);
+					tower.userAction.dispatch(vg.MouseCaster.CLICK, this.overTile, hit);
 					break;
 			}
 		}

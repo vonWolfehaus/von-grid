@@ -75,7 +75,6 @@ window.addEventListener('load', function(evt) {
 	});
 	var board = new vg.Board(grid);
 	var mouse = new vg.MouseCaster(board.group, scene.camera, canvas);
-
 	var input = new Input(board.group, mouse);
 	var plane = new EditorPlane(board.group, grid, mouse);
 
@@ -88,12 +87,13 @@ window.addEventListener('load', function(evt) {
 
 	var boardSize = 20; // TODO: get from settings
 	plane.generatePlane(boardSize * boardSize * 1.8, boardSize * boardSize * 1.8);
-	board.generateOverlay(boardSize);
 	plane.addHoverMeshToGroup(scene.container);
+
+	board.generateOverlay(boardSize);
 
 	tower.tileAction.add(onMapChange, this);
 
-	scene.add(board.group);
+	// scene.add(board.group);
 	scene.focusOn(board.group);
 
 	if (map) {
@@ -113,13 +113,13 @@ window.addEventListener('load', function(evt) {
 				mouse.active = true;
 			}
 		}
-		/*if (dirtyMap) {
+		if (dirtyMap) {
 			saveTimer--;
 			if (saveTimer === 0) {
 				dirtyMap = false;
 				data.save();
 			}
-		}*/
+		}
 		mouse.update();
 		input.update();
 		plane.update();
@@ -142,6 +142,7 @@ window.addEventListener('load', function(evt) {
 	function loadMap(json) {
 		grid.load(json);
 		board.setGrid(grid);
+		board.generateTilemap();
 		scene.add(board.group);
 		console.log('Map load complete');
 	}
