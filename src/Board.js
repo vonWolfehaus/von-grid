@@ -75,7 +75,7 @@ vg.Board.prototype = {
 	},
 
 	getRandomTile: function() {
-		var i = vg.Tools.randomInt(0, this.tiles.length);
+		var i = vg.Tools.randomInt(0, this.tiles.length-1);
 		return this.tiles[i];
 	},
 

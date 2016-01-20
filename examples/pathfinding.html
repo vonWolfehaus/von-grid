@@ -80,7 +80,7 @@
 
 		var a = board.getRandomTile();
 		var b = board.getRandomTile();
-		if (a === b) {
+		if (a.cell.equals(b.cell)) {
 			// they're on top of each other, so place one at a diagonal of the other
 			var neighbors = grid.getNeighbors(a, true);
 			// the diagonals are added to the list after all the others are, so we pick the last one
@@ -195,13 +195,13 @@
 			grid.traverse(deselectVisited);
 			var path = board.findPath(startSprite.tile, endSprite.tile);
 			// highlight the path with markers
-			console.log(path)
 			if (path) {
+				console.log(path)
 				for (var i = 0; i < path.length; i++) {
 					var s = markers[i];
 					if (!s) s = markers[i] = new Sprite(spriteConfig);
 					s.activate();
-					board.setEntityOnTile(s, path[i]);
+					board.setEntityOnTile(s, path[i].tile);
 				}
 				// see which tiles were visited
 				grid.traverse(selectVisited);
@@ -229,15 +229,15 @@
 			return true; // yes, keep next for consideration
 		}
 
-		function selectVisited(t) {
-			if (t.cell._visited) {
-				t.select();
+		function selectVisited(c) {
+			if (c._visited) {
+				c.tile.select();
 			}
 		}
 
-		function deselectVisited(t) {
-			if (t.selected) {
-				t.deselect();
+		function deselectVisited(c) {
+			if (c.tile.selected) {
+				c.tile.deselect();
 			}
 		}
 

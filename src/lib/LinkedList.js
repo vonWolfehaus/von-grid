@@ -62,7 +62,7 @@
 			if (!obj.uniqueID) {
 				try {
 					obj.uniqueID = LinkedList.generateID();
-					console.log('New ID: '+obj.uniqueID);
+					// console.log('New ID: '+obj.uniqueID);
 				}
 				catch (err) {
 					console.error('[LinkedList.addNode] obj passed is immutable: cannot attach necessary identifier');

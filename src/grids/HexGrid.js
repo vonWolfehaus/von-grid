@@ -71,10 +71,10 @@ vg.HexGrid = function(config) {
 
 	this._hashDelimeter = '.';
 	// pre-computed permutations
-	this._directions = [new THREE.Vector3(+1, -1, 0), new THREE.Vector3(+1, 0, -1), new THREE.Vector3(0, +1, -1),
-						new THREE.Vector3(-1, +1, 0), new THREE.Vector3(-1, 0, +1), new THREE.Vector3(0, -1, +1)];
-	this._diagonals = [new THREE.Vector3(+2, -1, -1), new THREE.Vector3(+1, +1, -2), new THREE.Vector3(-1, +2, -1),
-						new THREE.Vector3(-2, +1, +1), new THREE.Vector3(-1, -1, +2), new THREE.Vector3(+1, -2, +1)];
+	this._directions = [new vg.Cell(+1, -1, 0), new vg.Cell(+1, 0, -1), new vg.Cell(0, +1, -1),
+						new vg.Cell(-1, +1, 0), new vg.Cell(-1, 0, +1), new vg.Cell(0, -1, +1)];
+	this._diagonals = [new vg.Cell(+2, -1, -1), new vg.Cell(+1, +1, -2), new vg.Cell(-1, +2, -1),
+						new vg.Cell(-2, +1, +1), new vg.Cell(-1, -1, +2), new vg.Cell(+1, -2, +1)];
 	// cached objects
 	this._list = [];
 	this._vec3 = new THREE.Vector3();
@@ -100,12 +100,15 @@ vg.HexGrid.prototype = {
 		High-level functions that the Board interfaces with (all grids implement)
 	 */
 
-	// grid cell (Hex in this case) to position in pixels/world
+	// grid cell (Hex in cube coordinate space) to position in pixels/world
 	cellToPixel: function(cell) {
-		var p = this.axialToPixel(cell);
-		this._vec3.x = p.x;
+		// var p = this.axialToPixel(cell);
+		// this._vec3.x = p.x;
+		// this._vec3.y = cell.h;
+		// this._vec3.z = -p.y;
+		this._vec3.x = cell.q * this.cellWidth * 0.75;
 		this._vec3.y = cell.h;
-		this._vec3.z = -p.y;
+		this._vec3.z = -((cell.s - cell.r) * this.cellLength * 0.5);
 		return this._vec3;
 	},
 
@@ -113,7 +116,7 @@ vg.HexGrid.prototype = {
 		// convert a position in world space ("pixels") to cell coordinates
 		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
-		this._cel.set(q, r, -q - r);
+		this._cel.set(q, r);
 		return this.cubeRound(this._cel);
 	},
 
@@ -128,8 +131,8 @@ vg.HexGrid.prototype = {
 		var q, r; // = x, y
 		q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
-		this._cel.set(q, r, 0);
-		this.cubeRound(this.axialToCube(this._cel));
+		this._cel.set(q, r);
+		this.cubeRound(this._cel);
 		return this.cells[this.cellToHash(this._cel)];
 	},
 
@@ -171,9 +174,13 @@ vg.HexGrid.prototype = {
 		return this.cells[c];
 	},
 
+	cellToHash: function(cell) {
+		return cell.q+this._hashDelimeter+cell.r+this._hashDelimeter+cell.s;
+	},
+
 	distance: function(cellA, cellB) {
-		var d = this.cubeDistance(cellA, cellB);
-		d += cellB.h - cellA.h;
+		var d = Math.max(Math.abs(cellA.q - cellB.q), Math.abs(cellA.r - cellB.r), Math.abs(cellA.s - cellB.s));
+		d += cellB.h - cellA.h; // include vertical height
 		return d;
 	},
 
@@ -421,55 +428,49 @@ vg.HexGrid.prototype = {
 		return json;
 	},
 
-	/*
-		________________________________________________________________________
+	/*  ________________________________________________________________________
 		Hexagon-specific conversion math
+		Mostly commented out bwcause they're inlined whenever possible to increase performance.
+		They're still here for reference.
 	 */
 
-	cellToHash: function(cell) {
-		return cell.q+this._hashDelimeter+cell.r+this._hashDelimeter+cell.s;
-	},
-
-	pixelToAxial: function(pos) {
+	/*pixelToAxial: function(pos) {
 		var q, r; // = x, y
 		q = pos.x * ((2/3) / this.cellSize);
 		r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
-		this._vec3.set(q, r, 0);
-		return this.axialRound(this._vec3);
-	},
+		this._cel.set(q, r, -q-r);
+		return this.cubeRound(this._cel);
+	},*/
 
-	axialToCube: function(h) {
+	/*axialToCube: function(h) {
 		return {
 			q: h.q,
 			r: h.r,
 			s: -h.q - h.r
 		};
-		// return this._conversionVec.set(h.x, h.y, -h.x - h.y);
-	},
+	},*/
 
-	cubeToAxial: function(cell) {
+	/*cubeToAxial: function(cell) {
 		return cell; // yep
-	},
+	},*/
 
-	axialToPixel: function(cell) {
+	/*axialToPixel: function(cell) {
 		var x, y; // = q, r
 		x = cell.q * this.cellWidth * 0.75;
 		y = (cell.s - cell.r) * this.cellLength * 0.5;
 		return {x: x, y: -y};
-		// return this._conversionVec.set(x, y, 0);
-	},
+	},*/
 
 	/*hexToPixel: function(h) {
 		var x, y; // = q, r
 		x = this.cellSize * 1.5 * h.x;
 		y = this.cellSize * vg.SQRT3 * (h.y + (h.x * 0.5));
 		return {x: x, y: y};
-		// return this._conversionVec.set(x, y, 0);
 	},*/
 
-	axialRound: function(h) {
+	/*axialRound: function(h) {
 		return this.cubeRound(this.axialToCube(h));
-	},
+	},*/
 
 	cubeRound: function(h) {
 		var rx = Math.round(h.q);
@@ -490,11 +491,10 @@ vg.HexGrid.prototype = {
 			rz = -rx-ry;
 		}
 
-		// return {x: rx, y: ry, z: rz};
 		return this._cel.set(rx, ry, rz);
 	},
 
-	cubeDistance: function(a, b) {
+	/*cubeDistance: function(a, b) {
 		return Math.max(Math.abs(a.q - b.q), Math.abs(a.r - b.r), Math.abs(a.s - b.s));
-	}
+	}*/
 };
