@@ -169,3 +169,5 @@ vg.MouseCaster.prototype = {
 		this.signal.dispatch(vg.MouseCaster.WHEEL, this.wheel);
 	}
 };
+
+vg.MouseCaster.prototype.constructor = vg.MouseCaster;

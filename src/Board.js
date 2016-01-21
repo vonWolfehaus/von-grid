@@ -136,3 +136,5 @@ vg.Board.prototype = {
 		if (this.tileGroup) this.group.remove(this.tileGroup);
 	}
 };
+
+vg.Board.prototype.constructor = vg.Board;

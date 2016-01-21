@@ -49,3 +49,5 @@ vg.Cell.prototype = {
 		return this.q === cell.q && this.r === cell.r && this.s === cell.s;
 	}
 };
+
+vg.Cell.prototype.constructor = vg.Cell;

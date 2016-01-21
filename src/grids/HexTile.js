@@ -98,3 +98,5 @@ vg.HexTile.prototype = {
 		this._emissive = null;
 	}
 };
+
+vg.HexTile.prototype.constructor = vg.HexTile;

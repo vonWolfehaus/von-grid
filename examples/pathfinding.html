@@ -196,7 +196,6 @@
 			var path = board.findPath(startSprite.tile, endSprite.tile);
 			// highlight the path with markers
 			if (path) {
-				console.log(path)
 				for (var i = 0; i < path.length; i++) {
 					var s = markers[i];
 					if (!s) s = markers[i] = new Sprite(spriteConfig);
