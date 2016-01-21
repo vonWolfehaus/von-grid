@@ -24,7 +24,7 @@ define('Editor', function() {
 		if (nexus.mouse.down && keyboard.shift && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// only check if the user's mouse is over the editor plane
 			if (!currentGridCell.equals(prevGridCell)) {
-				addCell(currentGridCell);
+				addTile(currentGridCell);
 			}
 			prevGridCell.copy(currentGridCell);
 		}
@@ -53,7 +53,7 @@ define('Editor', function() {
 					if (last === _cel.h) return;
 					removeTile(overTile);
 
-					var cell = addCell(_cel);
+					var cell = addTile(_cel);
 					cell.tile.select();
 
 					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, cell.tile);
@@ -66,7 +66,7 @@ define('Editor', function() {
 						removeTile(overTile);
 					}
 					else if (!overTile && nexus.mouse.down) {
-						addCell(currentGridCell);
+						addTile(currentGridCell);
 					}
 				}
 				break;
@@ -78,14 +78,14 @@ define('Editor', function() {
 			case vg.MouseCaster.DOWN:
 				if (keyboard.shift && nexus.mouse.down && data && !overTile) {
 					// if shift is down then they're painting, so add a tile immediately
-					addCell(currentGridCell);
+					addTile(currentGridCell);
 				}
 				break;
 
 			case vg.MouseCaster.UP:
 				if (nexus.mouse.down && data && !overTile) {
 					// create a new tile, if one isn't already there
-					addCell(currentGridCell);
+					addTile(currentGridCell);
 				}
 				else if (nexus.mouse.rightDown && overTile) {
 					// remove a tile if it's there and right mouse is down
@@ -95,7 +95,7 @@ define('Editor', function() {
 		}
 	}
 
-	function addCell(cell) {
+	function addTile(cell) {
 		if (!cell || nexus.board.getTileAtCell(cell)) return;
 
 		var newCell = new vg.Cell();
@@ -108,7 +108,7 @@ define('Editor', function() {
 
 		tower.tileAction.dispatch(tower.TILE_ADD, newTile);
 
-		return newCell;
+		return newTile;
 	}
 
 	function removeTile(overTile) {

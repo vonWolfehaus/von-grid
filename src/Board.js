@@ -41,7 +41,8 @@ vg.Board.prototype = {
 		if (i === -1) this.tiles.push(tile);
 		else return;
 
-		this.grid.setPositionToCell(tile.position, tile.cell);
+		this.snapTileToGrid(tile);
+		tile.position.y = 0;
 
 		this.tileGroup.add(tile.mesh);
 		this.grid.add(tile.cell);
@@ -72,6 +73,22 @@ vg.Board.prototype = {
 	getTileAtCell: function(cell) {
 		var h = this.grid.cellToHash(cell);
 		return cell.tile || (typeof this.grid.cells[h] !== 'undefined' ? this.grid.cells[h].tile : null);
+	},
+	
+	snapToGrid: function(pos) {
+		var cell = this.grid.pixelToCell(pos);
+		pos.copy(this.grid.cellToPixel(cell));
+	},
+	
+	snapTileToGrid: function(tile) {
+		if (tile.cell) {
+			tile.position.copy(this.grid.cellToPixel(tile.cell));
+		}
+		else {
+			var cell = this.grid.pixelToCell(tile.position);
+			tile.position.copy(this.grid.cellToPixel(cell));
+		}
+		return tile;
 	},
 
 	getRandomTile: function() {

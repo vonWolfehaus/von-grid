@@ -76,7 +76,7 @@ window.addEventListener('load', function(evt) {
 	scene.controls.addEventListener('wheel', onControlWheel);
 
 	var grid = new vg.HexGrid({
-		rings: 10,
+		rings: 5,
 		cellSize: 10
 	});
 	var board = new vg.Board(grid);
@@ -191,6 +191,41 @@ window.addEventListener('load', function(evt) {
 			false, false, false, false, 0, null
 		);
 		link.dispatchEvent(evt);
+	}
+});
+/*
+	Handles JSON for whatever data needs to be saved to localStorage, and provides a convenient signal for whenever that data changes.
+*/
+define('data', {
+	_store: {},
+	changed: new vg.Signal(),
+
+	get: function(key) {
+		return this._store[key] || null;
+	},
+
+	set: function(key, val) {
+		// fire event first so we can retrieve old data before it's overwritten (just in case)
+		this.changed.dispatch(key, this._store[key], val);
+		this._store[key] = val;
+	},
+
+	save: function() {
+		window.localStorage['vongrid'] = JSON.stringify(this._store);
+	},
+
+	load: function(json) {
+		var data = window.localStorage['vongrid'];
+		if (json || data) {
+			try {
+				this._store = json || JSON.parse(data);
+				this.changed.dispatch('load-success');
+			}
+			catch (err) {
+				console.warn('Error loading editor data');
+				this.changed.dispatch('load-failure');
+			}
+		}
 	}
 });
 define('keyboard', function() {
@@ -402,7 +437,7 @@ define('Input', function() {
 			if (hit) {
 				// flip things around a little to fit to our rotated grid
 				this.editorWorldPos.x = hit.point.x;
-				this.editorWorldPos.y = -hit.point.z;
+				this.editorWorldPos.y = hit.point.z; // grids are rotated on axis so that objects keep their y+ orientation
 				this.editorWorldPos.z = hit.point.y;
 			}
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
@@ -528,28 +563,6 @@ define('EditorPlane', function() {
 			this.scene.add(this.mesh);
 		},
 
-		//http://stackoverflow.com/questions/20734438/algorithm-to-generate-a-hexagonal-grid-with-coordinate-system
-		// http://www.redblobgames.com/grids/hexagons/implementation.html
-		/*generateHexGrid: function(Graphics g, Point origin, int size, int radius, int padding) {
-			double ang30 = Math.toRadians(30);
-			double xOff = Math.cos(ang30) * (radius + padding);
-			double yOff = Math.sin(ang30) * (radius + padding);
-			int half = size / 2;
-
-			for (int row = 0; row < size; row++) {
-				int cols = size - java.lang.Math.abs(row - half);
-
-				for (int col = 0; col < cols; col++) {
-					int xLbl = row < half ? col - row : col - half;
-					int yLbl = row - half;
-					int x = (int) (origin.x + xOff * (col * 2 + 1 - cols));
-					int y = (int) (origin.y + yOff * (row - half) * 3);
-
-					drawHex(g, xLbl, yLbl, x, y, radius);
-				}
-			}
-		},*/
-
 		addHoverMeshToGroup: function(group) {
 			if (this.hoverMesh.parent) {
 				this.hoverMesh.parent.remove(this.hoverMesh);
@@ -559,7 +572,8 @@ define('EditorPlane', function() {
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
-				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				var cell = this.grid.pixelToCell(this.nexus.input.editorWorldPos);
+				this.hoverMesh.position.copy(this.grid.cellToPixel(cell));
 				this.hoverMesh.position.y += 0.1;
 				this.hoverMesh.visible = true;
 			}
@@ -692,7 +706,7 @@ define('Editor', function() {
 		if (nexus.mouse.down && keyboard.shift && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// only check if the user's mouse is over the editor plane
 			if (!currentGridCell.equals(prevGridCell)) {
-				addCell(currentGridCell);
+				addTile(currentGridCell);
 			}
 			prevGridCell.copy(currentGridCell);
 		}
@@ -721,7 +735,7 @@ define('Editor', function() {
 					if (last === _cel.h) return;
 					removeTile(overTile);
 
-					var cell = addCell(_cel);
+					var cell = addTile(_cel);
 					cell.tile.select();
 
 					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, cell.tile);
@@ -734,7 +748,7 @@ define('Editor', function() {
 						removeTile(overTile);
 					}
 					else if (!overTile && nexus.mouse.down) {
-						addCell(currentGridCell);
+						addTile(currentGridCell);
 					}
 				}
 				break;
@@ -746,14 +760,14 @@ define('Editor', function() {
 			case vg.MouseCaster.DOWN:
 				if (keyboard.shift && nexus.mouse.down && data && !overTile) {
 					// if shift is down then they're painting, so add a tile immediately
-					addCell(currentGridCell);
+					addTile(currentGridCell);
 				}
 				break;
 
 			case vg.MouseCaster.UP:
 				if (nexus.mouse.down && data && !overTile) {
 					// create a new tile, if one isn't already there
-					addCell(currentGridCell);
+					addTile(currentGridCell);
 				}
 				else if (nexus.mouse.rightDown && overTile) {
 					// remove a tile if it's there and right mouse is down
@@ -763,7 +777,7 @@ define('Editor', function() {
 		}
 	}
 
-	function addCell(cell) {
+	function addTile(cell) {
 		if (!cell || nexus.board.getTileAtCell(cell)) return;
 
 		var newCell = new vg.Cell();
@@ -776,7 +790,7 @@ define('Editor', function() {
 
 		tower.tileAction.dispatch(tower.TILE_ADD, newTile);
 
-		return newCell;
+		return newTile;
 	}
 
 	function removeTile(overTile) {
@@ -787,41 +801,6 @@ define('Editor', function() {
 
 	return {
 
-	}
-});
-/*
-	Handles JSON for whatever data needs to be saved to localStorage, and provides a convenient signal for whenever that data changes.
-*/
-define('data', {
-	_store: {},
-	changed: new vg.Signal(),
-
-	get: function(key) {
-		return this._store[key] || null;
-	},
-
-	set: function(key, val) {
-		// fire event first so we can retrieve old data before it's overwritten (just in case)
-		this.changed.dispatch(key, this._store[key], val);
-		this._store[key] = val;
-	},
-
-	save: function() {
-		window.localStorage['vongrid'] = JSON.stringify(this._store);
-	},
-
-	load: function(json) {
-		var data = window.localStorage['vongrid'];
-		if (json || data) {
-			try {
-				this._store = json || JSON.parse(data);
-				this.changed.dispatch('load-success');
-			}
-			catch (err) {
-				console.warn('Error loading editor data');
-				this.changed.dispatch('load-failure');
-			}
-		}
 	}
 });
 //# sourceMappingURL=app.js.map

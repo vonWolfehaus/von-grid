@@ -46,7 +46,7 @@ vg.HexTile = function(config) {
 	// create references so we can control orientation through this (Hex), instead of drilling down
 	this.position = this.mesh.position;
 	this.rotation = this.mesh.rotation;
-
+	
 	// rotate it to face "up" (the threejs coordinate space is Y+)
 	this.rotation.x = -90 * vg.DEG_TO_RAD;
 	this.mesh.scale.set(settings.scale, settings.scale, 1);

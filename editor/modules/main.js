@@ -70,7 +70,7 @@ window.addEventListener('load', function(evt) {
 	scene.controls.addEventListener('wheel', onControlWheel);
 
 	var grid = new vg.HexGrid({
-		rings: 10,
+		rings: 5,
 		cellSize: 10
 	});
 	var board = new vg.Board(grid);

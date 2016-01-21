@@ -102,13 +102,9 @@ vg.HexGrid.prototype = {
 
 	// grid cell (Hex in cube coordinate space) to position in pixels/world
 	cellToPixel: function(cell) {
-		// var p = this.axialToPixel(cell);
-		// this._vec3.x = p.x;
-		// this._vec3.y = cell.h;
-		// this._vec3.z = -p.y;
 		this._vec3.x = cell.q * this.cellWidth * 0.75;
 		this._vec3.y = cell.h;
-		this._vec3.z = -((cell.s - cell.r) * this.cellLength * 0.5);
+		this._vec3.z = (cell.s - cell.r) * this.cellLength * 0.5;
 		return this._vec3;
 	},
 
@@ -116,22 +112,15 @@ vg.HexGrid.prototype = {
 		// convert a position in world space ("pixels") to cell coordinates
 		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
-		this._cel.set(q, r);
+		this._cel.set(q, r, -q-r);
 		return this.cubeRound(this._cel);
-	},
-
-	setPositionToCell: function(pos, cell) {
-		pos.x = cell.q * this.cellWidth * 0.75;
-		pos.y = 0;
-		pos.z = (cell.s - cell.r) * this.cellLength * 0.5;
 	},
 
 	getCellAt: function(pos) {
 		// get the Cell (if any) at the passed world position
-		var q, r; // = x, y
-		q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
-		r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
-		this._cel.set(q, r);
+		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
+		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
+		this._cel.set(q, r, -q-r);
 		this.cubeRound(this._cel);
 		return this.cells[this.cellToHash(this._cel)];
 	},
@@ -430,7 +419,7 @@ vg.HexGrid.prototype = {
 
 	/*  ________________________________________________________________________
 		Hexagon-specific conversion math
-		Mostly commented out bwcause they're inlined whenever possible to increase performance.
+		Mostly commented out because they're inlined whenever possible to increase performance.
 		They're still here for reference.
 	 */
 

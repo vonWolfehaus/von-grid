@@ -68,28 +68,6 @@ define('EditorPlane', function() {
 			this.scene.add(this.mesh);
 		},
 
-		//http://stackoverflow.com/questions/20734438/algorithm-to-generate-a-hexagonal-grid-with-coordinate-system
-		// http://www.redblobgames.com/grids/hexagons/implementation.html
-		/*generateHexGrid: function(Graphics g, Point origin, int size, int radius, int padding) {
-			double ang30 = Math.toRadians(30);
-			double xOff = Math.cos(ang30) * (radius + padding);
-			double yOff = Math.sin(ang30) * (radius + padding);
-			int half = size / 2;
-
-			for (int row = 0; row < size; row++) {
-				int cols = size - java.lang.Math.abs(row - half);
-
-				for (int col = 0; col < cols; col++) {
-					int xLbl = row < half ? col - row : col - half;
-					int yLbl = row - half;
-					int x = (int) (origin.x + xOff * (col * 2 + 1 - cols));
-					int y = (int) (origin.y + yOff * (row - half) * 3);
-
-					drawHex(g, xLbl, yLbl, x, y, radius);
-				}
-			}
-		},*/
-
 		addHoverMeshToGroup: function(group) {
 			if (this.hoverMesh.parent) {
 				this.hoverMesh.parent.remove(this.hoverMesh);
@@ -99,7 +77,8 @@ define('EditorPlane', function() {
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
-				this.grid.setPositionToCell(this.hoverMesh.position, this.grid.pixelToCell(this.nexus.input.editorWorldPos));
+				var cell = this.grid.pixelToCell(this.nexus.input.editorWorldPos);
+				this.hoverMesh.position.copy(this.grid.cellToPixel(cell));
 				this.hoverMesh.position.y += 0.1;
 				this.hoverMesh.visible = true;
 			}
