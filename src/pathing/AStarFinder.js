@@ -37,10 +37,10 @@ vg.AStarFinder.prototype = {
 			// pop the position of current which has the minimum `_calcCost` value.
 			current = this.list.shift();
 			current._visited = true;
-			console.log(current);
+			
 
 			// if reached the end position, construct the path and return it
-			if (current.equals(endNode)) {
+			if (current.q === endNode.q && current.r === endNode.r && current.s === endNode.s) {
 				return vg.PathUtil.backtrace(endNode);
 			}
 
@@ -60,12 +60,13 @@ vg.AStarFinder.prototype = {
 					n._visited = true;
 					n._parent = current;
 					n._calcCost = costSoFar;
+					console.log(current);
 					// _priority is the most important property, since it makes the algorithm "greedy" and seek the goal.
 					// otherwise it behaves like a brushfire/breadth-first
 					n._priority = costSoFar + grid.distance(endNode, n);
 
 					// check neighbor if it's the end current as well--often cuts steps by a significant amount
-					if (n.equals(endNode)) {
+					if (n.q === endNode.q && n.r === endNode.r && n.s === endNode.s) {
 						return vg.PathUtil.backtrace(endNode);
 					}
 					// console.log(n);
