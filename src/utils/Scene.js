@@ -135,3 +135,5 @@ vg.Scene.prototype = {
 		this.camera.lookAt(obj.position);
 	}
 };
+
+vg.Scene.prototype.constructor = vg.Scene;

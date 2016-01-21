@@ -9,8 +9,8 @@ var Sprite = function(settings) {
 	this.container = null;
 	this.texture = null;
 	this.scale = 1;
-	this.highlight = 'rgb(0, 0, 255)';
-	this.offsetY = 0; // how high off the board this object sits
+	this.highlight = 'rgb(0, 168, 228)';
+	this.heightOffset = 0; // how high off the board this object sits
 	this.obstacle = false;
 
 	// attribute override
@@ -19,8 +19,8 @@ var Sprite = function(settings) {
 	// other objects like the SelectionManager expect these on all objects that are added to the scene
 	this.active = false;
 	this.uniqueId = vg.Tools.generateID();
-	this.objectType = 'entity'; // Board.Entity
-	this.cell = null;
+	this.objectType = vg.ENT;
+	this.tile = null;
 
 	// sanity checks
 	if (!this.texture) {
@@ -42,7 +42,6 @@ var Sprite = function(settings) {
 
 	if (!this.highlightMaterial) {
 		this.highlightMaterial = this.material;
-
 	}
 
 	this.view = new THREE.Sprite(this.material);
@@ -82,7 +81,7 @@ Sprite.prototype = {
 
 	dispose: function() {
 		this.container = null;
-		this.cell = null;
+		this.tile = null;
 		this.position = null;
 		this.view = null;
 	}

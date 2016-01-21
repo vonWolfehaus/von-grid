@@ -2,8 +2,7 @@
 	Grid cell that constructs its geometry for rendering and holds gameplay properties.
  */
 // 'utils/Tools'
-vg.Square = function(size, scale, geometry, material) {
-	this.type = vg.Square.FLAT;
+vg.SquareTile = function(size, scale, geometry, material) {
 	this.material = material;
 	this.geo = geometry;
 
@@ -53,10 +52,7 @@ vg.Square = function(size, scale, geometry, material) {
 	this._emissive = this.material.emissive.getHex();
 };
 
-vg.Square.FLAT = 0;
-vg.Square.POINTY = 45 * 0.0174532925;
-
-vg.Square.prototype = {
+vg.SquareTile.prototype = {
 	select: function() {
 		this.material.emissive.setHex(this.highlight);
 		this.selected = true;
@@ -74,3 +70,5 @@ vg.Square.prototype = {
 		this.gridPos = cell;
 	}
 };
+
+vg.SquareTile.prototype.constructor = vg.SquareTile;

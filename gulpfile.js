@@ -28,7 +28,7 @@ var glob = {
 
 gulp.task('default', ['clean'], function() {
 	runSequence(
-		['all', 'hex', 'sqr']
+		['scripts']
 	);
 });
 
@@ -36,14 +36,14 @@ gulp.task('clean', del.bind(null, [dist]));
 
 gulp.task('dev', ['clean'], function() {
 	runSequence(
-		['all'],
+		['scripts'],
 		['watch']
 	);
 });
 
 gulp.task('dev-ed', ['clean'], function() {
 	runSequence(
-		['all', 'scripts-editor'],
+		['scripts', 'scripts-editor'],
 		['serve-editor']
 	);
 });
@@ -51,6 +51,8 @@ gulp.task('dev-ed', ['clean'], function() {
 /*----------------------------------------------------------------------
 	SCRIPTS
 */
+
+gulp.task('scripts', ['all', 'hex', 'sqr']);
 
 gulp.task('all', function() {
 	return gulp.src(glob.scripts)
@@ -128,7 +130,7 @@ gulp.task('styles', function() {
 
 // Defines the list of resources to watch for changes.
 function watch() {
-	gulp.watch(glob.scripts, ['all', reload]);
+	gulp.watch(glob.scripts, ['scripts', reload]);
 	//gulp.watch(glob.styles, ['styles', reload]);
 }
 
@@ -141,9 +143,8 @@ function serve(dir) {
 		}
 	});
 
-	//browserSync.watch(dir+'/**/*.*').on('change', reload);
 	browserSync.watch(dist+'/**/*.*').on('change', reload);
-	gulp.watch(glob.scripts, ['all']);
+	gulp.watch(glob.scripts, ['scripts']);
 }
 
 gulp.task('watch', function() {
@@ -157,6 +158,7 @@ gulp.task('serve-editor', function() {
 
 gulp.task('serve-examples', function() {
 	//gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
+	browserSync.watch('examples/**/*.*').on('change', reload);
 	serve('examples');
 });
 

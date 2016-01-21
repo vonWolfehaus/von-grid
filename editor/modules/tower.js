@@ -6,7 +6,7 @@ define('tower', {
 	saveMap: new vg.Signal(),
 	loadMap: new vg.Signal(),
 
-	CELL_CHANGE_HEIGHT: 'cell.change.height',
-	CELL_ADD: 'cell.add',
-	CELL_REMOVE: 'cell.remove',
+	TILE_CHANGE_HEIGHT: 'cell.change.height',
+	TILE_ADD: 'cell.add',
+	TILE_REMOVE: 'cell.remove',
 });

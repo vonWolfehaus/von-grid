@@ -68,3 +68,5 @@ vg.SelectionManager.prototype = {
 		}
 	}
 };
+
+vg.SelectionManager.prototype.constructor = vg.SelectionManager;

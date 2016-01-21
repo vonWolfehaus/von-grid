@@ -12,7 +12,7 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 
 - Simple API for attaching objects to the grid through `Board.js`
 - **A* pathfinding** with or without weighted nodes, and a `walkable` flag
-- Make maps with `editor/index.html` (save/load with `.json` files)
+- Make maps with [the editor](http://vonwolfehaus.github.io/von-grid/editor/) (autosaves to localstorage, and save/load as `.json` files)
 - Varied height
 - Sparse maps
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
@@ -22,8 +22,8 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 
 #### Roadmap
 
-- Vastly improved editor
-- Abstract graph
+- Improved editor
+- Improved API
 - Arbitrary tile model support
 
 ## Usage
@@ -57,3 +57,9 @@ function update() {
 #### Examples
 
 For the simple examples you can drop them into Chrome, but for ones that require images or models, you'll have to run `gulp examples`. A browser tab will be opened to the examples directory for you.
+
+## Editor
+
+#### [Try it out](http://vonwolfehaus.github.io/von-grid/editor/)
+
+![screenshot](editor.png)

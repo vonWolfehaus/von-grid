@@ -6,6 +6,8 @@
 	group - any Object3D (Scene, Group, Mesh, Sprite, etc) that the mouse will cast against
 	camera - the camera to cast from
 	[element] - optional element to attach mouse event to
+
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
  */
 vg.MouseCaster = function(group, camera, element) {
 	this.down = false; // left click
@@ -167,3 +169,5 @@ vg.MouseCaster.prototype = {
 		this.signal.dispatch(vg.MouseCaster.WHEEL, this.wheel);
 	}
 };
+
+vg.MouseCaster.prototype.constructor = vg.MouseCaster;
