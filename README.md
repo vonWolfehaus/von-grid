@@ -43,6 +43,8 @@ var grid = new vg.HexGrid({
 
 var board = new vg.Board(grid);
 
+board.generateTilemap();
+
 scene.add(board.group);
 scene.focusOn(board.group);
 
