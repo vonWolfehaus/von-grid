@@ -46,13 +46,12 @@
 
 		var grid = new vg.HexGrid({
 			rings: 6,
-			tileSize: 10
+			cellSize: 10
 		});
-		/*var grid = new SquareGrid({
+		/*var grid = new vg.SqrGrid({
 			width: 10,
 			height: 10,
-			tileSize: 15,
-			tileScale: 0.95
+			cellSize: 10
 		});*/
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);

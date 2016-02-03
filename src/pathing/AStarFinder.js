@@ -25,10 +25,10 @@ vg.AStarFinder.prototype = {
 		// clear old values from previous finding
 		grid.clearPath();
 		this.list.clear();
-		
+
 		// push the start current into the open list
 		this.list.add(startNode);
-		
+
 		// while the open list is not empty
 		while (this.list.length > 0) {
 			// sort so lowest cost is first
@@ -37,7 +37,6 @@ vg.AStarFinder.prototype = {
 			// pop the position of current which has the minimum `_calcCost` value.
 			current = this.list.shift();
 			current._visited = true;
-			
 
 			// if reached the end position, construct the path and return it
 			if (current === endNode) {

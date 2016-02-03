@@ -49,7 +49,7 @@ vg.HexGrid = function(config) {
 	var i, verts = [];
 	// create the skeleton of the hex
 	for (i = 0; i < 6; i++) {
-		verts.push(this.createVertex(i));
+		verts.push(this._createVertex(i));
 	}
 	// copy the verts into a shape for the geometry to use
 	this.cellShape = new THREE.Shape();
@@ -74,7 +74,7 @@ vg.HexGrid = function(config) {
 	this._directions = [new vg.Cell(+1, -1, 0), new vg.Cell(+1, 0, -1), new vg.Cell(0, +1, -1),
 						new vg.Cell(-1, +1, 0), new vg.Cell(-1, 0, +1), new vg.Cell(0, -1, +1)];
 	this._diagonals = [new vg.Cell(+2, -1, -1), new vg.Cell(+1, +1, -2), new vg.Cell(-1, +2, -1),
-						new vg.Cell(-2, +1, +1), new vg.Cell(-1, -1, +2), new vg.Cell(+1, -2, +1)];
+					   new vg.Cell(-2, +1, +1), new vg.Cell(-1, -1, +2), new vg.Cell(+1, -2, +1)];
 	// cached objects
 	this._list = [];
 	this._vec3 = new THREE.Vector3();
@@ -113,7 +113,7 @@ vg.HexGrid.prototype = {
 		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
 		this._cel.set(q, r, -q-r);
-		return this.cubeRound(this._cel);
+		return this._cubeRound(this._cel);
 	},
 
 	getCellAt: function(pos) {
@@ -121,7 +121,7 @@ vg.HexGrid.prototype = {
 		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
 		this._cel.set(q, r, -q-r);
-		this.cubeRound(this._cel);
+		this._cubeRound(this._cel);
 		return this.cells[this.cellToHash(this._cel)];
 	},
 
@@ -210,7 +210,7 @@ vg.HexGrid.prototype = {
 			this._matCache[c.matConfig.mat_cache_id] = mat;
 		}*/
 
-		var hex = new vg.HexTile({
+		var hex = new vg.Tile({
 			size: this.cellSize,
 			scale: scale,
 			cell: cell,
@@ -308,11 +308,6 @@ vg.HexGrid.prototype = {
 		}
 	},
 
-	createVertex: function(i) {
-		var angle = (vg.TAU / 6) * i;
-		return new THREE.Vector3((this.cellSize * Math.cos(angle)), (this.cellSize * Math.sin(angle)), 0);
-	},
-
 	add: function(cell) {
 		var h = this.cellToHash(cell);
 		if (this.cells[h]) {
@@ -373,7 +368,7 @@ vg.HexGrid.prototype = {
 	load: function(json) {
 		var i, c;
 		var cells = json.cells;
-		
+
 		this.cells = {};
 		this.numCells = 0;
 
@@ -423,15 +418,20 @@ vg.HexGrid.prototype = {
 		They're still here for reference.
 	 */
 
-	/*pixelToAxial: function(pos) {
+	_createVertex: function(i) {
+		var angle = (vg.TAU / 6) * i;
+		return new THREE.Vector3((this.cellSize * Math.cos(angle)), (this.cellSize * Math.sin(angle)), 0);
+	},
+
+	/*_pixelToAxial: function(pos) {
 		var q, r; // = x, y
 		q = pos.x * ((2/3) / this.cellSize);
 		r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.y) / this.cellSize;
 		this._cel.set(q, r, -q-r);
-		return this.cubeRound(this._cel);
+		return this._cubeRound(this._cel);
 	},*/
 
-	/*axialToCube: function(h) {
+	/*_axialToCube: function(h) {
 		return {
 			q: h.q,
 			r: h.r,
@@ -439,29 +439,29 @@ vg.HexGrid.prototype = {
 		};
 	},*/
 
-	/*cubeToAxial: function(cell) {
+	/*_cubeToAxial: function(cell) {
 		return cell; // yep
 	},*/
 
-	/*axialToPixel: function(cell) {
+	/*_axialToPixel: function(cell) {
 		var x, y; // = q, r
 		x = cell.q * this.cellWidth * 0.75;
 		y = (cell.s - cell.r) * this.cellLength * 0.5;
 		return {x: x, y: -y};
 	},*/
 
-	/*hexToPixel: function(h) {
+	/*_hexToPixel: function(h) {
 		var x, y; // = q, r
 		x = this.cellSize * 1.5 * h.x;
 		y = this.cellSize * vg.SQRT3 * (h.y + (h.x * 0.5));
 		return {x: x, y: y};
 	},*/
 
-	/*axialRound: function(h) {
-		return this.cubeRound(this.axialToCube(h));
+	/*_axialRound: function(h) {
+		return this._cubeRound(this.axialToCube(h));
 	},*/
 
-	cubeRound: function(h) {
+	_cubeRound: function(h) {
 		var rx = Math.round(h.q);
 		var ry = Math.round(h.r);
 		var rz = Math.round(h.s);
@@ -483,7 +483,7 @@ vg.HexGrid.prototype = {
 		return this._cel.set(rx, ry, rz);
 	},
 
-	/*cubeDistance: function(a, b) {
+	/*_cubeDistance: function(a, b) {
 		return Math.max(Math.abs(a.q - b.q), Math.abs(a.r - b.r), Math.abs(a.s - b.s));
 	}*/
 };

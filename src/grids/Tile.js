@@ -3,7 +3,7 @@
 
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
 */
-vg.HexTile = function(config) {
+vg.Tile = function(config) {
 	config = config || {};
 	var settings = {
 		size: 10,
@@ -16,7 +16,7 @@ vg.HexTile = function(config) {
 	vg.Tools.merge(true, settings, config);
 
 	if (!settings.cell || !settings.geometry) {
-		throw new Error('Missing vg.HexTile configuration');
+		throw new Error('Missing vg.Tile configuration');
 	}
 
 	this.cell = settings.cell;
@@ -46,7 +46,7 @@ vg.HexTile = function(config) {
 	// create references so we can control orientation through this (Hex), instead of drilling down
 	this.position = this.mesh.position;
 	this.rotation = this.mesh.rotation;
-	
+
 	// rotate it to face "up" (the threejs coordinate space is Y+)
 	this.rotation.x = -90 * vg.DEG_TO_RAD;
 	this.mesh.scale.set(settings.scale, settings.scale, 1);
@@ -59,7 +59,7 @@ vg.HexTile = function(config) {
 	}
 };
 
-vg.HexTile.prototype = {
+vg.Tile.prototype = {
 	select: function() {
 		if (this.material.emissive) {
 			this.material.emissive.setHex(this.highlight);
@@ -99,4 +99,4 @@ vg.HexTile.prototype = {
 	}
 };
 
-vg.HexTile.prototype.constructor = vg.HexTile;
+vg.Tile.prototype.constructor = vg.Tile;
