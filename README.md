@@ -1,4 +1,4 @@
-# 3D hex/square tile system
+# 3D hex tile system
 
 ![screenshot](hex-grid.jpg)
 
@@ -17,14 +17,13 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 - Sparse maps
 - **Mouse interaction** with the grid's cells (over, out, down, up, click, wheel)
 - Programmatic geometry, allow you to precisely adjust every aspect of the hexagon
-- Square grid ~~that can be used interchangeably~~(currently working but lots of disparities as I build the editor)
+- Square grid that can be used interchangeably
 - Include only the hex grid by downloading `dist/hex-grid.js`, or all grid types with `von-grid.js`, etc
 
 #### Roadmap
 
 - Improved editor
 - Improved API
-- Arbitrary tile model support
 - Abstract grid
 
 ## Usage
