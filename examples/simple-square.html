@@ -29,13 +29,12 @@
 	<script type="text/javascript" src="../dist/sqr-grid.min.js"></script>
 	<script type="text/javascript">
 	window.addEventListener('load', function(evt) {
-
 		var scene = new vg.Scene({
 			element: document.getElementById('view'),
 			cameraPosition: {x:0, y:150, z:150}
 		}, true);
 
-		var grid = new vg.SquareGrid({
+		var grid = new vg.SqrGrid({
 			width: 5,
 			height: 8,
 			cellSize: 10,
@@ -43,7 +42,7 @@
 		});
 
 		var board = new vg.Board(grid);
-		
+
 		// this will generate extruded square tiles
 		board.generateTilemap();
 
