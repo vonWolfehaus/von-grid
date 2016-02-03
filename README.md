@@ -25,6 +25,7 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 - Improved editor
 - Improved API
 - Arbitrary tile model support
+- Abstract grid
 
 ## Usage
 
