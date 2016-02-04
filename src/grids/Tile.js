@@ -13,7 +13,7 @@ vg.Tile = function(config) {
 		geometry: null, // required threejs geometry
 		material: null // not required but it would improve performance significantly
 	};
-	vg.Tools.merge(true, settings, config);
+	settings = vg.Tools.merge(settings, config);
 
 	if (!settings.cell || !settings.geometry) {
 		throw new Error('Missing vg.Tile configuration');
@@ -43,7 +43,7 @@ vg.Tile = function(config) {
 	this.mesh = new THREE.Mesh(this.geometry, this.material);
 	this.mesh.userData.structure = this;
 
-	// create references so we can control orientation through this (Hex), instead of drilling down
+	// create references so we can control orientation through this (Tile), instead of drilling down
 	this.position = this.mesh.position;
 	this.rotation = this.mesh.rotation;
 
@@ -76,12 +76,15 @@ vg.Tile.prototype = {
 		return this;
 	},
 
-	// Hexagon cells are in cube coordinates; this is a modified HexGrid.hexToPixel
-	/*placeAt: function(cell) {
-		this.position.x = cell.q * this.width * 0.75;
-		this.position.y = 0;
-		this.position.z = (cell.s - cell.r) * this.height * 0.5;
-	},*/
+	toggle: function() {
+		if (this.selected) {
+			this.deselect();
+		}
+		else {
+			this.select();
+		}
+		return this;
+	},
 
 	dispose: function() {
 		if (this.cell && this.cell.tile) this.cell.tile = null;

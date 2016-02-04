@@ -46,85 +46,65 @@ vg.Tools = {
 	},
 
 	isPlainObject: function(obj) {
-		// Not plain objects:
-		// - Any object or value whose internal [[Class]] property is not '[object Object]'
-		// - DOM nodes
-		// - window
 		if (typeof(obj) !== 'object' || obj.nodeType || obj === obj.window) {
 			return false;
 		}
-
-		// Support: Firefox <20
-		// The try/catch suppresses exceptions thrown when attempting to access
-		// the 'constructor' property of certain host objects, ie. |window.location|
+		// The try/catch suppresses exceptions thrown when attempting to access the 'constructor' property of certain host objects, ie. |window.location|
 		// https://bugzilla.mozilla.org/show_bug.cgi?id=814622
 		try {
 			if (obj.constructor && !Object.prototype.hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')) {
 				return false;
 			}
 		}
-		catch (e) {
+		catch (err) {
 			return false;
 		}
-
 		// If the function hasn't returned already, we're confident that
 		// |obj| is a plain object, created by {} or constructed with new Object
 		return true;
 	},
 
-	merge: function() {
-		var options, name, src, copy, copyIsArray, clone,
-			target = arguments[0] || {},
-			i = 1,
-			length = arguments.length,
-			deep = false;
-
-		// Handle a deep copy situation
-		if (typeof target === 'boolean') {
-			deep = target;
-			target = arguments[1] || {};
-			// skip the boolean and the target
-			i = 2;
-		}
-
-		while (i < length) {
-			// Only deal with non-null/undefined values
-			if ((options = arguments[i]) !== null) {
-				// Extend the base object
-				for (name in options) {
-					src = target[name];
-					copy = options[name];
-
-					// Prevent never-ending loop
-					if (target === copy) {
-						continue;
-					}
-
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (this.isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && Array.isArray(src) ? src : [];
-						}
-						else {
-							clone = src && this.isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = this.merge(deep, clone, copy);
-
-					}
-					else if (copy !== undefined) {
-						// Don't bring in undefined values
-						target[name] = copy;
+	// https://github.com/KyleAMathews/deepmerge/blob/master/index.js
+	merge: function(target, src) {
+		var self = this, array = Array.isArray(src);
+		var dst = array && [] || {};
+		if (array) {
+			target = target || [];
+			dst = dst.concat(target);
+			src.forEach(function(e, i) {
+				if (typeof dst[i] === 'undefined') {
+					dst[i] = e;
+				}
+				else if (self.isPlainObject(e)) {
+					dst[i] = self.merge(target[i], e);
+				}
+				else {
+					if (target.indexOf(e) === -1) {
+						dst.push(e);
 					}
 				}
-			}
-			i++;
+			});
+			return dst;
 		}
-
-		// Return the modified object
-		return target;
+		if (target && self.isPlainObject(target)) {
+			Object.keys(target).forEach(function (key) {
+				dst[key] = target[key];
+			});
+		}
+		Object.keys(src).forEach(function (key) {
+			if (!src[key] || !self.isPlainObject(src[key])) {
+				dst[key] = src[key];
+			}
+			else {
+				if (!target[key]) {
+					dst[key] = src[key];
+				}
+				else {
+					dst[key] = self.merge(target[key], src[key]);
+				}
+			}
+		});
+		return dst;
 	},
 
 	now: function() {

@@ -26,8 +26,10 @@ vg.Scene = function(sceneConfig, controlConfig) {
 		noZoom: false
 	};
 
-	vg.Tools.merge(sceneSettings, sceneConfig);
-	if (typeof controlConfig !== 'boolean') vg.Tools.merge(controlSettings, controlConfig);
+	sceneSettings = vg.Tools.merge(sceneSettings, sceneConfig);
+	if (typeof controlConfig !== 'boolean') {
+		controlSettings = vg.Tools.merge(controlSettings, controlConfig);
+	}
 
 	this.renderer = new THREE.WebGLRenderer({
 		alpha: sceneSettings.alpha,

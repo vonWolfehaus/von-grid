@@ -6,10 +6,14 @@
 vg.AStarFinder = function(finderConfig) {
 	finderConfig = finderConfig || {};
 
-	this.allowDiagonal = false;
-	this.heuristicFilter = null;
+	var settings = {
+		allowDiagonal: false,
+		heuristicFilter: null
+	};
+	settings = vg.Tools.merge(settings, finderConfig);
 
-	vg.Tools.merge(this, finderConfig);
+	this.allowDiagonal = settings.allowDiagonal;
+	this.heuristicFilter = settings.heuristicFilter;
 
 	this.list = new vg.LinkedList();
 };
