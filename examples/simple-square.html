@@ -36,22 +36,36 @@
 
 		var grid = new vg.SqrGrid({
 			width: 5,
-			height: 8,
-			cellSize: 10,
-			cellScale: 0.95
+			height: 5,
+			cellSize: 11
 		});
 
+		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var board = new vg.Board(grid);
 
 		// this will generate extruded square tiles
-		board.generateTilemap();
+		board.generateTilemap({
+			scale: 0.96
+		});
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
+		mouse.signal.add(function(evt, tile) {
+			if (evt === vg.MouseCaster.CLICK) {
+				// we can simply access tile, like this:
+				// tile.toggle();
+				// or we can use the mouse's raw coordinates to access the cell directly, just for fun:
+				var cell = board.grid.pixelToCell(mouse.position);
+				var t = board.getTileAtCell(cell);
+				if (t) t.toggle();
+			}
+		}, this);
+
 		update();
 
 		function update() {
+			mouse.update();
 			scene.render();
 			requestAnimationFrame(update);
 		}
