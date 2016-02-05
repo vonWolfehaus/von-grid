@@ -5,7 +5,6 @@
 	type
 	size - number of cells (in radius); only used if the map is generated
 	cellSize
-	cellSides
 	cells - a hash so we can have sparse maps
 	numCells
 	extrudeSettings
@@ -18,13 +17,13 @@
  */
 // 'utils/Loader', 'graphs/Hex', 'utils/Tools'
 vg.HexGrid = function(config) {
+	config = config || {};
 	/*  ______________________________________________
 		GRID INTERFACE:
 	*/
 	this.type = vg.HEX;
-	this.size = 5;
+	this.size = 5; // only used for generated maps
 	this.cellSize = typeof config.cellSize === 'undefined' ? 10 : config.cellSize;
-	this.cellSides = 6;
 	this.cells = {};
 	this.numCells = 0;
 

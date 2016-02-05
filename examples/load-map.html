@@ -35,18 +35,13 @@
 		}, true);
 
 		// this constructs the cells in grid coordinate space
-		var grid = new vg.HexGrid({
-			cellSize: 11 // this is important for cell to world-space conversions so be sure it's accurate for your custom tiles
-		});
-
+		var grid = new vg.HexGrid();
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var board = new vg.Board(grid);
 
 		grid.load('assets/hex-map.json', function() {
 			// this will generate extruded hexagonal tiles of the grid that was loaded
-			board.generateTilemap({
-				tileScale: 0.87
-			});
+			board.generateTilemap();
 		}, this);
 
 		scene.add(board.group);

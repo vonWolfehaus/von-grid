@@ -35,11 +35,11 @@
 		}, true);
 
 		var grid = new vg.SqrGrid({
-			cellSize: 11
+			cellSize: 11 // size of individual cells
 		});
 
 		grid.generate({
-			size: 5
+			size: 5 // size of the board
 		});
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
@@ -47,7 +47,7 @@
 
 		// this will generate extruded square tiles
 		board.generateTilemap({
-			scale: 0.96
+			tileScale: 0.96 // you might have to scale the tile so the extruded geometry fits the cell size perfectly
 		});
 
 		scene.add(board.group);
