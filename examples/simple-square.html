@@ -35,9 +35,11 @@
 		}, true);
 
 		var grid = new vg.SqrGrid({
-			width: 5,
-			height: 5,
 			cellSize: 11
+		});
+
+		grid.generate({
+			size: 5
 		});
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);

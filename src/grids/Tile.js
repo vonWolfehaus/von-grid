@@ -6,9 +6,6 @@
 vg.Tile = function(config) {
 	config = config || {};
 	var settings = {
-		size: 10,
-		height: 1, // vertical/y extent of tile
-		scale: 1, // helpful for offsetting extrusion
 		cell: null, // required vg.Cell
 		geometry: null, // required threejs geometry
 		material: null // not required but it would improve performance significantly

@@ -161,16 +161,29 @@ vg.Tools = {
 		return color;
 	},
 
-	getJSON: function(url, callback, scope) {
+	getJSON: function(config) {
 		var xhr = new XMLHttpRequest();
+		var uri = config.cache ? config.url : config.url + '?t=' + Math.floor(Math.random() * 10000) + Date.now();
 		xhr.onreadystatechange = function() {
-			if (this.readyState < 4 || this.status !== 200) {
-				console.warn('[Tools] Error - '+this.statusText +' - loading '+url);
+			if (this.status === 200) {
+				var json = null;
+				try {
+					json = JSON.parse(this.responseText);
+				}
+				catch (err) {
+					// console.warn('[Tools.getJSON] Error: '+config.url+' is not a json resource');
+					return;
+				}
+				config.callback.call(config.scope || null, json);
 				return;
 			}
-			callback.call(scope || this, JSON.parse(this.responseText));
+			else if (this.status !== 0) {
+				console.warn('[Tools.getJSON] Error: '+this.status+' ('+this.statusText+') :: '+config.url);
+			}
 		}
-		xhr.open('GET', url, true);
+		xhr.open('GET', uri, true);
+		xhr.setRequestHeader('Accept', 'application/json');
+		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.send('');
 	}
 };

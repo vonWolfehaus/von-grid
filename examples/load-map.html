@@ -39,30 +39,22 @@
 			cellSize: 11 // this is important for cell to world-space conversions so be sure it's accurate for your custom tiles
 		});
 
-		grid.generate({
-			size: 5
-		});
-
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var board = new vg.Board(grid);
 
-		// this will generate extruded hexagonal tiles
-		board.generateTilemap({
-			scale: 0.96
-		});
+		grid.load('assets/hex-map.json', function() {
+			// this will generate extruded hexagonal tiles of the grid that was loaded
+			board.generateTilemap({
+				tileScale: 0.87
+			});
+		}, this);
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
-		var vec = new THREE.Vector3();
-
 		mouse.signal.add(function(evt, tile) {
 			if (evt === vg.MouseCaster.CLICK) {
-				// tile.toggle();
-				// or we can use the mouse's raw coordinates to access the cell directly, just for fun:
-				var cell = board.grid.pixelToCell(mouse.position);
-				var t = board.getTileAtCell(cell);
-				if (t) t.toggle();
+				tile.toggle();
 			}
 		}, this);
 

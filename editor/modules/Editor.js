@@ -46,17 +46,17 @@ define('Editor', function() {
 					var last = _cel.h;
 					_cel.h += dif > 0 ? -heightStep : heightStep;
 					if (_cel.h < 1) _cel.h = 1;
-					
+
 					nexus.mouse.wheel = Math.round((_cel.h / heightStep) + (dif > 0 ? -1 : 1));
 					lastHeight = nexus.mouse.wheel;
 
 					if (last === _cel.h) return;
 					removeTile(overTile);
 
-					var cell = addTile(_cel);
-					cell.tile.select();
+					var tile = addTile(_cel);
+					tile.select();
 
-					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, cell.tile);
+					tower.tileAction.dispatch(tower.TILE_CHANGE_HEIGHT, tile);
 				}
 				break;
 
