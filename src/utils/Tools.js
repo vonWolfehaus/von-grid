@@ -163,7 +163,8 @@ vg.Tools = {
 
 	getJSON: function(config) {
 		var xhr = new XMLHttpRequest();
-		var uri = config.cache ? config.url : config.url + '?t=' + Math.floor(Math.random() * 10000) + Date.now();
+		var cache = typeof config.cache === 'undefined' ? false : config.cache;
+		var uri = cache ? config.url : config.url + '?t=' + Math.floor(Math.random() * 10000) + Date.now();
 		xhr.onreadystatechange = function() {
 			if (this.status === 200) {
 				var json = null;
