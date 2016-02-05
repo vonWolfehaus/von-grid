@@ -41,18 +41,20 @@
 		var scene = new vg.Scene({
 			element: document.getElementById('view'),
 			cameraType: 'OrthographicCamera',
-			cameraPosition: {x:0, y:200, z:0}
+			cameraPosition: {x:0, y:200, z:0},
+			orthoZoom: 3
 		}, false);
 
 		var grid = new vg.HexGrid({
-			rings: 6,
 			cellSize: 10
 		});
 		/*var grid = new vg.SqrGrid({
-			width: 10,
-			height: 10,
 			cellSize: 10
 		});*/
+
+		grid.generate({
+			size: 10
+		});
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		// we only want to scan while the mouse is held down

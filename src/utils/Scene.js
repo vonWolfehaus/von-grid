@@ -16,7 +16,8 @@ vg.Scene = function(sceneConfig, controlConfig) {
 		light: new THREE.DirectionalLight(0xffffff),
 		lightPosition: null,
 		cameraType: 'PerspectiveCamera',
-		cameraPosition: null // {x, y, z}
+		cameraPosition: null, // {x, y, z}
+		orthoZoom: 4
 	};
 
 	var controlSettings = {
@@ -41,7 +42,7 @@ vg.Scene = function(sceneConfig, controlConfig) {
 	this.width = window.innerWidth;
 	this.height = window.innerHeight;
 
-	this.orthoZoom = 4;
+	this.orthoZoom = sceneSettings.orthoZoom;
 
 	this.container = new THREE.Scene();
 	this.container.fog = sceneSettings.fog;

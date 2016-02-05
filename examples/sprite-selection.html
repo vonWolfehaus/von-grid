@@ -37,13 +37,14 @@
 		}, true);
 
 		/*var grid = new vg.HexGrid({
-			rings: 4,
 			cellSize: 10
 		});*/
 		var grid = new vg.SqrGrid({
-			width: 8,
-			height: 8,
-			cellSize: 10
+			cellSize: 10 // size of individual cells
+		});
+
+		grid.generate({
+			size: 10 // size of the board
 		});
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);

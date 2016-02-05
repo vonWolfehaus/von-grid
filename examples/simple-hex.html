@@ -36,8 +36,11 @@
 
 		// this constructs the cells in grid coordinate space
 		var grid = new vg.HexGrid({
-			rings: 4,
-			cellSize: 11 // this is important for cell to world-space conversions so be sure it's accurate for your custom tiles
+			cellSize: 11 // size of individual cells
+		});
+
+		grid.generate({
+			size: 5 // size of the board
 		});
 
 		var mouse = new vg.MouseCaster(scene.container, scene.camera);
@@ -45,11 +48,13 @@
 
 		// this will generate extruded hexagonal tiles
 		board.generateTilemap({
-			scale: 0.96
+			tileScale: 0.96 // you might have to scale the tile so the extruded geometry fits the cell size perfectly
 		});
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
+
+		var vec = new THREE.Vector3();
 
 		mouse.signal.add(function(evt, tile) {
 			if (evt === vg.MouseCaster.CLICK) {

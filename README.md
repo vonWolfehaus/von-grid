@@ -35,10 +35,12 @@ Please use this to make awesome hex-based web games. Or port the code and make a
 ```javascript
 var scene = new vg.Scene({ // I made a very handy util for creating three.js scenes quickly
 	cameraPosition: {x:0, y:150, z:150}
-}, true); // add orbit controls
+}, true); // 'true' or a config object adds orbit controls
 
-var grid = new vg.HexGrid({
-	rings: 4
+var grid = new vg.HexGrid();
+
+grid.generate({
+	size: 4
 });
 
 var board = new vg.Board(grid);

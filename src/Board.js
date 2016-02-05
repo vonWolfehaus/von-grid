@@ -65,8 +65,7 @@ vg.Board.prototype = {
 		if (!this.tileGroup) return;
 		var tiles = this.tileGroup.children;
 		for (var i = 0; i < tiles.length; i++) {
-			this.tileGroup.remove(tiles[i].mesh);
-			tiles[i].dispose();
+			this.tileGroup.remove(tiles[i]);
 		}
 	},
 
@@ -74,12 +73,12 @@ vg.Board.prototype = {
 		var h = this.grid.cellToHash(cell);
 		return cell.tile || (typeof this.grid.cells[h] !== 'undefined' ? this.grid.cells[h].tile : null);
 	},
-	
+
 	snapToGrid: function(pos) {
 		var cell = this.grid.pixelToCell(pos);
 		pos.copy(this.grid.cellToPixel(cell));
 	},
-	
+
 	snapTileToGrid: function(tile) {
 		if (tile.cell) {
 			tile.position.copy(this.grid.cellToPixel(tile.cell));
