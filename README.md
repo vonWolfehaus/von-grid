@@ -60,7 +60,7 @@ function update() {
 
 #### Examples
 
-For the simple examples you can drop them into Chrome, but for ones that require images or models, you'll have to run `gulp examples`. A browser tab will be opened to the examples directory for you.
+For the simple examples you can drop them into Chrome, but for ones that require images or models, you'll have to run `gulp serve-examples`. A browser tab will be opened to the examples directory for you.
 
 ## Editor
 
