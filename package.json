@@ -1,7 +1,7 @@
 {
-  "name": "hex-grid",
+  "name": "von-grid",
   "description": "Hexagonal (and other) grid stuff with three.js",
-  "repository": "https://github.com/vonWolfehaus/hex-grid",
+  "repository": "https://github.com/vonWolfehaus/von-grid",
   "license": "MIT",
   "devDependencies": {
     "browser-sync": "^2.2.3",

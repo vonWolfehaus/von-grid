@@ -36,6 +36,7 @@ vg.HexGrid = function(config) {
 	for (i = 0; i < 6; i++) {
 		verts.push(this._createVertex(i));
 	}
+
 	// copy the verts into a shape for the geometry to use
 	this.cellShape = new THREE.Shape();
 	this.cellShape.moveTo(verts[0].x, verts[0].y);

@@ -34,6 +34,7 @@ vg.SqrGrid = function(config) {
 	verts.push(new THREE.Vector3(-this.cellSize, this.cellSize));
 	verts.push(new THREE.Vector3(this.cellSize, this.cellSize));
 	verts.push(new THREE.Vector3(this.cellSize, -this.cellSize));
+
 	// copy the verts into a shape for the geometry to use
 	this.cellShape = new THREE.Shape();
 	this.cellShape.moveTo(-this.cellSize, -this.cellSize);
