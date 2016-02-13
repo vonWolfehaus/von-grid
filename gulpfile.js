@@ -37,7 +37,8 @@ gulp.task('clean', del.bind(null, [dist]));
 gulp.task('dev', ['clean'], function() {
 	runSequence(
 		['scripts'],
-		['watch']
+		['watch'],
+		['serve-examples']
 	);
 });
 
