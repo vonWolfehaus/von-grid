@@ -98,6 +98,7 @@ vg.Scene = function(sceneConfig, controlConfig) {
 };
 
 vg.Scene.prototype = {
+	constructor: vg.Scene,
 
 	attachTo: function(element) {
 		element.style.width = this.width + 'px';
@@ -138,5 +139,3 @@ vg.Scene.prototype = {
 		this.camera.lookAt(obj.position);
 	}
 };
-
-vg.Scene.prototype.constructor = vg.Scene;
