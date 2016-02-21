@@ -104,6 +104,14 @@ vg.Tools = {
 		return dst;
 	},
 
+	overwrite: function(target, src) {
+		for (var p in src) {
+			if (target.hasOwnProperty(p) && src.hasOwnProperty(p)) {
+				target[p] = src[p];
+			}
+		}
+	},
+
 	now: function() {
 		return window.nwf ? window.nwf.system.Performance.elapsedTime : window.performance.now();
 	},

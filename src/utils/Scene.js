@@ -66,10 +66,7 @@ vg.Scene = function(sceneConfig, controlConfig) {
 	this.contolled = !!controlConfig;
 	if (this.contolled) {
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.minDistance = controlSettings.minDistance;
-		this.controls.maxDistance = controlSettings.maxDistance;
-		this.controls.zoomSpeed = controlSettings.zoomSpeed;
-		this.controls.noZoom = controlSettings.noZoom;
+		vg.Tools.overwrite(this.controls, controlSettings);
 	}
 
 	if (sceneSettings.cameraPosition) {
