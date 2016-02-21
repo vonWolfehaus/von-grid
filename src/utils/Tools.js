@@ -45,12 +45,11 @@ vg.Tools = {
 		return Math.random().toString(36).slice(2) + Date.now();
 	},
 
+	// @source: jQuery
 	isPlainObject: function(obj) {
 		if (typeof(obj) !== 'object' || obj.nodeType || obj === obj.window) {
 			return false;
 		}
-		// The try/catch suppresses exceptions thrown when attempting to access the 'constructor' property of certain host objects, ie. |window.location|
-		// https://bugzilla.mozilla.org/show_bug.cgi?id=814622
 		try {
 			if (obj.constructor && !Object.prototype.hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')) {
 				return false;
@@ -59,12 +58,10 @@ vg.Tools = {
 		catch (err) {
 			return false;
 		}
-		// If the function hasn't returned already, we're confident that
-		// |obj| is a plain object, created by {} or constructed with new Object
 		return true;
 	},
 
-	// https://github.com/KyleAMathews/deepmerge/blob/master/index.js
+	// @source: https://github.com/KyleAMathews/deepmerge/blob/master/index.js
 	merge: function(target, src) {
 		var self = this, array = Array.isArray(src);
 		var dst = array && [] || {};
@@ -117,9 +114,7 @@ vg.Tools = {
 		}
 	},
 
-	/*
-		@source: http://jsperf.com/radix-sort
-	 */
+	// @source: http://jsperf.com/radix-sort
 	radixSort: function(arr, idxBegin, idxEnd, bit) {
 		idxBegin = idxBegin || 0;
 		idxEnd = idxEnd || arr.length;
@@ -166,20 +161,17 @@ vg.Tools = {
 		var cache = typeof config.cache === 'undefined' ? false : config.cache;
 		var uri = cache ? config.url : config.url + '?t=' + Math.floor(Math.random() * 10000) + Date.now();
 		xhr.onreadystatechange = function() {
-			if (this.status === 200) {
+			if (xhr.readyState === 4 && xhr.status === 200) {
 				var json = null;
 				try {
-					json = JSON.parse(this.responseText);
+					json = JSON.parse(xhr.responseText);
 				}
 				catch (err) {
-					// console.warn('[Tools.getJSON] Error: '+config.url+' is not a json resource');
+					console.warn('[Tools.getJSON] Error: '+config.url+' is not a json resource');
 					return;
 				}
 				config.callback.call(config.scope || null, json);
 				return;
-			}
-			else if (this.status !== 0) {
-				console.warn('[Tools.getJSON] Error: '+this.status+' ('+this.statusText+') :: '+config.url);
 			}
 		}
 		xhr.open('GET', uri, true);

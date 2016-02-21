@@ -91,6 +91,7 @@ vg.Board.prototype = {
 	},
 
 	getRandomTile: function() {
+		if (this.tiles.length === 0) return null;
 		var i = vg.Tools.randomInt(0, this.tiles.length-1);
 		return this.tiles[i];
 	},
@@ -106,7 +107,7 @@ vg.Board.prototype = {
 			this.tiles.forEach(function(t) {
 				this.grid.remove(t.cell);
 				t.dispose();
-			});
+			}.bind(this));
 			this.grid.dispose();
 		}
 		this.grid = newGrid;
