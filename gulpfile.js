@@ -15,8 +15,10 @@ var sources = {
 	core: [src+'/vg.js', src+'/lib/*.js', src+'/utils/*.js', src+'/pathing/*.js', src+'/*.js'],
 	hex: src+'/grids/HexGrid.js',
 	sqr: src+'/grids/SqrGrid.js',
-	editorScripts: ['editor/ui/**/*.js', 'editor/modules/**/*.js'],
-	extras: src+'/extras/**/*.js'
+	extras: src+'/extras/**/*.js',
+	editorScripts: ['editor/modules/**/*.js'],
+	editorUIScripts: ['editor/ui/**/*.{js,tag}'],
+	styles: 'editor/ui/**/*.styl'
 };
 
 
@@ -41,7 +43,7 @@ gulp.task('dev', ['clean'], function() {
 
 gulp.task('dev-ed', ['clean'], function() {
 	runSequence(
-		['scripts', 'scripts-editor'],
+		['scripts', 'scripts-editor', 'scripts-editor-ui'],
 		['serve-editor']
 	);
 });
@@ -85,13 +87,24 @@ gulp.task('scripts-editor', function() {
 	return gulp.src(sources.editorScripts)
 		.pipe($.plumber({errorHandler: handleErrors}))
 		.pipe($.sortAmd())
-		//.pipe($.eslint({ fix: true }))
-		//.pipe($.eslint.formatEach())
-		//.pipe($.eslint.failOnError())
-		.pipe($.addSrc.prepend('./editor/lib/define.min.js'))
+		.pipe($.eslint({ fix: true }))
+		.pipe($.eslint.formatEach())
+		.pipe($.eslint.failOnError())
 		.pipe($.sourcemaps.init())
 		.pipe($.concat('app.js'))
-		//.pipe($.uglify())
+		.pipe($.uglify())
+		.pipe($.sourcemaps.write('.'))
+		.pipe(gulp.dest('editor'))
+		.pipe(browserSync.stream());
+});
+
+gulp.task('scripts-editor-ui', function() {
+	return gulp.src(sources.editorUIScripts)
+		.pipe($.plumber({errorHandler: handleErrors}))
+		.pipe($.if('*.tag', $.riot()))
+		.pipe($.sortAmd())
+		.pipe($.sourcemaps.init())
+		.pipe($.concat('ui.js'))
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest('editor'))
 		.pipe(browserSync.stream());
@@ -101,18 +114,18 @@ gulp.task('scripts-editor', function() {
 	CSS
 */
 
-// gulp.task('styles', function() {
-// 	return gulp.src(src+'/**.styl')
-// 		.pipe($.plumber({errorHandler: handleErrors}))
-// 		.pipe($.sourcemaps.init())
-// 		.pipe($.stylus({
-// 			compress: true
-// 		}))
-// 		.pipe($.autoprefixer())
-// 		.pipe($.concat('styles.css'))
-// 		.pipe($.sourcemaps.write('.'))
-// 		.pipe(gulp.dest(dist))
-// });
+gulp.task('styles', function() {
+	return gulp.src(sources.styles)
+		.pipe($.plumber({errorHandler: handleErrors}))
+		.pipe($.sourcemaps.init())
+		.pipe($.stylus({
+			compress: true
+		}))
+		.pipe($.autoprefixer())
+		.pipe($.concat('style.css'))
+		.pipe($.sourcemaps.write('.'))
+		.pipe(gulp.dest('editor'))
+});
 
 
 /*_____________________________________________________________________
@@ -125,7 +138,6 @@ function watch() {
 	gulp.watch(sources.hex, ['scripts', reload]);
 	gulp.watch(sources.sqr, ['scripts', reload]);
 	gulp.watch(sources.extras, ['scripts', reload]);
-	//gulp.watch(sources.styles, ['styles', reload]);
 }
 
 function serve(dir) {
@@ -144,8 +156,10 @@ function serve(dir) {
 gulp.task('watch', watch);
 
 gulp.task('serve-editor', function() {
-	browserSync.watch('editor/**/*.*').on('change', reload);
+	browserSync.watch('editor/**/*.{html,png}').on('change', reload);
 	gulp.watch(sources.editorScripts, ['scripts-editor', reload]);
+	gulp.watch(sources.editorUIScripts, ['scripts-editor-ui', reload]);
+	gulp.watch(sources.styles, ['styles', reload]);
 	serve('editor');
 });
 
