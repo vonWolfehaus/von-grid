@@ -14,8 +14,6 @@ vg.Board = function(grid, finderConfig) {
 	this.grid = null;
 	this.overlay = null;
 	this.finder = new vg.AStarFinder(finderConfig);
-	// need to keep a resource cache around, so this Loader does that, use it instead of THREE.ImageUtils
-	vg.Loader.init();
 
 	this.setGrid(grid);
 };

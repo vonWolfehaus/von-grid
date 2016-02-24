@@ -3,26 +3,24 @@ var fs = require('fs');
 var $ = require('gulp-load-plugins')();
 var del = require('del');
 var runSequence = require('run-sequence');
+var path = require('path');
+var Q = require('q');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
-var path = require('path');
-
-var pkg = require('./package.json');
-//var preprocessOpts = {context: { NODE_ENV: process.env.NODE_ENV || 'development', DEBUG: true}};
 
 var dist = 'dist';
 var src = 'src';
 
-var glob = {
-	scripts: [src+'/vg.js', src+'/**/*.js'],
-	hexScripts: [src+'/vg.js', src+'/**/*.js', '!src/grids/Square.js', '!src/grids/SquareGrid.js'],
-	sqrScripts: [src+'/vg.js', src+'/**/*.js', '!src/grids/Hex.js', '!src/grids/HexGrid.js'],
+var sources = {
+	core: [src+'/vg.js', src+'/lib/*.js', src+'/utils/*.js', src+'/pathing/*.js', src+'/*.js'],
+	hex: src+'/grids/HexGrid.js',
+	sqr: src+'/grids/SqrGrid.js',
 	editorScripts: ['editor/ui/**/*.js', 'editor/modules/**/*.js'],
-	styles: src+'/**/*.styl'
+	extras: src+'/extras/**/*.js'
 };
 
 
-/*----------------------------------------------------------------------
+/*_____________________________________________________________________
 	MACRO
 */
 
@@ -37,8 +35,7 @@ gulp.task('clean', del.bind(null, [dist]));
 gulp.task('dev', ['clean'], function() {
 	runSequence(
 		['scripts'],
-		['watch'],
-		['serve-examples']
+		['watch', 'serve-examples']
 	);
 });
 
@@ -49,50 +46,43 @@ gulp.task('dev-ed', ['clean'], function() {
 	);
 });
 
-/*----------------------------------------------------------------------
+/*_____________________________________________________________________
 	SCRIPTS
 */
 
-gulp.task('scripts', ['all', 'hex', 'sqr']);
+gulp.task('scripts', function() {
+	var bundles = {
+		'von-grid': sources.core.concat(sources.hex, sources.sqr),
+		'hex-grid': sources.core.concat(sources.hex),
+		'sqr-grid': sources.core.concat(sources.sqr),
+		'von-grid-extras': sources.extras
+	};
 
-gulp.task('all', function() {
-	return gulp.src(glob.scripts)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.eslint({ fix: true }))
-		.pipe($.eslint.formatEach())
-		.pipe($.eslint.failOnError())
-		.pipe($.sourcemaps.init())
-		.pipe($.concat('von-grid.min.js'))
-		.pipe($.uglify())
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe(browserSync.stream());
-});
+	var promises = Object.keys(bundles).map(function (key) {
+		var deferred = Q.defer();
+		var val = bundles[key];
 
-gulp.task('hex', function() {
-	return gulp.src(glob.hexScripts)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.concat('hex-grid.min.js'))
-		.pipe($.uglify())
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe(browserSync.stream());
-});
+		gulp.src(val)
+			.pipe($.plumber({errorHandler: handleErrors}))
+			.pipe($.eslint({ fix: true }))
+			.pipe($.eslint.formatEach())
+			.pipe($.eslint.failOnError())
+			.pipe($.sourcemaps.init())
+			.pipe($.concat(key+'.min.js'))
+			.pipe($.uglify())
+			.pipe($.sourcemaps.write('.'))
+			.pipe(gulp.dest(dist))
+			.on('end', function () {
+				deferred.resolve();
+			});
 
-gulp.task('sqr', function() {
-	return gulp.src(glob.sqrScripts)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.concat('sqr-grid.min.js'))
-		.pipe($.uglify())
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-		.pipe(browserSync.stream());
+		return deferred.promise;
+	});
+	return Q.all(promises);
 });
 
 gulp.task('scripts-editor', function() {
-	return gulp.src(glob.editorScripts)
+	return gulp.src(sources.editorScripts)
 		.pipe($.plumber({errorHandler: handleErrors}))
 		.pipe($.sortAmd())
 		//.pipe($.eslint({ fix: true }))
@@ -107,32 +97,35 @@ gulp.task('scripts-editor', function() {
 		.pipe(browserSync.stream());
 });
 
-/*----------------------------------------------------------------------
+/*_____________________________________________________________________
 	CSS
 */
-/*
-gulp.task('styles', function() {
-	return gulp.src(glob.styles)
-		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sourcemaps.init())
-		.pipe($.stylus({
-			compress: true
-		}))
-		.pipe($.autoprefixer())
-		.pipe($.concat('styles.css'))
-		.pipe($.sourcemaps.write('.'))
-		.pipe(gulp.dest(dist))
-});
-*/
 
-/*----------------------------------------------------------------------
+// gulp.task('styles', function() {
+// 	return gulp.src(src+'/**.styl')
+// 		.pipe($.plumber({errorHandler: handleErrors}))
+// 		.pipe($.sourcemaps.init())
+// 		.pipe($.stylus({
+// 			compress: true
+// 		}))
+// 		.pipe($.autoprefixer())
+// 		.pipe($.concat('styles.css'))
+// 		.pipe($.sourcemaps.write('.'))
+// 		.pipe(gulp.dest(dist))
+// });
+
+
+/*_____________________________________________________________________
 	SERVER
 */
 
 // Defines the list of resources to watch for changes.
 function watch() {
-	gulp.watch(glob.scripts, ['scripts', reload]);
-	//gulp.watch(glob.styles, ['styles', reload]);
+	gulp.watch(sources.core, ['scripts', reload]);
+	gulp.watch(sources.hex, ['scripts', reload]);
+	gulp.watch(sources.sqr, ['scripts', reload]);
+	gulp.watch(sources.extras, ['scripts', reload]);
+	//gulp.watch(sources.styles, ['styles', reload]);
 }
 
 function serve(dir) {
@@ -145,25 +138,23 @@ function serve(dir) {
 	});
 
 	browserSync.watch(dist+'/**/*.*').on('change', reload);
-	gulp.watch(glob.scripts, ['scripts']);
+	gulp.watch(sources.core, ['scripts']);
 }
 
-gulp.task('watch', function() {
-	watch();
-});
+gulp.task('watch', watch);
 
 gulp.task('serve-editor', function() {
-	gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
+	browserSync.watch('editor/**/*.*').on('change', reload);
+	gulp.watch(sources.editorScripts, ['scripts-editor', reload]);
 	serve('editor');
 });
 
 gulp.task('serve-examples', function() {
-	//gulp.watch(glob.editorScripts, ['scripts-editor', reload]);
 	browserSync.watch('examples/**/*.*').on('change', reload);
 	serve('examples');
 });
 
-/*----------------------------------------------------------------------
+/*_____________________________________________________________________
 	HELPERS
 */
 
