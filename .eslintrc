@@ -3,6 +3,10 @@
 	"extends": "eslint:recommended",
 	"globals": {
 		"vg": true,
+		"ex": true,
+		"ui": true,
+		"define": true,
+		"require": true,
 		"THREE": true
 	},
 	"rules": {
