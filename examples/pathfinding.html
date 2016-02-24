@@ -37,6 +37,7 @@
 
 		I also added an example heuristic filter that will discard neighbors that are too tall to "jump" to, forcing the algorithm to find a winding path through the valleys and canyons. It's also possible to not find a path in this scenario, in which case `null` is returned.
 	*/
+	var ex = ex || {};
 	window.addEventListener('load', function(evt) {
 		// setup the thing
 		var scene = new vg.Scene({
@@ -72,6 +73,11 @@
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
+		ex.loader = new THREE.TextureLoader();
+		ex.loader.load('../examples/img/water.png');
+		ex.loader.load('../examples/img/fire.png');
+		ex.loader.load('../examples/img/marker.png');
+
 		// populate the board
 		var spriteConfig = {
 			container: board.group,
@@ -89,12 +95,12 @@
 			b = neighbors[neighbors.length-1];
 		}
 
-		var startSprite = new Sprite(spriteConfig);
+		var startSprite = new ex.Sprite(spriteConfig);
 		startSprite.activate();
 		board.setEntityOnTile(startSprite, a);
 
 		spriteConfig.url = '../examples/img/fire.png'
-		var endSprite = new Sprite(spriteConfig);
+		var endSprite = new ex.Sprite(spriteConfig);
 		endSprite.activate();
 		board.setEntityOnTile(endSprite, b);
 
@@ -104,7 +110,7 @@
 		var i;
 		var markers = [];
 		for (i = 0; i < 20; i++) {
-			markers[i] = new Sprite(spriteConfig);
+			markers[i] = new ex.Sprite(spriteConfig);
 		}
 
 		// obstacles
@@ -118,7 +124,7 @@
 		var obstacles = [];
 		var obstaclesUsed = [];
 		for (i = 0; i < 20; i++) {
-			obstacles[i] = new Sprite(obstacleConfig);
+			obstacles[i] = new ex.Sprite(obstacleConfig);
 		}
 
 		// keep track of states

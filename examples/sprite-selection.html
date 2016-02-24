@@ -30,6 +30,7 @@
 	<script type="text/javascript" src="../dist/von-grid-extras.min.js"></script>
 	<script type="text/javascript" src="js/Sprite.js"></script>
 	<script type="text/javascript">
+	var ex = ex || {};
 	window.addEventListener('load', function(evt) {
 		// setup the thing
 		var scene = new vg.Scene({
@@ -66,10 +67,16 @@
 			heightOffset: 6
 		};
 
-		for (i = 0; i < 5; i++) {
-			sprites[i] = new Sprite(spriteConfig);
-			sprites[i].activate(vg.Tools.randomInt(100), vg.Tools.randomInt(grid.extrudeSettings.amount + 15, 40), vg.Tools.randomInt(100));
-		}
+		THREE.DefaultLoadingManager.onLoad = function() {
+			spriteConfig.texture = tex;
+			for (i = 0; i < 5; i++) {
+				sprites[i] = new ex.Sprite(spriteConfig);
+				sprites[i].activate(vg.Tools.randomInt(100), vg.Tools.randomInt(grid.extrudeSettings.amount + 15, 40), vg.Tools.randomInt(100));
+			}
+		};
+
+		ex.loader = new THREE.TextureLoader();
+		var tex = ex.loader.load(spriteConfig.url);
 
 		// keep track of states
 		var currentPiece = 0;
