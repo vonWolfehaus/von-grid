@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<meta name="author" content="Corey Birnbaum" />
+	<title>Grid</title>
+
+	<link href="reset.css" rel="stylesheet" type="text/css"/>
+	<link href="style.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+
+	<div id="view" class="absolute"></div>
+	<tool-menu></tool-menu>
+	<app-menu></app-menu>
+
+	<lightbox id='js-overlay-newmap'>
+		<form-newmap/>
+	</lightbox>
+	<lightbox id='js-overlay-help'>
+		<table style="color:#fff; text-align: left;">
+			<tr><td>Left Click</td><td>create cell</td></tr>
+			<tr><td>Shift + Left Click</td><td>paint cells</td></tr>
+			<tr><td>Right Click</td><td>remove cell</td></tr>
+			<tr><td>Shift + Right Click</td><td>erase cells</td></tr>
+			<tr><td>Mousewheel</td><td>adjust zoom of camera</td></tr>
+			<tr><td>Shift + Mousewheel</td><td>adjust height of cell</td></tr>
+			<tr><td>Left click and drag</td><td>orbit camera</td></tr>
+			<tr><td>Right Click</td><td>pan camera</td></tr>
+		</table>
+	</lightbox>
+
+	<script type="text/javascript" src="lib/riot.min.js"></script>
+	<script type="text/javascript" src="lib/define.min.js"></script>
+	<script type="text/javascript" src="ui.js"></script>
+</body>
+</html>

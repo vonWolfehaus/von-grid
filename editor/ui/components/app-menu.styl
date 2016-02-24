@@ -1,0 +1,71 @@
+@require '../variables';
+
+app-menu {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+
+	// background-color: rgba(0, 0, 0, 0.5);
+	user-select: none;
+}
+
+.app-menu__list {
+	display: flex;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	list-style-type: none;
+}
+
+.app-menu__item {
+	display: flex;
+	width: 56px;
+	height: @width;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+
+	cursor: pointer;
+
+	background-color: $color-primary;
+	color: #000;
+	border: 1px solid $color-secondary;
+
+	&:hover {
+		background-color: $color-secondary;
+		border-color: $color-primary;
+	}
+
+	&:active {
+		background-color: $color-highlight;
+		color: #fff;
+	}
+
+	&:first-child {
+		border-bottom: none;
+	}
+
+	&:last-child {
+		border-top: none;
+	}
+}
+
+li[data-action="showHelp"] .help-icon {
+	width: 32px;
+	height: @width;
+	line-height: 28px;
+	border: 2px solid black;
+	border-radius: 50%;
+	font-weight: bold;
+
+	&:active {
+		border-color: #fff;
+	}
+}

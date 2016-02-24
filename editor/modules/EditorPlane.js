@@ -64,7 +64,7 @@ define('EditorPlane', function() {
 			this.geometry = new THREE.PlaneBufferGeometry(width, width, 1, 1);
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
-			this.mesh.position.y -= 0.1;
+			// this.mesh.position.y -= 0.1;
 			this.scene.add(this.mesh);
 		},
 

@@ -1,0 +1,62 @@
+@require 'variables';
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	overflow: hidden;
+	font-family: Helvetica, sans-serif;
+}
+
+button {
+	border: none;
+	outline: none;
+	background-color: $color-highlight;
+	color: #fff;
+	padding: 5px 10px;
+	margin: 10px;
+
+	&:hover {
+		background-color: lighten($color-highlight, 30%);
+	}
+
+	&:active {
+		background-color: darken($color-highlight, 30%);
+	}
+}
+
+input[type='number'],
+input[type='text'] {
+	width: 70px;
+	font-size: 18px;
+	margin-bottom: 5px;
+	padding-left: 5px;
+
+	border: none;
+	border-bottom: 2px solid $color-primary;
+	background: none;
+	color: #fff;
+
+	&:hover {
+		border-color: $color-secondary;
+	}
+}
+
+
+
+.absolute {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.flex-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.hidden {
+	display: none;
+}
