@@ -19,12 +19,9 @@ define('EditorPlane', function() {
 		this.scene = scene;
 		this.grid = grid;
 
-		this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
-			color: 0x1aaeff,
-			side: THREE.DoubleSide
-		}));
-
 		this.mouse = mouse;
+
+		this.hoverMesh = null;
 
 		/*this.mouse.signal.add(onUserAction, this);
 		function onUserAction(type, overCell) {
@@ -66,13 +63,15 @@ define('EditorPlane', function() {
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
 			// this.mesh.position.y -= 0.1;
 			this.scene.add(this.mesh);
-		},
 
-		addHoverMeshToGroup: function(group) {
-			if (this.hoverMesh.parent) {
+			if (this.hoverMesh && this.hoverMesh.parent) {
 				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			group.add(this.hoverMesh);
+			this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
+				color: 0x1aaeff,
+				side: THREE.DoubleSide
+			}));
+			this.nexus.scene.container.add(this.hoverMesh);
 		},
 
 		update: function() {

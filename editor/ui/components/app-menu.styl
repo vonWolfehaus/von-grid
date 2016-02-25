@@ -3,12 +3,12 @@
 app-menu {
 	display: block;
 	position: absolute;
-	top: 0;
-	bottom: 0;
+	top: $tool-button-size;
 	left: 0;
 
-	// background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.1);
 	user-select: none;
+	z-index: 10; // keep on top of the flyout
 }
 
 .app-menu__list {
@@ -26,8 +26,8 @@ app-menu {
 
 .app-menu__item {
 	display: flex;
-	width: 56px;
-	height: @width;
+	width: $app-button-size;
+	height: 48px;
 	text-align: center;
 	align-items: center;
 	justify-content: center;
@@ -36,7 +36,7 @@ app-menu {
 
 	background-color: $color-primary;
 	color: #000;
-	border: 1px solid $color-secondary;
+	border-bottom: 1px solid $color-secondary;
 
 	&:hover {
 		background-color: $color-secondary;
@@ -48,12 +48,8 @@ app-menu {
 		color: #fff;
 	}
 
-	&:first-child {
-		border-bottom: none;
-	}
-
 	&:last-child {
-		border-top: none;
+		border-bottom: none;
 	}
 }
 

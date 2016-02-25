@@ -1,6 +1,7 @@
 <app-menu>
 	<ul class="app-menu__list">
-		<!-- <li class="app-menu__item" onclick={ onClick } data-action="newMap">New Map</li> -->
+		<li class="app-menu__item" onclick={ onClick } data-action="settings">Map</li>
+		<!-- <li class="app-menu__item" onclick={ onClick } data-action="newMap">New</li> -->
 		<li class="app-menu__item" onclick={ onClick } data-action="saveMap">Save</li>
 		<li class="app-menu__item" onclick={ onClick } data-action="loadMap">Load</li>
 		<li class="app-menu__item" onclick={ onClick } data-action="showHelp">
@@ -13,6 +14,10 @@
 		var action = evt.target.dataset.action;
 
 		switch (action) {
+			case 'settings':
+				var el = document.getElementById('js-flyout-settings');
+				el.classList.remove('hidden');
+				break;
 			case 'newMap':
 				var el = document.getElementById('js-overlay-newmap');
 				el.classList.remove('hidden');

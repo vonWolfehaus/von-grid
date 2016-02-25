@@ -2,6 +2,7 @@
 	<div class="lightbox__overlay absolute" onclick={ dismiss }></div>
 	<div class="lightbox__panel flex-container">
 		<yield/>
+		<button class="overlay__close-btn" onclick={ dismiss }>X</button>
 	</div>
 
 	<script>

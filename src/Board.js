@@ -114,7 +114,7 @@ vg.Board.prototype = {
 		this.group.add(this.tileGroup);
 	},
 
-	generateOverlay: function(size) {
+	generateOverlay: function() {
 		var mat = new THREE.LineBasicMaterial({
 			color: 0x000000,
 			opacity: 0.3
@@ -126,7 +126,7 @@ vg.Board.prototype = {
 
 		this.overlay = new THREE.Object3D();
 
-		this.grid.generateOverlay(size, this.overlay, mat);
+		this.grid.generateOverlay(this.overlay, mat);
 
 		this.group.add(this.overlay);
 	},

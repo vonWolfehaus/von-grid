@@ -14,32 +14,26 @@
 <body>
 
 	<div id="view" class="absolute"></div>
-	<div id="control-panel" class="absolute">
-		<h2>Instructions</h2>
-		<ul>
-			<li>Left Click: create cell</li>
-			<li>Shift + Left Click: paint cells</li>
-			<li>Right Click: remove cell</li>
-			<li>Shift + Right Click: erase cells</li>
-			<li>Mousewheel: adjust zoom of camera</li>
-			<li>Shift+Mousewheel: adjust height of cell</li>
-			<li>Left click and drag: orbit camera</li>
-			<li>Right click and drag: pan camera</li>
-		</ul>
 
-		<h2>Editor settings</h2>
-		<span>Map size: 20</span>
-		<span>Height step: 3</span>
-		<br/>
+	<!-- <tool-menu></tool-menu> -->
+	<app-menu></app-menu>
 
-		<h2>File</h2>
-		<button id="save-btn">Save Map</button>
-		<br/>
-		<button id="load-btn">Load Map</button>
+	<flyout id='js-flyout-settings'>
+		<form-map-settings/>
+	</flyout>
 
-		<h2>Materials</h2>
-		...
-	</div>
+	<lightbox id='js-overlay-help'>
+		<table style="color:#fff; text-align: left;">
+			<tr><td>Left Click</td><td>create cell</td></tr>
+			<tr><td>Shift + Left Click</td><td>paint cells</td></tr>
+			<tr><td>Right Click</td><td>remove cell</td></tr>
+			<tr><td>Shift + Right Click</td><td>erase cells</td></tr>
+			<tr><td>Mousewheel</td><td>adjust zoom of camera</td></tr>
+			<tr><td>Shift + Mousewheel</td><td>adjust height of cell</td></tr>
+			<tr><td>Left click and drag</td><td>orbit camera</td></tr>
+			<tr><td>Right Click</td><td>pan camera</td></tr>
+		</table>
+	</lightbox>
 
 	<script type="text/javascript" src="../lib/three.min.js"></script>
 	<script type="text/javascript" src="../lib/OrbitControls.js"></script>
@@ -47,6 +41,8 @@
 	<script type="text/javascript" src="../dist/von-grid-extras.min.js"></script>
 
 	<script type="text/javascript" src="lib/riot.min.js"></script>
+	<script type="text/javascript" src="ui.js"></script>
+
 	<script type="text/javascript" src="lib/define.min.js"></script>
 	<script type="text/javascript" src="app.js"></script>
 </body>

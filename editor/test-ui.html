@@ -14,12 +14,18 @@
 <body>
 
 	<div id="view" class="absolute"></div>
+
 	<tool-menu></tool-menu>
 	<app-menu></app-menu>
 
-	<lightbox id='js-overlay-newmap'>
+	<flyout id='js-flyout-settings'>
+		<form-map-settings/>
+	</flyout>
+
+	<!-- <lightbox id='js-overlay-newmap'>
 		<form-newmap/>
-	</lightbox>
+	</lightbox> -->
+
 	<lightbox id='js-overlay-help'>
 		<table style="color:#fff; text-align: left;">
 			<tr><td>Left Click</td><td>create cell</td></tr>
@@ -34,7 +40,6 @@
 	</lightbox>
 
 	<script type="text/javascript" src="lib/riot.min.js"></script>
-	<script type="text/javascript" src="lib/define.min.js"></script>
 	<script type="text/javascript" src="ui.js"></script>
 </body>
 </html>

@@ -22,6 +22,9 @@ define('Input', function() {
 		keyboard.signal.add(function(type, code) {
 			if (type === keyboard.eventType.DOWN) {
 				if (code === keyboard.code.SHIFT) nexus.scene.controls.enabled = false;
+				/*else if (code === keyboard.code.A) {
+					nexus.scene.focusOn(nexus.board.tileGroup); // doesn't work??
+				}*/
 			}
 			else {
 				if (code === keyboard.code.SHIFT) nexus.scene.controls.enabled = true;
@@ -32,19 +35,18 @@ define('Input', function() {
 	Input.prototype = {
 		update: function() {
 			var hit = this.mouse.allHits[0];
-			if (hit) {
-				// flip things around a little to fit to our rotated grid
+			if (hit) { // fun fact, 3 references are faster than 1 function call
 				this.editorWorldPos.x = hit.point.x;
-				this.editorWorldPos.y = hit.point.z; // grids are rotated on axis so that objects keep their y+ orientation
-				this.editorWorldPos.z = hit.point.y;
+				this.editorWorldPos.y = hit.point.y;
+				this.editorWorldPos.z = hit.point.z;
 			}
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 			var dy = this.mouseDelta.y - this.mouse.screenPosition.y;
-			this._travel += Math.sqrt(dx * dx + dy * dy);
+			this._travel += Math.sqrt(dx * dx + dy * dy); // fun fact, sqrt is on of the most expensive math ops
 		},
 
 		onMouse: function(type, obj) {
-			var hit, cell;
+			var hit;
 			if (this.mouse.allHits && this.mouse.allHits[0]) {
 				hit = this.mouse.allHits[0];
 			}

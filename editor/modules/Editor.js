@@ -31,7 +31,7 @@ define('Editor', function() {
 	}
 
 	function onUserAction(type, overTile, data) {
-		var hit = nexus.mouse.allHits[0]
+		// var hit = nexus.mouse.allHits[0];
 		switch (type) {
 			case vg.MouseCaster.WHEEL:
 				if (keyboard.shift && overTile) {

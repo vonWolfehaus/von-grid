@@ -29,19 +29,15 @@ riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item 
 		ui.activeTool = this.items[0];
 	});
 }, '{ }');
-riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
+riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
 
 	ui.on(ui.Events.HIDE_OVERLAY, this.dismiss);
 }, '{ }');
-riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="40" min="1" max="{maxMapSize}" type="number"> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> </span> <span> <button onclick="{onCancel}">Cancel</buttn> <button onclick="{onCreate}">Create</buttn> </span>', '', 'class="flex-container"', function(opts) {
+riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="40" min="1" max="{maxMapSize}" type="number"> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> </span> <span> <button onclick="{onCreate}">Create</buttn> </span>', '', 'class="flex-container"', function(opts) {
 	this.maxMapSize = 1000;
-
-	this.onCancel = function() {
-		ui.trigger(ui.Events.HIDE_OVERLAY);
-	}.bind(this)
 
 	this.onCreate = function() {
 		if (this.mapSize.value > this.maxMapSize) {
@@ -52,11 +48,56 @@ riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input n
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
 }, '{ }');
-riot.tag2('app-menu', '<ul class="app-menu__list"> <li class="app-menu__item" onclick="{onClick}" data-action="saveMap">Save</li> <li class="app-menu__item" onclick="{onClick}" data-action="loadMap">Load</li> <li class="app-menu__item" onclick="{onClick}" data-action="showHelp"> <span class="help-icon" onclick="{onClick}" data-action="showHelp">?</span> </li> </ul>', '', '', function(opts) {
+riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="40" min="1" max="{maxMapSize}" type="number"> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> </span> <span> <button onclick="{onUpdate}">Create Map</buttn> </span>', '', 'class="flex-container"', function(opts) {
+	this.maxMapSize = 1000;
+
+	this.updateSettings = function(settings) {
+		this.mapSize.value = settings.mapSize;
+		this.cellSize.value = settings.cellSize;
+		this.update();
+	}.bind(this)
+
+	this.onUpdate = function() {
+		if (this.mapSize.value > this.maxMapSize) {
+			this.mapSize.value = this.maxMapSize;
+		}
+
+		ui.trigger(ui.Events.UPDATE_SETTINGS, {
+			mapSize: parseInt(this.mapSize.value),
+			cellSize: parseInt(this.cellSize.value)
+		});
+
+	}.bind(this)
+
+	this.on('mount unmount', function(evt) {
+		if (evt === 'mount') {
+			ui.on(ui.Events.UPDATE_SETTINGS, this.updateSettings);
+		}
+		else if (evt === 'unmount') {
+			ui.off(ui.Events.UPDATE_SETTINGS, this.updateSettings);
+		}
+	});
+
+	this.on('error', function(evt) {
+		console.log(evt);
+	});
+}, '{ }');
+riot.tag2('flyout', '<div class="flyout__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container hidden"', function(opts) {
+	this.dismiss = function() {
+		this.root.classList.add('hidden');
+	}.bind(this)
+
+	ui.on(ui.Events.HIDE_FLYOUT, this.dismiss);
+}, '{ }');
+riot.tag2('app-menu', '<ul class="app-menu__list"> <li class="app-menu__item" onclick="{onClick}" data-action="settings">Map</li> <li class="app-menu__item" onclick="{onClick}" data-action="saveMap">Save</li> <li class="app-menu__item" onclick="{onClick}" data-action="loadMap">Load</li> <li class="app-menu__item" onclick="{onClick}" data-action="showHelp"> <span class="help-icon" onclick="{onClick}" data-action="showHelp">?</span> </li> </ul>', '', '', function(opts) {
 	this.onClick = function(evt) {
 		var action = evt.target.dataset.action;
 
 		switch (action) {
+			case 'settings':
+				var el = document.getElementById('js-flyout-settings');
+				el.classList.remove('hidden');
+				break;
 			case 'newMap':
 				var el = document.getElementById('js-overlay-newmap');
 				el.classList.remove('hidden');
@@ -79,10 +120,12 @@ var ui = {
 
 	Events: {
 		TOOL_CHANGE: 'tool-change',
+		UPDATE_SETTINGS: 'update-map-settings',
 		NEW_MAP: 'new-map',
 		SAVE_MAP: 'save-map',
 		LOAD_MAP: 'load-map',
-		HIDE_OVERLAY: 'ui-hide-overlay'
+		HIDE_OVERLAY: 'ui-hide-overlay',
+		HIDE_FLYOUT: 'ui-hide-flyout'
 	},
 
 	Tools: {
