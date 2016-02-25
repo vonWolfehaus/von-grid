@@ -86,10 +86,11 @@ gulp.task('scripts', function() {
 gulp.task('scripts-editor', function() {
 	return gulp.src(sources.editorScripts)
 		.pipe($.plumber({errorHandler: handleErrors}))
-		.pipe($.sortAmd())
 		.pipe($.eslint({ fix: true }))
 		.pipe($.eslint.formatEach())
 		.pipe($.eslint.failOnError())
+		.pipe($.flatten()) // required by sorting alg for some reason
+		.pipe($.sortAmd())
 		.pipe($.sourcemaps.init())
 		.pipe($.concat('app.js'))
 		.pipe($.uglify())
