@@ -37,7 +37,7 @@ gulp.task('clean', del.bind(null, [dist]));
 gulp.task('dev', ['clean'], function() {
 	runSequence(
 		['scripts'],
-		['watch', 'serve-examples']
+		['serve-examples']
 	);
 });
 
@@ -149,11 +149,10 @@ function serve(dir) {
 		}
 	});
 
+	watch();
 	browserSync.watch(dist+'/**/*.*').on('change', reload);
 	gulp.watch(sources.core, ['scripts']);
 }
-
-gulp.task('watch', watch);
 
 gulp.task('serve-editor', function() {
 	browserSync.watch('editor/**/*.{html,png}').on('change', reload);
