@@ -27,6 +27,7 @@ riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item 
 
 	this.on('mount', function() {
 		ui.activeTool = this.items[0];
+		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
 	});
 }, '{ }');
 riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {

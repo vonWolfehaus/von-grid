@@ -34,6 +34,7 @@
 
 	this.on('mount', function() {
 		ui.activeTool = this.items[0];
+		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
 	});
 	</script>
 </tool-menu>

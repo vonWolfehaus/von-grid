@@ -47,7 +47,6 @@ window.addEventListener('load', function(evt) {
 
 	ui.on(ui.Events.SAVE_MAP, function() {
 		saveMap();
-		return false;
 	});
 
 	ui.on(ui.Events.LOAD_MAP, function() {

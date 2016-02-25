@@ -19,17 +19,17 @@ define('Input', function() {
 
 		this._travel = 0;
 
-		keyboard.signal.add(function(type, code) {
+		/*keyboard.signal.add(function(type, code) {
 			if (type === keyboard.eventType.DOWN) {
 				if (code === keyboard.code.SHIFT) nexus.scene.controls.enabled = false;
-				/*else if (code === keyboard.code.A) {
+				else if (code === keyboard.code.A) {
 					nexus.scene.focusOn(nexus.board.tileGroup); // doesn't work??
-				}*/
+				}
 			}
 			else {
 				if (code === keyboard.code.SHIFT) nexus.scene.controls.enabled = true;
 			}
-		}, this);
+		}, this);*/
 	};
 
 	Input.prototype = {
@@ -43,6 +43,13 @@ define('Input', function() {
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 			var dy = this.mouseDelta.y - this.mouse.screenPosition.y;
 			this._travel += Math.sqrt(dx * dx + dy * dy); // fun fact, sqrt is on of the most expensive math ops
+
+			if (keyboard.ctrl) {
+				nexus.scene.controls.enabled = true;
+			}
+			else {
+				nexus.scene.controls.enabled = false;
+			}
 		},
 
 		onMouse: function(type, obj) {
