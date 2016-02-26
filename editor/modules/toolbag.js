@@ -25,7 +25,7 @@ define('toolbag', function() {
 
 	function update() {
 		currentGridCell = nexus.grid.pixelToCell(nexus.input.editorWorldPos);
-		if (nexus.mouse.down && ui.activeTool.name === 'ADD_TILE' && nexus.mouse.allHits && nexus.mouse.allHits.length) {
+		if (!keyboard.ctrl && nexus.mouse.down && ui.activeTool.name === 'ADD_TILE' && nexus.mouse.allHits && nexus.mouse.allHits.length) {
 			// special case since the over event doesn't fire if there's no tile
 			if (!currentGridCell.equals(prevGridCell)) {
 				addTile.action(currentGridCell, null);
@@ -47,7 +47,7 @@ define('toolbag', function() {
 
 	function onUserAction(type, overTile, data) {
 		// var hit = nexus.mouse.allHits[0];
-		if (keyboard.ctrl || /*data === null || */nexus.mouse.rightDown || !tool) {
+		if (keyboard.ctrl || data === null || nexus.mouse.rightDown || !tool) {
 			// there's no picked object, which means the user isn't hovering over any mesh in the scene
 			// also ignore right-mouse clicks
 			return;

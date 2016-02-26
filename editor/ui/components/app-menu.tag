@@ -1,7 +1,6 @@
 <app-menu>
 	<ul class="app-menu__list">
 		<li class="app-menu__item" onclick={ onClick } data-action="settings">Map</li>
-		<!-- <li class="app-menu__item" onclick={ onClick } data-action="newMap">New</li> -->
 		<li class="app-menu__item" onclick={ onClick } data-action="saveMap">Save</li>
 		<li class="app-menu__item" onclick={ onClick } data-action="loadMap">Load</li>
 		<li class="app-menu__item" onclick={ onClick } data-action="showHelp">
@@ -16,11 +15,12 @@
 		switch (action) {
 			case 'settings':
 				var el = document.getElementById('js-flyout-settings');
-				el.classList.remove('hidden');
-				break;
-			case 'newMap':
-				var el = document.getElementById('js-overlay-newmap');
-				el.classList.remove('hidden');
+				if (el.classList.contains('hidden')) {
+					el.classList.remove('hidden');
+				}
+				else {
+					el.classList.add('hidden');
+				}
 				break;
 			case 'saveMap':
 				ui.trigger(ui.Events.SAVE_MAP);

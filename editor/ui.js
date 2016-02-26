@@ -1,13 +1,15 @@
-riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item {tool-menu__item--active: active}" each="{items}" data="{this}" onclick="{parent.clickTool}"> {displayText} </li> </ul>', '', '', function(opts) {
+riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item {tool-menu__item--active: active}" each="{items}" data="{this}" title="{displayText}" onclick="{parent.clickTool}"> <img riot-src="images/{icon}"> </li> </ul>', '', '', function(opts) {
 	this.items = [
 		{
 			name: 'ADD_TILE',
 			displayText: 'Add Tile',
+			icon: 'add-tile.png',
 			active: true
 		},
 		{
 			name: 'REMOVE_TILE',
 			displayText: 'Remove Tile',
+			icon: 'remove-tile.png',
 			active: false
 		},
 	];
@@ -49,23 +51,27 @@ riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input n
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
 }, '{ }');
-riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="40" min="1" max="{maxMapSize}" type="number"> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> </span> <span> <button onclick="{onUpdate}">Create Map</buttn> </span>', '', 'class="flex-container"', function(opts) {
+riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="5" min="1" max="{maxMapSize}" type="number"> <button onclick="{onMapUpdate}">Create Map</button> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <div class="form-group"> <span> <label for="planeSize">Plane size:</label> <input name="planeSize" value="50" min="1" type="number"> </span> <br> <span> <label for="planeColor">Plane color:</label> <input name="planeColor" value="#ffffff" type="color"> </span> <br> <button onclick="{onMapUpdate}">Update Plane</button> <div>', '', 'class="flex-container"', function(opts) {
 	this.maxMapSize = 1000;
 
 	this.updateSettings = function(settings) {
 		this.mapSize.value = settings.mapSize;
 		this.cellSize.value = settings.cellSize;
+		this.planeSize.value = settings.planeSize;
+		this.planeColor.value = settings.planeColor;
 		this.update();
 	}.bind(this)
 
-	this.onUpdate = function() {
+	this.onMapUpdate = function() {
 		if (this.mapSize.value > this.maxMapSize) {
 			this.mapSize.value = this.maxMapSize;
 		}
 
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
 			mapSize: parseInt(this.mapSize.value),
-			cellSize: parseInt(this.cellSize.value)
+			cellSize: parseInt(this.cellSize.value),
+			planeSize: parseInt(this.planeSize.value),
+			planeColor: this.planeColor.value,
 		});
 
 	}.bind(this)
@@ -77,10 +83,6 @@ riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <i
 		else if (evt === 'unmount') {
 			ui.off(ui.Events.UPDATE_SETTINGS, this.updateSettings);
 		}
-	});
-
-	this.on('error', function(evt) {
-		console.log(evt);
 	});
 }, '{ }');
 riot.tag2('flyout', '<div class="flyout__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container hidden"', function(opts) {
@@ -97,11 +99,12 @@ riot.tag2('app-menu', '<ul class="app-menu__list"> <li class="app-menu__item" on
 		switch (action) {
 			case 'settings':
 				var el = document.getElementById('js-flyout-settings');
-				el.classList.remove('hidden');
-				break;
-			case 'newMap':
-				var el = document.getElementById('js-overlay-newmap');
-				el.classList.remove('hidden');
+				if (el.classList.contains('hidden')) {
+					el.classList.remove('hidden');
+				}
+				else {
+					el.classList.add('hidden');
+				}
 				break;
 			case 'saveMap':
 				ui.trigger(ui.Events.SAVE_MAP);

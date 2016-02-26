@@ -281,9 +281,10 @@ vg.SqrGrid.prototype = {
 		this.cellShapeGeo = new THREE.ShapeGeometry(this.cellShape);
 	},
 
-	generateOverlay: function(overlayObj, overlayMat) {
+	generateOverlay: function(overlayObj, overlayMat, size) {
 		var x, y;
-		var half = Math.ceil(this.size / 2);
+		size = size || this.size;
+		var half = Math.ceil(size / 2);
 		for (x = -half; x < half; x++) {
 			for (y = -half; y < half; y++) {
 				this._cel.set(x, y); // define the cell

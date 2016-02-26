@@ -12,3 +12,5 @@ node_modules
 .lock-wscript
 
 hex-map.json
+*.psd
+editor/assets

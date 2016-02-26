@@ -1,7 +1,7 @@
 <tool-menu>
 	<ul class="tool-menu__list">
-		<li class="tool-menu__item { tool-menu__item--active: active }" each={ items } data={ this} onclick={ parent.clickTool }>
-			{ displayText }
+		<li class="tool-menu__item { tool-menu__item--active: active }" each={ items } data={ this} title={ displayText } onclick={ parent.clickTool }>
+			<img src="images/{ icon }"/>
 		</li>
 	</ul>
 
@@ -10,11 +10,13 @@
 		{
 			name: 'ADD_TILE',
 			displayText: 'Add Tile',
+			icon: 'add-tile.png',
 			active: true
 		},
 		{
 			name: 'REMOVE_TILE',
 			displayText: 'Remove Tile',
+			icon: 'remove-tile.png',
 			active: false
 		},
 	];

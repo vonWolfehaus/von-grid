@@ -291,12 +291,13 @@ vg.HexGrid.prototype = {
 		this.cellShapeGeo = new THREE.ShapeGeometry(this.cellShape);
 	},
 
-	generateOverlay: function(overlayObj, overlayMat) {
+	generateOverlay: function(overlayObj, overlayMat, size) {
 		var x, y, z;
-		for (x = -this.size; x < this.size+1; x++) {
-			for (y = -this.size; y < this.size+1; y++) {
+		size = size || this.size;
+		for (x = -size; x < size+1; x++) {
+			for (y = -size; y < size+1; y++) {
 				z = -x-y;
-				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size && Math.abs(z) <= this.size) {
+				if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
 					this._cel.set(x, y, z); // define the cell
 					var line = new THREE.Line(this.cellGeo, overlayMat);
 					line.position.copy(this.cellToPixel(this._cel));
