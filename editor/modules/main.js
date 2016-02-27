@@ -103,6 +103,8 @@ window.addEventListener('load', function(evt) {
 			mapSize: grid.size,
 			cellSize: grid.cellSize,
 			planeSize: plane.planeSize,
+			heightStep: 3,
+			maxTileHeight: 30,
 			planeColor: '#ffffff'
 		};
 		data.set('settings', settings);
@@ -122,6 +124,8 @@ window.addEventListener('load', function(evt) {
 		// console.log('current grid size: '+grid.size+', new: '+settings.mapSize);
 		// console.log('current cell size: '+grid.cellSize+', new: '+settings.cellSize);
 		plane.updatePlane(settings.planeColor, settings.planeSize);
+
+
 
 		data.set('settings', settings);
 		onMapChange();

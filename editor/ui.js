@@ -57,12 +57,14 @@ riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input n
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
 }, '{ }');
-riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="5" min="1" max="{maxMapSize}" type="number"> <button onclick="{onMapUpdate}">Create Map</button> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <div class="form-group"> <span> <label for="planeSize">Plane size:</label> <input name="planeSize" value="50" min="1" type="number"> </span> <br> <span> <label for="planeColor">Plane color:</label> <input name="planeColor" value="#ffffff" type="color"> </span> <br> <button onclick="{onMapUpdate}">Update Plane</button> <div>', '', 'class="flex-container"', function(opts) {
+riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="5" min="1" max="{maxMapSize}" type="number"> <button onclick="{onMapUpdate}">Create Map</button> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <span> <label for="heightStep">Height step:</label> <input name="heightStep" value="3" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <span> <label for="maxTileHeight">Max Tile Height:</label> <input name="maxTileHeight" value="30" min="1" type="number"> <button onclick="{onMapUpdate}">Update</button> </span> <div class="form-group"> <span> <label for="planeSize">Plane size:</label> <input name="planeSize" value="50" min="1" type="number"> </span> <br> <span> <label for="planeColor">Plane color:</label> <input name="planeColor" value="#ffffff" type="color"> </span> <br> <button onclick="{onMapUpdate}">Update Plane</button> <div>', '', 'class="flex-container"', function(opts) {
 	this.maxMapSize = 1000;
 
 	this.updateSettings = function(settings) {
 		this.mapSize.value = settings.mapSize;
 		this.cellSize.value = settings.cellSize;
+		this.heightStep.value = settings.heightStep;
+		this.maxTileHeight.value = settings.maxTileHeight;
 		this.planeSize.value = settings.planeSize;
 		this.planeColor.value = settings.planeColor;
 		this.update();
@@ -76,6 +78,8 @@ riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <i
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
 			mapSize: parseInt(this.mapSize.value),
 			cellSize: parseInt(this.cellSize.value),
+			heightStep: parseInt(this.heightStep.value),
+			maxTileHeight: parseInt(this.maxTileHeight.value),
 			planeSize: parseInt(this.planeSize.value),
 			planeColor: this.planeColor.value,
 		});

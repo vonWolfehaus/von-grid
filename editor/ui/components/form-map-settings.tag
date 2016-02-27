@@ -9,6 +9,16 @@
 		<input type="number" name="cellSize" value="10" min="1"/>
 		<button onclick={ onMapUpdate }>Update Map</button>
 	</span>
+	<span>
+		<label for="heightStep">Height step:</label>
+		<input type="number" name="heightStep" value="3" min="1"/>
+		<button onclick={ onMapUpdate }>Update Map</button>
+	</span>
+	<span>
+		<label for="maxTileHeight">Max Tile Height:</label>
+		<input type="number" name="maxTileHeight" value="30" min="1"/>
+		<button onclick={ onMapUpdate }>Update</button>
+	</span>
 	<div class="form-group">
 		<span>
 			<label for="planeSize">Plane size:</label>
@@ -29,6 +39,8 @@
 	updateSettings(settings) {
 		this.mapSize.value = settings.mapSize;
 		this.cellSize.value = settings.cellSize;
+		this.heightStep.value = settings.heightStep;
+		this.maxTileHeight.value = settings.maxTileHeight;
 		this.planeSize.value = settings.planeSize;
 		this.planeColor.value = settings.planeColor;
 		this.update();
@@ -42,6 +54,8 @@
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
 			mapSize: parseInt(this.mapSize.value),
 			cellSize: parseInt(this.cellSize.value),
+			heightStep: parseInt(this.heightStep.value),
+			maxTileHeight: parseInt(this.maxTileHeight.value),
 			planeSize: parseInt(this.planeSize.value),
 			planeColor: this.planeColor.value,
 		});

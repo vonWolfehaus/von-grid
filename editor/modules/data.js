@@ -24,7 +24,7 @@ define('data', {
 		if (json || data) {
 			try {
 				this._store = json || JSON.parse(data);
-				this.changed.dispatch('load-success');
+				this.changed.dispatch('load-success', this._store);
 			}
 			catch (err) {
 				console.warn('Error loading editor data');

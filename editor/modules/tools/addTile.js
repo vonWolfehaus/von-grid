@@ -1,10 +1,8 @@
 define('addTile', function() {
 	var tower = require('tower');
 	var nexus = require('nexus');
-	// var keyboard = require('keyboard');
-	// var motor = require('motor');
+	var data = require('data');
 
-	// TODO: get these values from UI
 	var heightStep = 3;
 
 	function over(cell, tile, mesh) {
@@ -38,6 +36,17 @@ define('addTile', function() {
 
 		return newTile;
 	}
+
+	function dataChanged(key, oldData, newData) {
+		if (key === 'settings') {
+			heightStep = newData.heightStep;
+		}
+		if (key === 'load-success') {
+			heightStep = oldData.settings.heightStep;
+		}
+	}
+
+	data.changed.add(dataChanged, this);
 
 	return {
 		onOver: over,
