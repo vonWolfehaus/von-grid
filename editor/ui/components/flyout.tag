@@ -1,7 +1,7 @@
 <flyout class="flex-container hidden">
 	<div class="flyout__panel flex-container">
 		<yield/>
-		<button class="overlay__close-btn" onclick={ dismiss }>X</button>
+		<button class="overlay__close-btn" onclick={ dismiss }><i class="icon-cancel"></i></button>
 	</div>
 
 	<script>

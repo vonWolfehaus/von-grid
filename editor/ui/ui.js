@@ -12,8 +12,9 @@ var ui = {
 	},
 
 	Tools: {
-		ADD_TILE: 'Add Tile',
-		REMOVE_TILE: 'Remove Tile',
+		ADD_TILE: 'add-tile',
+		REMOVE_TILE: 'remove-tile',
+		WALK_TILE: 'set-tile-walk',
 	}
 };
 

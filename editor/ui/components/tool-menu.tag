@@ -19,6 +19,12 @@
 			icon: 'remove-tile.png',
 			active: false
 		},
+		{
+			name: 'WALK_TILE',
+			displayText: 'Set Tile Walkability',
+			icon: 'set-walkability.png',
+			active: false
+		},
 	];
 
 	clickTool(evt) {

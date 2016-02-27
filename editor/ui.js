@@ -12,6 +12,12 @@ riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item 
 			icon: 'remove-tile.png',
 			active: false
 		},
+		{
+			name: 'WALK_TILE',
+			displayText: 'Set Tile Walkability',
+			icon: 'set-walkability.png',
+			active: false
+		},
 	];
 
 	this.clickTool = function(evt) {
@@ -32,7 +38,7 @@ riot.tag2('tool-menu', '<ul class="tool-menu__list"> <li class="tool-menu__item 
 		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
 	});
 }, '{ }');
-riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
+riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
@@ -85,14 +91,14 @@ riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <i
 		}
 	});
 }, '{ }');
-riot.tag2('flyout', '<div class="flyout__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}">X</button> </div>', '', 'class="flex-container hidden"', function(opts) {
+riot.tag2('flyout', '<div class="flyout__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
 
 	ui.on(ui.Events.HIDE_FLYOUT, this.dismiss);
 }, '{ }');
-riot.tag2('app-menu', '<ul class="app-menu__list"> <li class="app-menu__item" onclick="{onClick}" data-action="settings">Map</li> <li class="app-menu__item" onclick="{onClick}" data-action="saveMap">Save</li> <li class="app-menu__item" onclick="{onClick}" data-action="loadMap">Load</li> <li class="app-menu__item" onclick="{onClick}" data-action="showHelp"> <span class="help-icon" onclick="{onClick}" data-action="showHelp">?</span> </li> </ul>', '', '', function(opts) {
+riot.tag2('app-menu', '<ul class="app-menu__list"> <li class="app-menu__item" onclick="{onClick}" data-action="settings"> <i class="icon-cogs"></i>Map </li> <li class="app-menu__item" onclick="{onClick}" data-action="saveMap"> <i class="icon-download"></i>Save </li> <li class="app-menu__item" onclick="{onClick}" data-action="loadMap"> <i class="icon-cw"></i>Load </li> <li class="app-menu__item" onclick="{onClick}" data-action="showHelp"> <i class="icon-help"></i>Help </li> </ul>', '', '', function(opts) {
 	this.onClick = function(evt) {
 		var action = evt.target.dataset.action;
 
@@ -133,8 +139,9 @@ var ui = {
 	},
 
 	Tools: {
-		ADD_TILE: 'Add Tile',
-		REMOVE_TILE: 'Remove Tile',
+		ADD_TILE: 'add-tile',
+		REMOVE_TILE: 'remove-tile',
+		WALK_TILE: 'set-tile-walk',
 	}
 };
 

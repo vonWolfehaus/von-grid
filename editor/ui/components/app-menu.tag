@@ -1,10 +1,16 @@
 <app-menu>
 	<ul class="app-menu__list">
-		<li class="app-menu__item" onclick={ onClick } data-action="settings">Map</li>
-		<li class="app-menu__item" onclick={ onClick } data-action="saveMap">Save</li>
-		<li class="app-menu__item" onclick={ onClick } data-action="loadMap">Load</li>
+		<li class="app-menu__item" onclick={ onClick } data-action="settings">
+			<i class="icon-cogs"></i>Map
+		</li>
+		<li class="app-menu__item" onclick={ onClick } data-action="saveMap">
+			<i class="icon-download"></i>Save
+		</li>
+		<li class="app-menu__item" onclick={ onClick } data-action="loadMap">
+			<i class="icon-cw"></i>Load
+		</li>
 		<li class="app-menu__item" onclick={ onClick } data-action="showHelp">
-			<span class="help-icon" onclick={ onClick } data-action="showHelp">?</span>
+			<i class="icon-help"></i>Help
 		</li>
 	</ul>
 

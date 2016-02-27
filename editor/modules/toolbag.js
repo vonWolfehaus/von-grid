@@ -9,6 +9,7 @@ define('toolbag', function() {
 
 	var addTile = require('addTile');
 	var removeTile = require('removeTile');
+	var walkableTile = require('walkableTile');
 
 	var tool = addTile; // should be the first tool in the bag as determined by tool-menu.tag
 
@@ -42,7 +43,14 @@ define('toolbag', function() {
 			case ui.Tools.REMOVE_TILE:
 				tool = removeTile;
 				break;
+			case ui.Tools.WALK_TILE:
+				tool = walkableTile;
+				break;
+			default:
+				tool = null;
+				break;
 		}
+		// console.log('Tool selected: '+evt);
 	}
 
 	function onUserAction(type, overTile, data) {
@@ -83,14 +91,6 @@ define('toolbag', function() {
 
 			case vg.MouseCaster.OVER:
 				tool.onOver(currentGridCell, overTile, data);
-				/*if (keyboard.shift) {
-					if (overTile && nexus.mouse.rightDown) {
-						removeTile(overTile);
-					}
-					else if (!overTile && nexus.mouse.down) {
-						addTile(currentGridCell);
-					}
-				}*/
 				break;
 
 			case vg.MouseCaster.OUT:
@@ -98,22 +98,10 @@ define('toolbag', function() {
 				break;
 
 			case vg.MouseCaster.DOWN:
-				/*if (keyboard.shift && nexus.mouse.down && data && !overTile) {
-					// if shift is down then they're painting, so add a tile immediately
-					addTile(currentGridCell);
-				}*/
 				tool.onDown(currentGridCell, overTile, data);
 				break;
 
 			case vg.MouseCaster.UP:
-				/*if (nexus.mouse.down && data && !overTile) {
-					// create a new tile, if one isn't already there
-					addTile(currentGridCell);
-				}
-				else if (nexus.mouse.rightDown && overTile) {
-					// remove a tile if it's there and right mouse is down
-					removeTile(overTile);
-				}*/
 				tool.onUp(currentGridCell, overTile, data);
 				break;
 		}
