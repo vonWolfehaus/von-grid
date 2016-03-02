@@ -86,16 +86,18 @@ vg.HexGeoGenerator.prototype = {
 	},
 
 	makeTileHighlight: function(material) {
+		var grid = require('nexus').grid;
 		if (!material) {
 			material = new THREE.MeshBasicMaterial({color: 0x24b4ff});
 		}
-		var verts = this.vertices.slice(0);
-		verts.push(verts[0].clone());
-		var curve = new THREE.CatmullRomCurve3(verts);
-		var geo = new THREE.TubeGeometry(curve, 6, 1, 2, true);
+
+		var geo = new THREE.TorusGeometry(grid.cellSize, 2, 3, 6);
 		var mesh = new THREE.Mesh(geo, material);
-		mesh.scale.x = 0.9;
-		mesh.scale.z = 0.9;
+
+		mesh.rotateX(vg.PI/2);
+		mesh.scale.x = 0.8;
+		mesh.scale.y = 0.8;
+
 		return mesh;
 	},
 
