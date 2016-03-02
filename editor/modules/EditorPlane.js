@@ -10,8 +10,13 @@ define('EditorPlane', function() {
 		this.tower = require('tower');
 
 		this.mesh = null;
-		this.material = new THREE.MeshBasicMaterial({
+		this.planeMaterial = new THREE.MeshBasicMaterial({
 			color: 0xffffff,
+			side: THREE.DoubleSide
+		});
+
+		this.hoverMaterial = new THREE.MeshBasicMaterial({
+			color: 0x1aaeff,
 			side: THREE.DoubleSide
 		});
 
@@ -20,44 +25,35 @@ define('EditorPlane', function() {
 		this.mouse = mouse;
 		this.board = this.nexus.board;
 
-		this.hoverMesh = null;
-		this.planeSize = grid.size;
-		this._actualSize = grid.size * grid.cellSize * 2;
+		this.hoverMesh = null; // mesh that hovers over empty cells
+		this.tileHoverMesh = null; // mesh that hovers over tiles
 
-		/*this.mouse.signal.add(onUserAction, this);
-		function onUserAction(type, overCell) {
+		this.planeSize = grid.size + 5;
+		this._actualSize = this.planeSize * (vg.SQRT3 * 0.5) * this.grid._cellWidth + this.grid.cellSize;
+
+		this.tower.userAction.add(onUserAction, this);
+		function onUserAction(type, overTile, data) {
 			switch (type) {
 				case vg.MouseCaster.OVER:
-					if (overCell) {
-						this.hoverMesh.mesh.visible = false;
+					if (overTile && !mouse.down) {
+						this.tileHoverMesh.visible = true;
+						this.tileHoverMesh.position.copy(overTile.position);
+						this.tileHoverMesh.position.y += 1;
 					}
 					break;
 
 				case vg.MouseCaster.OUT:
-					this.hoverMesh.mesh.visible = true;
-					break;
-
-				case vg.MouseCaster.DOWN:
-					this.hoverMesh.mesh.visible = false;
-					break;
-
-				case vg.MouseCaster.UP:
-					if (!overCell) {
-						this.hoverMesh.mesh.visible = true;
-					}
-					else {
-						this.hoverMesh.mesh.visible = false;
-					}
+					this.tileHoverMesh.visible = false;
 					break;
 			}
-		}*/
+		}
 	}
 
 	EditorPlane.prototype = {
 
 		updatePlane: function(color, size) {
 			var newColor = parseInt(color.replace(/^#/, ''), 16);
-			this.material.color.setHex(newColor);
+			this.planeMaterial.color.setHex(newColor);
 
 			if (this.planeSize !== size) {
 				this.planeSize = size;
@@ -69,18 +65,18 @@ define('EditorPlane', function() {
 						this._actualSize = size * this.grid.cellSize * 2;
 						break;
 				}
-				this.generatePlane();
+				this.generate();
 			}
 		},
 
-		generatePlane: function() {
+		generate: function() {
 			var geometry;
 			if (this.mesh && this.mesh.parent) {
 				this.mesh.parent.remove(this.mesh);
 				this.mesh.geometry.dispose();
 			}
 
-			this.board.generateOverlay(this.planeSize);
+			this.board.makeOverlay(this.planeSize);
 
 			switch (this.grid.type) {
 				case vg.HEX:
@@ -90,35 +86,38 @@ define('EditorPlane', function() {
 					geometry = new THREE.PlaneGeometry(this._actualSize, this._actualSize, 1, 1);
 					break;
 				default:
-					console.warn('[EditorPlane.generatePlane] no grid type set');
+					console.warn('[EditorPlane.generate] no grid type set');
 					break;
 			}
 
-			this.mesh = new THREE.Mesh(geometry, this.material);
+			this.mesh = new THREE.Mesh(geometry, this.planeMaterial);
 			this.mesh.rotation.x = 90 * vg.DEG_TO_RAD;
-			// this.mesh.position.y -= 0.1;
+			this.mesh.position.y = -0.5;
 			if (this.grid.type === vg.HEX) {
 				this.mesh.rotation.z = 90 * vg.DEG_TO_RAD;
 			}
 			this.scene.add(this.mesh);
-		},
 
-		generateHoverMesh: function() {
+			// make hover mesh
 			if (this.hoverMesh && this.hoverMesh.parent) {
 				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			this.hoverMesh = this.grid.generateTilePoly(new THREE.MeshBasicMaterial({
-				color: 0x1aaeff,
-				side: THREE.DoubleSide
-			}));
+			this.hoverMesh = this.board.geoGen.makeTilePoly(this.hoverMaterial);
 			this.nexus.scene.container.add(this.hoverMesh);
+
+			if (this.tileHoverMesh && this.tileHoverMesh.parent) {
+				this.tileHoverMesh.parent.remove(this.tileHoverMesh);
+			}
+			this.tileHoverMesh = this.board.geoGen.makeTileHighlight(this.hoverMaterial);
+			this.nexus.scene.container.add(this.tileHoverMesh);
+			this.tileHoverMesh.visible = false;
 		},
 
 		update: function() {
 			if (this.mouse.allHits.length && !this.mouse.pickedObject) {
 				var cell = this.grid.pixelToCell(this.nexus.input.editorWorldPos);
 				this.hoverMesh.position.copy(this.grid.cellToPixel(cell));
-				this.hoverMesh.position.y += 0.1;
+				this.hoverMesh.position.y += 0.05;
 				this.hoverMesh.visible = true;
 			}
 			else {

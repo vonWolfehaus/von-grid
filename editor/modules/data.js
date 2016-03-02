@@ -27,7 +27,7 @@ define('data', {
 				this.changed.dispatch('load-success', this._store);
 			}
 			catch (err) {
-				console.warn('Error loading editor data');
+				console.warn(err);
 				this.changed.dispatch('load-failure');
 			}
 		}

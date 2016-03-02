@@ -44,20 +44,18 @@
 			size: 5 // size of the board
 		});
 
-		var mouse = new vg.MouseCaster(scene.container, scene.camera);
+		// var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var board = new vg.Board(grid);
 
 		// this will generate extruded hexagonal tiles
-		board.generateTilemap({
-			tileScale: 0.96 // you might have to scale the tile so the extruded geometry fits the cell size perfectly
-		});
+		board.makeTiles();
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
 		var vec = new THREE.Vector3();
 
-		mouse.signal.add(function(evt, tile) {
+		/*mouse.signal.add(function(evt, tile) {
 			if (evt === vg.MouseCaster.CLICK) {
 				// tile.toggle();
 				// or we can use the mouse's raw coordinates to access the cell directly, just for fun:
@@ -65,12 +63,12 @@
 				var t = board.getTileAtCell(cell);
 				if (t) t.toggle();
 			}
-		}, this);
+		}, this);*/
 
 		update();
 
 		function update() {
-			mouse.update();
+			// mouse.update();
 			scene.render();
 			requestAnimationFrame(update);
 		}

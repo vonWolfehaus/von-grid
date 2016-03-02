@@ -47,9 +47,7 @@
 		var board = new vg.Board(grid);
 
 		// this will generate extruded square tiles
-		board.generateTilemap({
-			tileScale: 0.96 // you might have to scale the tile so the extruded geometry fits the cell size perfectly
-		});
+		board.makeTiles();
 
 		scene.add(board.group);
 		scene.focusOn(board.group);

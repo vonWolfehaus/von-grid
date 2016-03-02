@@ -12,7 +12,6 @@ define('Input', function() {
 
 		this.mouseDelta = new THREE.Vector3();
 		this.mousePanMinDistance = 0.1;
-		this.heightStep = 5;
 		this.editorWorldPos = new THREE.Vector3(); // current grid position of mouse
 
 		this.overTile = null;
@@ -64,16 +63,13 @@ define('Input', function() {
 
 				case vg.MouseCaster.OVER:
 					if (obj) {
-						this.overTile = obj.select();
+						this.overTile = obj;
 					}
 					tower.userAction.dispatch(vg.MouseCaster.OVER, this.overTile, hit);
 					break;
 
 				case vg.MouseCaster.OUT:
-					if (obj) {
-						obj.deselect();
-						this.overTile = null;
-					}
+					this.overTile = null;
 					tower.userAction.dispatch(vg.MouseCaster.OUT, this.overTile, hit);
 					break;
 

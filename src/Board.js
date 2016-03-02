@@ -6,19 +6,20 @@
 vg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
+	this.tileHeightStep = 3;
 	this.tiles = [];
-	this.tileGroup = null; // only for tiles
-
-	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup, never trashed
-
 	this.grid = null;
 	this.overlay = null;
 	this.finder = new vg.AStarFinder(finderConfig);
+	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup, never trashed
+	this.tileGroup = null; // only for tiles
 
 	this.setGrid(grid);
 };
 
 vg.Board.prototype = {
+	constructor: vg.Board,
+
 	setEntityOnTile: function(entity, tile) {
 		// snap an entity's position to a tile; merely copies position
 		var pos = this.grid.cellToPixel(tile.cell);
@@ -40,7 +41,7 @@ vg.Board.prototype = {
 		else return;
 
 		this.snapTileToGrid(tile);
-		tile.position.y = 0;
+		tile.position.y = tile.cell.h * this.tileHeightStep;
 
 		this.tileGroup.add(tile.mesh);
 		this.grid.add(tile.cell);
@@ -54,7 +55,7 @@ vg.Board.prototype = {
 		this.grid.remove(tile.cell);
 
 		if (i !== -1) this.tiles.splice(i, 1);
-		// this.tileGroup.remove(tile.mesh);
+		this.tileGroup.remove(tile.mesh);
 
 		tile.dispose();
 	},
@@ -114,7 +115,8 @@ vg.Board.prototype = {
 		this.group.add(this.tileGroup);
 	},
 
-	generateOverlay: function(size) {
+	// DEPRECATED
+	/*generateOverlay: function(size) {
 		var mat = new THREE.LineBasicMaterial({
 			color: 0x000000,
 			opacity: 0.3
@@ -129,9 +131,10 @@ vg.Board.prototype = {
 		this.grid.generateOverlay(this.overlay, mat, size);
 
 		this.group.add(this.overlay);
-	},
+	},*/
 
-	generateTilemap: function(config) {
+	// DEPRECATED
+	/*generateTilemap: function(config) {
 		this.reset();
 
 		var tiles = this.grid.generateTiles(config);
@@ -143,13 +146,81 @@ vg.Board.prototype = {
 		}
 
 		this.group.add(this.tileGroup);
+	},*/
+
+	/*
+		Make all the geometry and objects necessary to give 3D form to the current grid.
+		It uses ExtrudeGeometry with a slight bevel and creates a few unique materials for variation.
+
+		tileHeight 	[int] 	How tall the tile geometry is
+	*/
+	makeTiles: function(tileHeight) {
+		this.reset();
+		this.makeGenerator();
+
+		var i, c, geo, t;
+		geo = this.geoGen.makeTileGeo({
+			height: tileHeight || 1
+		});
+
+		var mats = [];
+		for (i = 0; i < 10; i++) {
+			mats.push(new THREE.MeshPhongMaterial({
+				color: vg.Tools.randomizeRGB('30, 30, 30', 13)
+			}));
+		}
+
+		for (i in this.grid.cells) {
+			c = this.grid.cells[i];
+			t = new vg.Tile({
+				cell: c,
+				geometry: geo,
+				material: mats[vg.Tools.randomInt(0, 9)],
+				scale: 0.95
+			});
+
+			t.position.copy(this.grid.cellToPixel(c));
+			t.position.y = c.h * this.tileHeightStep;
+
+			this.tiles.push(t);
+			this.tileGroup.add(t.mesh);
+		}
+	},
+
+	makeOverlay: function(size) {
+		var mat = new THREE.LineBasicMaterial({
+			color: 0x000000,
+			opacity: 0.3
+		});
+		this.makeGenerator();
+
+		if (this.overlay) {
+			this.group.remove(this.overlay);
+		}
+
+		this.overlay = new THREE.Object3D();
+
+		this.geoGen.makeOverlay(this.overlay, size, mat);
+
+		this.group.add(this.overlay);
+	},
+
+	makeGenerator: function() {
+		if (!this.geoGen) {
+			switch (this.grid.type) {
+				case vg.HEX:
+					this.geoGen = new vg.HexGeoGenerator();
+					break;
+			}
+		}
+		this.geoGen.init(this.grid.cellSize);
 	},
 
 	reset: function() {
 		// removes all tiles from the scene, but leaves the grid intact
 		this.removeAllTiles();
 		if (this.tileGroup) this.group.remove(this.tileGroup);
+		this.tileGroup = new THREE.Object3D();
+		this.group.add(this.tileGroup);
 	}
 };
-
-vg.Board.prototype.constructor = vg.Board;

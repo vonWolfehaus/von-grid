@@ -6,6 +6,7 @@
 vg.Tile = function(config) {
 	config = config || {};
 	var settings = {
+		scale: 1,
 		cell: null, // required vg.Cell
 		geometry: null, // required threejs geometry
 		material: null // not required but it would improve performance significantly
@@ -45,7 +46,7 @@ vg.Tile = function(config) {
 	this.rotation = this.mesh.rotation;
 
 	// rotate it to face "up" (the threejs coordinate space is Y+)
-	this.rotation.x = -90 * vg.DEG_TO_RAD;
+	this.rotation.x = 90 * vg.DEG_TO_RAD;
 	this.mesh.scale.set(settings.scale, settings.scale, 1);
 
 	if (this.material.emissive) {
