@@ -11,43 +11,25 @@ app-menu {
 }
 
 .app-menu__list {
-	display: flex;
 	width: $app-button-size;
 	height: 100%;
-	margin: 0;
-	padding: 0;
 
 	flex-direction: column;
 	align-items: flex-start;
 	justify-content: center;
-
-	list-style-type: none;
 }
 
 .app-menu__item {
 	display: flex;
 	width: 100%;
 	height: 48px;
-	padding: 0 10px;
 
-	text-align: center;
 	align-items: center;
-	justify-content: center;
 
-	cursor: pointer;
-
-	background-color: $color-primary;
-	color: #000;
 	border-bottom: 1px solid $color-secondary;
 
-	&:hover {
-		background-color: $color-secondary;
-		border-color: $color-primary;
-	}
-
-	&:active {
-		background-color: $color-highlight;
-		color: #fff;
+	&:first-child {
+		border-top: none;
 	}
 
 	&:last-child {
@@ -56,5 +38,6 @@ app-menu {
 
 	i[class^="icon-"] {
 		pointer-events: none;
+		padding: 0 8px 0;
 	}
 }

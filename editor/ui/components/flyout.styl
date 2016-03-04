@@ -3,12 +3,19 @@
 flyout {
 	position: absolute;
 	top: $tool-button-size;
-	left: $app-button-size;
+
+	&.left {
+		left: $app-button-size;
+	}
+
+	&.right {
+		right: 0;
+	}
 }
+
 
 .flyout__panel {
 	position: relative;
-	width: 300px;
 	padding: 15px 10px;
 
 	background-color: $color-bg;

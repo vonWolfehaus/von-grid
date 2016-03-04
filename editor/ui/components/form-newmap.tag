@@ -8,7 +8,7 @@
 		<input type="number" name="cellSize" value="10" min="1"/>
 	</span>
 	<span>
-		<button onclick={ onCreate }>Create</buttn>
+		<button onclick={ onCreate }>Create</button>
 	</span>
 
 	<script>

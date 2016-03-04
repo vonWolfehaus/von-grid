@@ -71,7 +71,7 @@
 			spriteConfig.texture = tex;
 			for (i = 0; i < 5; i++) {
 				sprites[i] = new ex.Sprite(spriteConfig);
-				sprites[i].activate(vg.Tools.randomInt(100), vg.Tools.randomInt(grid.extrudeSettings.amount + 15, 40), vg.Tools.randomInt(100));
+				sprites[i].activate(vg.util.randomInt(100), vg.util.randomInt(grid.extrudeSettings.amount + 15, 40), vg.util.randomInt(100));
 			}
 		};
 

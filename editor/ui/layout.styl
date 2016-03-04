@@ -6,7 +6,7 @@
 
 body {
 	overflow: hidden;
-	font-family: Helvetica, sans-serif;
+	font-family: Verdana, Helvetica, sans-serif;
 }
 
 button {
@@ -43,11 +43,65 @@ input[type='text'] {
 	}
 }
 
+select {
+	display: inline-block;
+	width: 100%;
+	height: 34px;
+
+	font-size: 18px;
+	line-height: 1;
+
+	outline: none;
+	border: 0;
+	background-color: #f8f8f8;
+}
+
+ul.btn-list {
+	list-style-type: none;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+ul.btn-list > li {
+	background-color: $color-primary;
+	color: #000;
+	cursor: pointer;
+
+	&:hover {
+		background-color: $color-secondary;
+		border-color: $color-primary;
+	}
+
+	&:active {
+		background-color: $color-highlight;
+		color: #fff;
+	}
+
+	&.active {
+		background-color: $color-highlight;
+		color: #fff;
+
+		&:hover {
+			background-color: $color-highlight;
+		}
+	}
+}
+
 .overlay__close-btn {
 	position: absolute;
 	top: -25px;
-	right: -25px;
+
+	line-height: 30px;
 	font-size: 18px;
+	border: 2px solid white;
+
+	&.left {
+		right: -25px;
+	}
+
+	&.right {
+		left: -25px;
+	}
 }
 
 .form-group {

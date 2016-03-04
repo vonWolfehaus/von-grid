@@ -1,4 +1,4 @@
-<lightbox class="flex-container absolute hidden">
+<lightbox class="flex-container absolute ">
 	<div class="lightbox__overlay absolute" onclick={ dismiss }></div>
 	<div class="lightbox__panel flex-container">
 		<yield/>

@@ -4,21 +4,19 @@
 		<input type="number" name="mapSize" value="5" min="1" max="{ maxMapSize }"/>
 		<button onclick={ onMapUpdate }>Create Map</button>
 	</span>
+
 	<span>
 		<label for="cellSize">Cell size:</label>
 		<input type="number" name="cellSize" value="10" min="1"/>
 		<button onclick={ onMapUpdate }>Update Map</button>
 	</span>
+
 	<span>
 		<label for="heightStep">Height step:</label>
 		<input type="number" name="heightStep" value="3" min="1"/>
 		<button onclick={ onMapUpdate }>Update Map</button>
 	</span>
-	<span>
-		<label for="maxTileHeight">Max Tile Height:</label>
-		<input type="number" name="maxTileHeight" value="30" min="1"/>
-		<button onclick={ onMapUpdate }>Update</button>
-	</span>
+
 	<div class="form-group">
 		<span>
 			<label for="planeSize">Plane size:</label>

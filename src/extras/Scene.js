@@ -27,9 +27,9 @@ vg.Scene = function(sceneConfig, controlConfig) {
 		noZoom: false
 	};
 
-	sceneSettings = vg.Tools.merge(sceneSettings, sceneConfig);
+	sceneSettings = vg.util.merge(sceneSettings, sceneConfig);
 	if (typeof controlConfig !== 'boolean') {
-		controlSettings = vg.Tools.merge(controlSettings, controlConfig);
+		controlSettings = vg.util.merge(controlSettings, controlConfig);
 	}
 
 	this.renderer = new THREE.WebGLRenderer({
@@ -68,7 +68,7 @@ vg.Scene = function(sceneConfig, controlConfig) {
 	this.contolled = !!controlConfig;
 	if (this.contolled) {
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-		vg.Tools.overwrite(this.controls, controlSettings);
+		vg.util.overwrite(this.controls, controlSettings);
 	}
 
 	if (sceneSettings.cameraPosition) {

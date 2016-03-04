@@ -18,13 +18,21 @@
 	<tool-menu></tool-menu>
 	<app-menu></app-menu>
 
-	<flyout id='js-flyout-settings'>
+	<flyout id="js-flyout-settings" side="left">
 		<form-map-settings/>
 	</flyout>
 
-	<!-- <lightbox id='js-overlay-newmap'>
-		<form-newmap/>
-	</lightbox> -->
+	<flyout id="js-flyout-tilesets" side="right" hideClose=true>
+		<tileset-menu/>
+	</flyout>
+
+	<lightbox id='js-overlay-newtileset'>
+		<form-newtileset/>
+	</lightbox>
+
+	<lightbox id='js-overlay-newtile'>
+		<form-newtile/>
+	</lightbox>
 
 	<lightbox id='js-overlay-help'>
 		<table style="color:#fff; text-align: left;">
@@ -38,6 +46,10 @@
 			<tr><td>Right Click</td><td>pan camera</td></tr>
 		</table>
 	</lightbox>
+	<script type="text/javascript" src="../lib/three.min.js"></script>
+	<script type="text/javascript" src="../lib/OrbitControls.js"></script>
+	<script type="text/javascript" src="../dist/von-grid.min.js"></script>
+	<script type="text/javascript" src="../dist/von-grid-extras.min.js"></script>
 
 	<script type="text/javascript" src="lib/riot.min.js"></script>
 	<script type="text/javascript" src="ui.js"></script>

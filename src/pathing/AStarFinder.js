@@ -10,7 +10,7 @@ vg.AStarFinder = function(finderConfig) {
 		allowDiagonal: false,
 		heuristicFilter: null
 	};
-	settings = vg.Tools.merge(settings, finderConfig);
+	settings = vg.util.merge(settings, finderConfig);
 
 	this.allowDiagonal = settings.allowDiagonal;
 	this.heuristicFilter = settings.heuristicFilter;

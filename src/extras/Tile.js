@@ -11,7 +11,7 @@ vg.Tile = function(config) {
 		geometry: null, // required threejs geometry
 		material: null // not required but it would improve performance significantly
 	};
-	settings = vg.Tools.merge(settings, config);
+	settings = vg.util.merge(settings, config);
 
 	if (!settings.cell || !settings.geometry) {
 		throw new Error('Missing vg.Tile configuration');
@@ -21,13 +21,13 @@ vg.Tile = function(config) {
 	if (this.cell.tile && this.cell.tile !== this) this.cell.tile.dispose(); // remove whatever was there
 	this.cell.tile = this;
 
-	this.uniqueID = vg.Tools.generateID();
+	this.uniqueID = vg.util.generateID();
 
 	this.geometry = settings.geometry;
 	this.material = settings.material;
 	if (!this.material) {
 		this.material = new THREE.MeshPhongMaterial({
-			color: vg.Tools.randomizeRGB('30, 30, 30', 13)
+			color: vg.util.randomizeRGB('30, 30, 30', 13)
 		});
 	}
 

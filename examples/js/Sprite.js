@@ -14,11 +14,11 @@ ex.Sprite = function(settings) {
 	this.obstacle = false;
 
 	// attribute override
-	vg.Tools.overwrite(this, settings);
+	vg.util.overwrite(this, settings);
 
 	// other objects like the SelectionManager expect these on all objects that are added to the scene
 	this.active = false;
-	this.uniqueId = vg.Tools.generateID();
+	this.uniqueId = vg.util.generateID();
 	this.objectType = vg.ENT;
 	this.tile = null;
 

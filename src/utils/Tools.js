@@ -1,4 +1,9 @@
-vg.Tools = {
+/*
+	Collection of useful functions.
+
+	@author Corey Birnbaum https://github.com/vonWolfehaus/
+*/
+vg.util = {
 	clamp: function(val, min, max) {
 		return Math.max(min, Math.min(max, val));
 	},

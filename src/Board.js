@@ -91,7 +91,7 @@ vg.Board.prototype = {
 
 	getRandomTile: function() {
 		if (this.tiles.length === 0) return null;
-		var i = vg.Tools.randomInt(0, this.tiles.length-1);
+		var i = vg.util.randomInt(0, this.tiles.length-1);
 		return this.tiles[i];
 	},
 
@@ -115,39 +115,6 @@ vg.Board.prototype = {
 		this.group.add(this.tileGroup);
 	},
 
-	// DEPRECATED
-	/*generateOverlay: function(size) {
-		var mat = new THREE.LineBasicMaterial({
-			color: 0x000000,
-			opacity: 0.3
-		});
-
-		if (this.overlay) {
-			this.group.remove(this.overlay);
-		}
-
-		this.overlay = new THREE.Object3D();
-
-		this.grid.generateOverlay(this.overlay, mat, size);
-
-		this.group.add(this.overlay);
-	},*/
-
-	// DEPRECATED
-	/*generateTilemap: function(config) {
-		this.reset();
-
-		var tiles = this.grid.generateTiles(config);
-		this.tiles = tiles;
-
-		this.tileGroup = new THREE.Object3D();
-		for (var i = 0; i < tiles.length; i++) {
-			this.tileGroup.add(tiles[i].mesh);
-		}
-
-		this.group.add(this.tileGroup);
-	},*/
-
 	/*
 		Make all the geometry and objects necessary to give 3D form to the current grid.
 		It uses ExtrudeGeometry with a slight bevel and creates a few unique materials for variation.
@@ -166,7 +133,7 @@ vg.Board.prototype = {
 		var mats = [];
 		for (i = 0; i < 10; i++) {
 			mats.push(new THREE.MeshPhongMaterial({
-				color: vg.Tools.randomizeRGB('30, 30, 30', 13)
+				color: vg.util.randomizeRGB('30, 30, 30', 13)
 			}));
 		}
 
@@ -175,7 +142,7 @@ vg.Board.prototype = {
 			t = new vg.Tile({
 				cell: c,
 				geometry: geo,
-				material: mats[vg.Tools.randomInt(0, 9)],
+				material: mats[vg.util.randomInt(0, 9)],
 				scale: 0.95
 			});
 

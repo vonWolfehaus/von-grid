@@ -185,6 +185,9 @@ window.addEventListener('load', function(evt) {
 		input.update();
 		plane.update();
 		scene.render();
+		if (ui.previewUpdate) {
+			ui.previewUpdate();
+		}
 	};
 	motor.add(update);
 

@@ -1,7 +1,7 @@
-<flyout class="flex-container hidden">
+<flyout class="flex-container { opts.side } hidden">
 	<div class="flyout__panel flex-container">
 		<yield/>
-		<button class="overlay__close-btn" onclick={ dismiss }><i class="icon-cancel"></i></button>
+		<button if={ !opts.hideclose } class="overlay__close-btn { opts.side }" onclick={ dismiss }><i class="icon-cancel"></i></button>
 	</div>
 
 	<script>

@@ -65,7 +65,7 @@ vg.HexGeoGenerator.prototype = {
 			bevelSize: 0.5,
 			bevelThickness: 0.5
 		};
-		vg.Tools.overwrite(settings, config);
+		vg.util.overwrite(settings, config);
 		settings.amount = config.height || settings.amount;
 
 		if (this.tileGeo) this.tileGeo.dispose();

@@ -1,5 +1,5 @@
 <app-menu>
-	<ul class="app-menu__list">
+	<ul class="btn-list app-menu__list">
 		<li class="app-menu__item" onclick={ onClick } data-action="settings">
 			<i class="icon-cogs"></i>Map
 		</li>

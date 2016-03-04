@@ -1,6 +1,6 @@
 <tool-menu>
-	<ul class="tool-menu__list">
-		<li class="tool-menu__item { tool-menu__item--active: active }" each={ items } data={ this} title={ displayText } onclick={ parent.clickTool }>
+	<ul class="btn-list tool-menu__list">
+		<li class="tool-menu__item { active: active }" each={ items } data={ this} title={ displayText } onclick={ parent.selectTool }>
 			<img src="images/{ icon }"/>
 		</li>
 	</ul>
@@ -27,9 +27,11 @@
 		},
 	];
 
-	clickTool(evt) {
+	selectTool(evt) {
 		var item = evt.item;
-		if (ui.activeTool.name === item.name) return;
+		if (ui.activeTool.name === item.name) {
+			return;
+		}
 
 		ui.activeTool.active = false;
 
