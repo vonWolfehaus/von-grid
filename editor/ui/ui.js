@@ -25,4 +25,8 @@ var ui = {
 };
 
 riot.observable(ui);
-riot.mount('*');
+// riot.mount('*');
+riot.mount('tool-menu');
+riot.mount('app-menu');
+riot.mount('flyout');
+riot.mount('lightbox');

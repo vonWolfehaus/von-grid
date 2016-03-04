@@ -158,11 +158,46 @@ riot.tag2('tileset-menu', '<form> <label for="tilesets">Tileset:</label> <select
 	ui.on(ui.Events.NEW_TILESET, this.newTileset);
 	ui.on(ui.Events.NEW_TILE, this.newTile);
 }, '{ }');
-riot.tag2('preview-canvas', '', '', '', function(opts) {
+riot.tag2('preview-canvas', '<canvas id="preview"></canvas> <span class="preview__info"> {meshSize} </span>', '', '', function(opts) {
 	this.renderer = null;
 	this.scene = null;
 	this.camera = null;
 	this.controls = null;
+	this.meshSize = '';
+
+	this.roundTenths = function(val) {
+		return Math.round(val * 10) / 10;
+	}.bind(this)
+
+	this.addMesh = function(obj) {
+		var o = this.scene.children[0];
+		while (o) {
+			this.scene.remove(o);
+			o = this.scene.children[0];
+		}
+		this.scene.add(obj);
+
+		var box = new THREE.Box3().setFromObject(obj);
+		var size = box.size();
+		this.meshSize = 'Size {x:'+this.roundTenths(size.x)+' y:'+this.roundTenths(size.y)+' z:'+this.roundTenths(size.z)+'}';
+
+		var fov = this.camera.fov * vg.DEG_TO_RAD;
+		var dist = Math.abs(Math.min(size.x, size.z) / Math.sin(fov / 2)) / 2;
+		console.log('Camera distance:', dist);
+
+		this.camera.position.set(0, dist, dist);
+		this.update();
+	}.bind(this)
+
+	this.showTile = function(color) {
+
+		if (ui.activeTileMesh) {
+			this.addMesh(ui.activeTileMesh);
+		}
+		else {
+
+		}
+	}.bind(this)
 
 	this.updatePreview = function() {
 		this.controls.update();
@@ -188,6 +223,7 @@ riot.tag2('preview-canvas', '', '', '', function(opts) {
 		var height = 150;
 
 		this.renderer = new THREE.WebGLRenderer({
+			canvas: document.getElementById('preview'),
 			alpha: true,
 			antialias: true
 		});
@@ -195,43 +231,48 @@ riot.tag2('preview-canvas', '', '', '', function(opts) {
 		this.renderer.sortObjects = false;
 
 		this.scene = new THREE.Scene();
-		this.scene.add(new THREE.AmbientLight(0xdddddd));
-		this.scene.add(new THREE.DirectionalLight(0xdddddd));
+		this.scene.add(new THREE.AmbientLight(0xffffff));
+		var light = new THREE.DirectionalLight(0xffffff);
+		light.position.set(-1, 1, -1).normalize();
+		this.scene.add(light);
 
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(width, height);
-		this.root.appendChild(this.renderer.domElement);
 
 		this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 5000);
-		this.camera.position.set(0, 100, 100);
+		this.camera.position.set(0, 20, 100);
 
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.minDistance = 50;
-		this.controls.maxDistance = 100;
+		this.controls.minDistance = 1;
+		this.controls.maxDistance = 10000;
 		this.controls.zoomSpeed = 2;
-		this.controls.noZoom = false;
-		this.controls.maxPolarAngle = (Math.PI / 2) - 0.01;
 
-		var geometry = new THREE.BoxGeometry(20, 20, 20);
-		var material = new THREE.MeshPhongMaterial({
-			color: 0x156289,
-			emissive: 0x072534,
-			side: THREE.DoubleSide,
-			shading: THREE.FlatShading
-		});
-		var cube = new THREE.Mesh(geometry, material);
-		this.scene.add(cube);
+		this.controls.maxPolarAngle = (Math.PI / 2) - 0.01;
 
 		ui.previewUpdate = this.updatePreview;
 
 		if (!window.require) {
 			requestAnimationFrame(this.updatePreview);
+
+			var geometry = new THREE.BoxGeometry(20, 20, 20);
+			var material = new THREE.MeshPhongMaterial({
+				color: 0x156289,
+				emissive: 0x072534,
+				shading: THREE.FlatShading
+			});
+			var cube = new THREE.Mesh(geometry, material);
+			this.scene.add(cube);
 		}
 	});
 
+	this.on('error', function(evt) {
+		console.error(evt);
+	});
+
 	ui.on(ui.Events.TOOL_CHANGE, this.toggle);
-});
-riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container absolute "', function(opts) {
+	ui.on(ui.Events.NEW_TILE, this.showTile);
+}, '{ }');
+riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
@@ -248,6 +289,12 @@ riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> G
 	this.wrongFileType = false;
 	this.showMessage = false;
 	this.warningMessage = '';
+	this.daeLoader = new THREE.ColladaLoader();
+
+	this.onModelLoad = function(obj) {
+		ui.activeTileMesh = obj.scene;
+		this.onCreate();
+	}.bind(this)
 
 	this.onCreate = function() {
 		var file = this.tileFile.value;
@@ -258,24 +305,20 @@ riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> G
 		}
 
 		if (!file && !this.generateTile.checked) {
-			this.warningMessage = 'Please choose to generate a tile, or upload a DAE (Collada) file';
+			this.warningMessage = 'Please choose to generate a tile, or upload a DAE (Collada) file.';
 			this.showMessage = true;
 			this.update();
 			return false;
 		}
 
-		var tile = {
-			file: file,
-			color: color
-		};
-
-		ui.trigger(ui.Events.NEW_TILE, tile);
+		ui.trigger(ui.Events.NEW_TILE, color);
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
 
 	this.on('mount', function() {
 		var self = this;
 		this.generateTile.onchange = function(evt) {
+			ui.activeTileMesh = null;
 			self.showMessage = false;
 			self.update();
 		};
@@ -283,13 +326,37 @@ riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> G
 		this.tileFile.onchange = function(evt) {
 			if (self.tileFile.value.split('.')[1] !== 'dae') {
 				self.wrongFileType = true;
-				self.warningMessage = 'This editor only takes .DAE (Collada) models';
+				self.warningMessage = 'This editor only takes .DAE (Collada) models.';
 			}
 			else {
 				self.wrongFileType = false;
 			}
 			self.showMessage = self.wrongFileType;
 			self.update();
+
+			if (self.showMessage) return false;
+
+			var file = this.files[0];
+			if (!file) {
+				return;
+			}
+
+			ui.activeTileMesh = null;
+
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				try {
+					self.daeLoader.parse(e.target.result, self.onModelLoad, './assets');
+				}
+				catch (err) {
+					self.showMessage = true;
+					self.warningMessage = 'There was an error parsing the Collada file: "'+err+'"';
+					self.update();
+					return false;
+				}
+			};
+
+			reader.readAsText(file);
 		};
 	});
 }, '{ }');
@@ -404,6 +471,10 @@ var ui = {
 };
 
 riot.observable(ui);
-riot.mount('*');
+// riot.mount('*');
+riot.mount('tool-menu');
+riot.mount('app-menu');
+riot.mount('flyout');
+riot.mount('lightbox');
 
 //# sourceMappingURL=ui.js.map
