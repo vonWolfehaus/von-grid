@@ -47,6 +47,12 @@
 		}
 	}
 
+	genPreview(tile) {
+		var canvas = document.getElementById('preview');
+		tile.preview = canvas.toDataURL('image/png');
+		riot.update();
+	}
+
 	updatePreview() {
 		this.controls.update();
 		this.renderer.render(this.scene, this.camera);
@@ -67,7 +73,7 @@
 	}
 
 	this.on('mount', function() {
-		var width = 208;
+		var width = 136;
 		var height = 150;
 
 		this.renderer = new THREE.WebGLRenderer({
@@ -119,6 +125,7 @@
 	});
 
 	ui.on(ui.Events.TOOL_CHANGE, this.toggle);
-	ui.on(ui.Events.NEW_TILE, this.showTile);
+	ui.on(ui.Events.NEW_TILE+' '+ui.Events.EDIT_TILE, this.showTile);
+	ui.on(ui.Events.GEN_TILE_PREVIEW, this.genPreview);
 	</script>
 </preview-canvas>

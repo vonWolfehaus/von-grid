@@ -38,7 +38,6 @@
 		this.mapSize.value = settings.mapSize;
 		this.cellSize.value = settings.cellSize;
 		this.heightStep.value = settings.heightStep;
-		this.maxTileHeight.value = settings.maxTileHeight;
 		this.planeSize.value = settings.planeSize;
 		this.planeColor.value = settings.planeColor;
 		this.update();

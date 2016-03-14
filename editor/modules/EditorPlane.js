@@ -31,8 +31,7 @@ define('EditorPlane', function() {
 		this.planeSize = grid.size + 5;
 		this._actualSize = this.planeSize * (vg.SQRT3 * 0.5) * this.grid._cellWidth + this.grid.cellSize;
 
-		this.tower.userAction.add(onUserAction, this);
-		function onUserAction(type, overTile, data) {
+		this.tower.userAction.add(function onUserAction(type, overTile, data) {
 			switch (type) {
 				case vg.MouseCaster.OVER:
 					if (overTile && !mouse.down) {
@@ -46,7 +45,16 @@ define('EditorPlane', function() {
 					this.tileHoverMesh.visible = false;
 					break;
 			}
-		}
+		}, this);
+
+
+		this.tower.tileAction.add(function onUserAction(type, overTile) {
+			if (type === this.tower.TILE_CHANGE_HEIGHT) {
+				// console.log(overTile.position)
+				this.tileHoverMesh.position.copy(overTile.position);
+				this.tileHoverMesh.position.y += 1;
+			}
+		}, this);
 	}
 
 	EditorPlane.prototype = {

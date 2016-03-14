@@ -2,7 +2,7 @@
 
 tileset-menu {
 	flex-direction: column;
-	width: 208px;
+	width: 136px;
 
 	form {
 		display: flex;
@@ -10,12 +10,6 @@ tileset-menu {
 		justify-content: center;
 		margin: 10px 0;
 		width: 100%;
-	}
-
-	label {
-		font-size: 1em;
-		line-height: 34px;
-		margin-right: 5px;
 	}
 }
 
@@ -52,13 +46,17 @@ tileset-menu {
 	text-align: center;
 	line-height: $tile-thumb-size - 2px;
 
-	&:nth-child(3n) {
+	&:nth-child(2n) {
 		margin-right: 0;
 	}
 
 	i.icon-plus {
 		font-size: 24px;
 	}
+}
+
+.tilesets__item-preview {
+
 }
 
 .tilesets__preview {

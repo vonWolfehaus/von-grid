@@ -14,7 +14,7 @@
 		{ warningMessage }
 	</span>
 
-	<button onclick={ onCreate }>Create Tile</button>
+	<button onclick={ onCreate }>{ ui.tileEditMode ? 'Change' : 'Create' } Tile</button>
 
 	<script>
 	this.wrongFileType = false;
@@ -43,7 +43,13 @@
 			return false;
 		}
 
-		ui.trigger(ui.Events.NEW_TILE, color);
+		if (ui.tileEditMode) {
+			ui.trigger(ui.Events.EDIT_TILE, color);
+		}
+		else {
+			ui.trigger(ui.Events.NEW_TILE, color);
+		}
+
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}
 

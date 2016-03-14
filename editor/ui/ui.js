@@ -3,6 +3,7 @@ var ui = {
 	activeTile: null, // ui object describing the tile
 	activeTileMesh: null, // what's shown in the preview scene
 	previewUpdate: null, // function that should get called every frame to update the preview scene
+	tileEditMode: false,
 
 	Events: {
 		TOOL_CHANGE: 'tool-change',
@@ -10,6 +11,8 @@ var ui = {
 		SELECT_TILE: 'select-tile',
 		NEW_TILESET: 'new-tileset',
 		NEW_TILE: 'new-tile',
+		EDIT_TILE: 'edit-tile',
+		GEN_TILE_PREVIEW: 'gen-tile-pre',
 		NEW_MAP: 'new-map',
 		SAVE_MAP: 'save-map',
 		LOAD_MAP: 'load-map',
