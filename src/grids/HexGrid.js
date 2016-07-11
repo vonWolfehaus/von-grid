@@ -43,6 +43,7 @@ vg.HexGrid = function(config) {
 		this.cellShape.lineTo(verts[i].x, verts[i].y);
 	}
 	this.cellShape.lineTo(verts[0].x, verts[0].y);
+	this.cellShape.autoClose = true;
 
 	this.cellGeo = new THREE.Geometry();
 	this.cellGeo.vertices = verts;
@@ -272,12 +273,13 @@ vg.HexGrid.prototype = {
 
 	generateOverlay: function(size, overlayObj, overlayMat) {
 		var x, y, z;
+		var geo = this.cellShape.createPointsGeometry();
 		for (x = -size; x < size+1; x++) {
 			for (y = -size; y < size+1; y++) {
 				z = -x-y;
 				if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
 					this._cel.set(x, y, z); // define the cell
-					var line = new THREE.Line(this.cellGeo, overlayMat);
+					var line = new THREE.Line(geo, overlayMat);
 					line.position.copy(this.cellToPixel(this._cel));
 					line.rotation.x = 90 * vg.DEG_TO_RAD;
 					overlayObj.add(line);
