@@ -44,6 +44,7 @@ vg.HexGeoGenerator.prototype = {
 			this.tileShape.lineTo(verts[i].x, verts[i].z);
 		}
 		this.tileShape.lineTo(verts[0].x, verts[0].z);
+		this.tileShape.autoClose = true;
 
 		this.shapeGeo = new THREE.ShapeGeometry(this.tileShape);
 		this.shapeGeo.rotateX(90 * vg.DEG_TO_RAD);
@@ -109,19 +110,25 @@ vg.HexGeoGenerator.prototype = {
 	*/
 	makeOverlay: function(containerObj, size, material) {
 		var x, y, z;
+		var geo = this.tileShape.createPointsGeometry();
 		for (x = -size; x < size+1; x++) {
 			for (y = -size; y < size+1; y++) {
 				z = -x-y;
 				if (Math.abs(x) <= size && Math.abs(y) <= size && Math.abs(z) <= size) {
 					this._cel.set(x, y, z); // define the cell
-					var line = new THREE.Line(this.flatGeo, material);
+					var line = new THREE.Line(geo, material);
 					line.position.copy(this._cellToPixel(this._cel));
 					line.position.y = 0.5;
-					// line.rotation.x = 90 * vg.DEG_TO_RAD;
+					line.rotation.x = 90 * vg.DEG_TO_RAD;
 					containerObj.add(line);
 				}
 			}
 		}
+		/*var tally = 0;
+		for (x = 0; x < containerObj.children.length; x++) {
+			tally += containerObj.children[x].geometry.vertices.length;
+		}
+		console.log('verts: '+tally);*/
 	},
 
 	_cellToPixel: function(cell) {
