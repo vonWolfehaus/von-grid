@@ -1,6 +1,6 @@
 <lightbox class="flex-container absolute hidden">
 	<div class="lightbox__overlay absolute" onclick={ dismiss }></div>
-	<div class="lightbox__panel flex-container">
+	<div class="lightbox__panel flex-container flex-col">
 		<yield/>
 		<button class="overlay__close-btn" onclick={ dismiss }><i class="icon-cancel"></i></button>
 	</div>
