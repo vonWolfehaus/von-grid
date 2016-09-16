@@ -39,7 +39,7 @@ riot.tag2('tool-menu', '<ul class="btn-list tool-menu__list"> <li class="tool-me
 		ui.activeTool = this.items[0];
 		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
 	});
-});
+}, '{ }');
 riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="tilesets">Tileset</label> <span class="tilesets__add" onclick="{addTileset}" title="Add a new tileset"> <i class="icon-plus"></i> </span> </span> <form> <select name="tilesets" onchange="{selectTileset}"> <option no-reorder each="{name, i in setList}" value="{i}">{name}</option> </select> </form> <ul class="btn-list tilesets__list"> <li class="tilesets__item {active: active}" each="{items}" onclick="{selectTile}" data-slotid="{slotid}"> <img class="tilesets__item-preview" riot-src="{preview}"> </li> <li class="tilesets__item" onclick="{addTile}" title="Add a new tile to this set"> <i class="icon-plus"></i> </li> </ul> <div class="tilesets__preview"> <preview-canvas></preview-canvas> <button onclick="{onEdit}">Edit</button> <button onclick="{onDelete}">Delete</button> </div>', '', 'class="flex-container"', function(opts) {
 	var self = this;
 
@@ -178,7 +178,7 @@ riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="ti
 	ui.on(ui.Events.TOOL_CHANGE, this.open);
 	ui.on(ui.Events.NEW_TILESET, this.newTileset);
 	ui.on(ui.Events.NEW_TILE+' '+ui.Events.EDIT_TILE, this.newTile);
-});
+}, '{ }');
 riot.tag2('preview-canvas', '<canvas id="preview"></canvas> <span class="preview__info"> {meshSize} </span>', '', '', function(opts) {
 	this.renderer = null;
 	this.scene = null;
@@ -299,20 +299,20 @@ riot.tag2('preview-canvas', '<canvas id="preview"></canvas> <span class="preview
 	ui.on(ui.Events.TOOL_CHANGE, this.toggle);
 	ui.on(ui.Events.NEW_TILE+' '+ui.Events.EDIT_TILE, this.showTile);
 	ui.on(ui.Events.GEN_TILE_PREVIEW, this.genPreview);
-});
+}, '{ }');
 riot.tag2('lightbox', '<div class="lightbox__overlay absolute" onclick="{dismiss}"></div> <div class="lightbox__panel flex-container flex-col"> <yield></yield> <button class="overlay__close-btn" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container absolute hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
 
 	ui.on(ui.Events.HIDE_OVERLAY, this.dismiss);
-});
+}, '{ }');
 riot.tag2('form-newtileset', '<form onsubmit="{onCreate}"> <label for="tilesetName">Name:</label> <input type="text" name="tilesetName"> <button onclick="{onCreate}">Create</button> </form>', '', 'class="flex-container"', function(opts) {
 	this.onCreate = function() {
 		ui.trigger(ui.Events.NEW_TILESET, this.tilesetName.value);
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
-});
+}, '{ }');
 riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> Generate </label> <input if="{!generateTile.checked}" type="file" accept=".dae" name="tileFile"> <label if="{generateTile.checked}"> Color: <input name="tileColor" type="color"> </label> <span if="{showMessage}" class="form-newtile__error"> {warningMessage} </span> <button onclick="{onCreate}">{ui.tileEditMode ? \'Change\' : \'Create\'} Tile</button>', '', 'class="flex-container"', function(opts) {
 	this.wrongFileType = false;
 	this.showMessage = false;
@@ -393,7 +393,7 @@ riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> G
 			reader.readAsText(file);
 		};
 	});
-});
+}, '{ }');
 riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="40" min="1" max="{maxMapSize}" type="number"> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> </span> <span> <button onclick="{onCreate}">Create</button> </span>', '', 'class="flex-container"', function(opts) {
 	this.maxMapSize = 1000;
 
@@ -405,7 +405,7 @@ riot.tag2('form-newmap', '<span> <label for="mapSize">Map size:</label> <input n
 		ui.trigger(ui.Events.NEW_MAP, this.mapSize.value, this.cellSize.value);
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
-});
+}, '{ }');
 riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <input name="mapSize" value="5" min="1" max="{maxMapSize}" type="number"> <button onclick="{onMapUpdate}">Create Map</button> </span> <span> <label for="cellSize">Cell size:</label> <input name="cellSize" value="10" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <span> <label for="heightStep">Height step:</label> <input name="heightStep" value="3" min="1" type="number"> <button onclick="{onMapUpdate}">Update Map</button> </span> <div class="form-group"> <span> <label for="planeSize">Plane size:</label> <input name="planeSize" value="50" min="1" type="number"> </span> <br> <span> <label for="planeColor">Plane color:</label> <input name="planeColor" value="#ffffff" type="color"> </span> <br> <button onclick="{onMapUpdate}">Update Plane</button> <div>', '', 'class="flex-container"', function(opts) {
 	this.maxMapSize = 1000;
 
@@ -442,14 +442,14 @@ riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <i
 			ui.off(ui.Events.UPDATE_SETTINGS, this.updateSettings);
 		}
 	});
-});
+}, '{ }');
 riot.tag2('flyout', '<div class="flyout__panel flex-container"> <yield></yield> <button if="{!opts.hideclose}" class="overlay__close-btn {opts.side}" onclick="{dismiss}"><i class="icon-cancel"></i></button> </div>', '', 'class="flex-container {opts.side} hidden"', function(opts) {
 	this.dismiss = function() {
 		this.root.classList.add('hidden');
 	}.bind(this)
 
 	ui.on(ui.Events.HIDE_FLYOUT, this.dismiss);
-});
+}, '{ }');
 riot.tag2('app-menu', '<ul class="btn-list app-menu__list"> <li class="app-menu__item" onclick="{onClick}" data-action="settings"> <i class="icon-cogs"></i>Map </li> <li class="app-menu__item" onclick="{onClick}" data-action="saveMap"> <i class="icon-download"></i>Save </li> <li class="app-menu__item" onclick="{onClick}" data-action="loadMap"> <i class="icon-cw"></i>Load </li> <li class="app-menu__item" onclick="{onClick}" data-action="showHelp"> <i class="icon-help"></i>Help </li> </ul>', '', '', function(opts) {
 	this.onClick = function(evt) {
 		var action = evt.target.dataset.action;
@@ -476,7 +476,7 @@ riot.tag2('app-menu', '<ul class="btn-list app-menu__list"> <li class="app-menu_
 				break;
 		}
 	}.bind(this)
-});
+}, '{ }');
 var ui = {
 	activeTool: null, // Tools.*
 	activeTile: null, // ui object describing the tile
