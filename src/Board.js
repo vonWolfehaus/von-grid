@@ -2,14 +2,13 @@
 	Interface to the grid. Holds data about the visual representation of the cells (tiles).
 
 	@author Corey Birnbaum https://github.com/vonWolfehaus/
- */
+*/
 vg.Board = function(grid, finderConfig) {
 	if (!grid) throw new Error('You must pass in a grid system for the board to use.');
 
 	this.tileHeightStep = 3;
 	this.tiles = [];
 	this.grid = null;
-	this.overlay = null;
 	this.finder = new vg.AStarFinder(finderConfig);
 	this.group = new THREE.Object3D(); // can hold all entities, also holds tileGroup, never trashed
 	this.tileGroup = null; // only for tiles
@@ -113,74 +112,6 @@ vg.Board.prototype = {
 		this.tiles = [];
 		this.tileGroup = new THREE.Object3D();
 		this.group.add(this.tileGroup);
-	},
-
-	/*
-		Make all the geometry and objects necessary to give 3D form to the current grid.
-		It uses ExtrudeGeometry with a slight bevel and creates a few unique materials for variation.
-
-		tileHeight 	[int] 	How tall the tile geometry is
-	*/
-	makeTiles: function(tileHeight) {
-		this.reset();
-		this.makeGenerator();
-
-		var i, c, geo, t;
-		geo = this.geoGen.makeTileGeo({
-			height: tileHeight || 1
-		});
-
-		var mats = [];
-		for (i = 0; i < 10; i++) {
-			mats.push(new THREE.MeshPhongMaterial({
-				color: vg.util.randomizeRGB('30, 30, 30', 13)
-			}));
-		}
-
-		for (i in this.grid.cells) {
-			c = this.grid.cells[i];
-			t = new vg.Tile({
-				cell: c,
-				geometry: geo,
-				material: mats[vg.util.randomInt(0, 9)],
-				scale: 0.95
-			});
-
-			t.position.copy(this.grid.cellToPixel(c));
-			t.position.y = c.h * this.tileHeightStep;
-
-			this.tiles.push(t);
-			this.tileGroup.add(t.mesh);
-		}
-	},
-
-	makeOverlay: function(size) {
-		var mat = new THREE.LineBasicMaterial({
-			color: 0x000000,
-			opacity: 0.3
-		});
-		this.makeGenerator();
-
-		if (this.overlay) {
-			this.group.remove(this.overlay);
-		}
-
-		this.overlay = new THREE.Object3D();
-
-		this.geoGen.makeOverlay(this.overlay, size, mat);
-
-		this.group.add(this.overlay);
-	},
-
-	makeGenerator: function() {
-		if (!this.geoGen) {
-			switch (this.grid.type) {
-				case vg.HEX:
-					this.geoGen = new vg.HexGeoGenerator();
-					break;
-			}
-		}
-		this.geoGen.init(this.grid.cellSize);
 	},
 
 	reset: function() {

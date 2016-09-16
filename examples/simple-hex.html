@@ -48,7 +48,8 @@
 		var board = new vg.Board(grid);
 
 		// this will generate extruded hexagonal tiles
-		board.makeTiles();
+		var gen = new vg.GeneratedTileManager(board);
+		gen.makeTiles(10);
 
 		scene.add(board.group);
 		scene.focusOn(board.group);

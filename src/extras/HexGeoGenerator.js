@@ -60,7 +60,7 @@ vg.HexGeoGenerator.prototype = {
 		config = config || {};
 		var settings = {
 			amount: 1,
-			bevelEnabled: true,
+			bevelEnabled: false,
 			bevelSegments: 1,
 			steps: 1,
 			bevelSize: 0.5,
