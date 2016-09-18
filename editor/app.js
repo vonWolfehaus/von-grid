@@ -401,10 +401,9 @@ define('Input', function() {
 		update: function() {
 			var hit = this.mouse.allHits[0];
 			if (hit) {
-				// flip things around a little to fit to our rotated grid
 				this.editorWorldPos.x = hit.point.x;
-				this.editorWorldPos.y = hit.point.z; // grids are rotated on axis so that objects keep their y+ orientation
-				this.editorWorldPos.z = hit.point.y;
+				this.editorWorldPos.y = hit.point.y;
+				this.editorWorldPos.z = hit.point.z;
 			}
 			var dx = this.mouseDelta.x - this.mouse.screenPosition.x;
 			var dy = this.mouseDelta.y - this.mouse.screenPosition.y;
