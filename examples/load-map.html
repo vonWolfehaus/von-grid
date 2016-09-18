@@ -42,7 +42,8 @@
 
 		grid.load('assets/hex-map.json', function() {
 			// this will generate extruded hexagonal tiles of the grid that was loaded
-			board.generateTilemap();
+			var gen = new vg.GeneratedTileManager(board);
+			gen.makeTiles();
 			// start the loop now that it's ready
 			update();
 		}, this);

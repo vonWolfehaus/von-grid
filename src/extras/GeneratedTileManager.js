@@ -22,7 +22,7 @@ vg.GeneratedTileManager.prototype = {
 
 		var i, c, geo, t;
 		geo = this.geoGen.makeTileGeo({
-			height: tileHeight || 1
+			height: tileHeight || 50
 		});
 
 		var mats = [];
@@ -34,7 +34,7 @@ vg.GeneratedTileManager.prototype = {
 
 		for (i in this.board.grid.cells) {
 			c = this.board.grid.cells[i];
-			t = new vg.GeneratedTile({
+			t = new vg.Tile({
 				cell: c,
 				geometry: geo,
 				material: mats[vg.util.randomInt(0, 9)],

@@ -49,7 +49,7 @@
 		scene.add( ambient );
 
 		var directionalLight = new THREE.DirectionalLight( 0xdddddd );
-		directionalLight.position.set( 0, 0, 1 );
+		directionalLight.position.set( 0, 1, 1 );
 		scene.add( directionalLight );
 
 		// texture
@@ -58,8 +58,7 @@
 		manager.onProgress = function ( item, loaded, total ) {
 			console.log( item, loaded, total );
 		};
-
-		var texture = new THREE.Texture();
+		var loader = new THREE.ImageLoader(manager);
 
 		var onProgress = function ( xhr ) {
 			if ( xhr.lengthComputable ) {
@@ -67,32 +66,38 @@
 				console.log( Math.round(percentComplete, 2) + '% downloaded' );
 			}
 		};
-
 		var onError = function ( xhr ) {};
 
-
-		var loader = new THREE.ImageLoader( manager );
-		loader.load( 'assets/hexTile_simple.jpg', function ( image ) {
+		var texture = new THREE.Texture();
+		loader.load('assets/hexTile.jpg', function (image) {
 			texture.image = image;
 			texture.needsUpdate = true;
-		} );
+		});
+
+		/*var alphaTexture = new THREE.Texture();
+		loader.load('assets/hexTile-alpha.jpg', function (image) {
+			alphaTexture.image = image;
+			alphaTexture.needsUpdate = true;
+		});*/
 
 		// material
 
-		var material = new THREE.MeshPhongMaterial( {
+		var material = new THREE.MeshPhongMaterial({
 			color: 0xffffff,
-			specular: 0x222222,
+			specular: 0x000000,
 			shininess: 0,
+			// shading: THREE.FlatShading,
 			map: texture,
+			// alphaMap: alphaTexture,
 			// specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
 			// normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 			// normalScale: new THREE.Vector2( 0.8, 0.8 )
-		} );
+		});
 
 		// model
 
 		var loader = new THREE.OBJLoader( manager );
-		loader.load( 'assets/hexTile_simple.obj', function ( obj ) {
+		loader.load( 'assets/hexTile.obj', function ( obj ) {
 			obj.traverse( function ( child ) {
 				if ( child instanceof THREE.Mesh ) {
 					child.material = material;

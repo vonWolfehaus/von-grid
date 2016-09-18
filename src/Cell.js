@@ -10,7 +10,9 @@ vg.Cell = function(q, r, s, h) {
 	this.h = h || 1; // 3D y position of the cell, used by visual representation and pathfinder
 	this.tile = null; // optional link to the visual representation's class instance
 	this.userData = {}; // populate with any extra data needed in your game
+	this.materialId = 0; // index of the material that this cell's tile should use
 	this.walkable = true; // if true, pathfinder will use as a through node
+
 	// rest of these are used by the pathfinder and overwritten at runtime, so don't touch
 	this._calcCost = 0;
 	this._priority = 0;
