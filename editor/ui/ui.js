@@ -4,6 +4,7 @@ var ui = {
 	activeTileMesh: null, // what's shown in the preview scene
 	previewUpdate: null, // function that should get called every frame to update the preview scene
 	tileEditMode: false,
+	data: null, // a link to the app data store (require('data'))
 
 	Events: {
 		TOOL_CHANGE: 'tool-change',

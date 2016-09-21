@@ -4,6 +4,7 @@ define('addTile', function() {
 	var tilemaker = require('tilemaker');
 
 	function over(cell, tile, mesh) {
+		if (cell.tile) return;
 		if (!tile && nexus.mouse.down) {
 			addTile(cell);
 		}
@@ -26,7 +27,7 @@ define('addTile', function() {
 		newCell.copy(cell);
 		newCell.h = Math.abs(nexus.mouse.wheel * nexus.board.tileHeightStep);
 
-		var newTile = tilemaker.getTile(newCell, 1);
+		var newTile = tilemaker.getTile(newCell, ui.activeTile.slotid);
 
 		nexus.board.addTile(newTile);
 

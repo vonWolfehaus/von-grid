@@ -118,7 +118,7 @@ vg.HexGeoGenerator.prototype = {
 					this._cel.set(x, y, z); // define the cell
 					var line = new THREE.Line(geo, material);
 					line.position.copy(this._cellToPixel(this._cel));
-					line.position.y = 0.5;
+					line.position.y = 0;
 					line.rotation.x = 90 * vg.DEG_TO_RAD;
 					containerObj.add(line);
 				}

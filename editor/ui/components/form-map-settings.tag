@@ -51,8 +51,7 @@
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
 			mapSize: parseInt(this.mapSize.value),
 			cellSize: parseInt(this.cellSize.value),
-			heightStep: parseInt(this.heightStep.value),
-			maxTileHeight: parseInt(this.maxTileHeight.value),
+			heightStep: parseFloat(this.heightStep.value),
 			planeSize: parseInt(this.planeSize.value),
 			planeColor: this.planeColor.value,
 		});

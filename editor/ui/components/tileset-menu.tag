@@ -1,20 +1,6 @@
 <tileset-menu class="flex-container">
-	<span class="flex-container flex-row">
-		<label for="tilesets">Tileset</label>
-
-		<span class="tilesets__add" onclick={ addTileset } title="Add a new tileset">
-			<i class="icon-plus"></i>
-		</span>
-	</span>
-
-	<form>
-		<select name="tilesets" onchange={ selectTileset }>
-			<option no-reorder each={ name, i in setList } value={ i }>{ name }</option>
-		</select>
-	</form>
-
 	<ul class="btn-list tilesets__list">
-		<li class="tilesets__item { active: active }" each={ items } onclick={ selectTile } data-slotid={ slotid }>
+		<li class="tilesets__item { active: active }" each={ tiles } onclick={ selectTile } data-slotid={ slotid }>
 			<img class="tilesets__item-preview" src={ preview }>
 		</li>
 		<li class="tilesets__item" onclick={ addTile } title="Add a new tile to this set">
@@ -31,39 +17,13 @@
 	<script>
 	var self = this;
 
-	this.setList = ['default'];
-
-	this.sets = {
-		'default': [
-			{
-				active: false,
-				slotid: 0,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 1,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 2,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 3,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 4,
-				preview: null
-			}
-		]
-	};
-
-	this.items = null;
+	this.tiles = [
+		{
+			active: false,
+			slotid: 0,
+			preview: null
+		}
+	];
 
 	onEdit() {
 		var el = document.getElementById('js-overlay-newtile');
@@ -75,28 +35,22 @@
 	onDelete() {
 		var i = ui.activeTile.slotid;
 
-		this.items.splice(i, 1);
+		this.tiles.splice(i, 1);
 		ui.activeTile = null;
 
-		// if (this.items.length > 0) {
-			// if (i >= this.items.length) i = this.items.length - 1;
-			this.selectTile({item: this.items[i]});
+		// if (this.tiles.length > 0) {
+			// if (i >= this.tiles.length) i = this.tiles.length - 1;
+			this.selectTile({item: this.tiles[i]});
 		/*}
 		else {
 			this.update();
 		}*/
 	}
 
-	newTileset(name) {
-		// when a new tileset was created by the overlay
-		this.sets[name] = [];
-		this.setList.push(name);
-		this.update();
-	}
-
 	newTile(evt) {
 		// another ui element created or edited a tile
-		var slot = this.items.length; // assume create
+		var slot = this.tiles.length; // assume create
+
 		if (evt === ui.Events.EDIT_TILE) {
 			// trash ui.activeTile
 			slot = ui.activeTile.slotid; // nope, it's an edit
@@ -108,7 +62,7 @@
 			slotid: slot,
 			preview: null
 		};
-		this.items.push(tile);
+		this.tiles.push(tile);
 
 		// create snapshot of the tile, but give the model some time to load first
 		setTimeout(function() {
@@ -116,23 +70,11 @@
 		}, 65);
 	}
 
-	addTileset() {
-		var el = document.getElementById('js-overlay-newtileset');
-		el.classList.remove('hidden');
-	}
-
 	addTile() {
 		var el = document.getElementById('js-overlay-newtile');
 		el.classList.remove('hidden');
 		ui.tileEditMode = false;
 		riot.update();
-	}
-
-	selectTileset(evt) {
-		var i = parseInt(evt.target.value);
-
-		this.items = this.sets[this.setList[i]];
-		this.update();
 	}
 
 	selectTile(evt) {
@@ -163,15 +105,12 @@
 	}
 
 	this.on('mount', function(evt) {
-		this.items = this.sets.default;
 		// hacks to open it on start since this tag mounts after tool-menu, where the first tool change event is fired
 		this.open(ui.Tools.ADD_TILE);
-		this.selectTile({item: this.items[0]});
-		this.update();
+		this.selectTile({item: this.tiles[0]});
 	});
 
 	ui.on(ui.Events.TOOL_CHANGE, this.open);
-	ui.on(ui.Events.NEW_TILESET, this.newTileset);
 	ui.on(ui.Events.NEW_TILE+' '+ui.Events.EDIT_TILE, this.newTile);
 	</script>
 </tileset-menu>

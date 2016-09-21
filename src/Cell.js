@@ -34,6 +34,7 @@ vg.Cell.prototype = {
 		this.r = cell.r;
 		this.s = cell.s;
 		this.h = cell.h;
+		this.materialId = cell.materialId;
 		this.tile = cell.tile || null;
 		this.userData = cell.userData || {};
 		this.walkable = cell.walkable;

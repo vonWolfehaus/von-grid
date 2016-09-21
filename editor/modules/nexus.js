@@ -5,4 +5,5 @@ define('nexus', {
 	scene: null,
 	input: null,
 	plane: null,
+	gen: null,
 });

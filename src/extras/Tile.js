@@ -17,8 +17,12 @@ vg.Tile = function(config) {
 		throw new Error('Missing vg.Tile configuration');
 	}
 
+	if (settings.cell.tile) {
+		// remove whatever was there
+		settings.cell.tile.dispose();
+	}
+
 	this.cell = settings.cell;
-	if (this.cell.tile && this.cell.tile !== this) this.cell.tile.dispose(); // remove whatever was there
 	this.cell.tile = this;
 
 	this.uniqueID = vg.util.generateID();

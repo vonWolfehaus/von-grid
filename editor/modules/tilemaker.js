@@ -5,48 +5,48 @@ define('tilemaker', function() {
 	var nexus = require('nexus');
 	var data = require('data');
 
+	// var tileset = new vg.TilesetManager(nexus.board);
+
 	var materials = [];
 	var tilePool = []; // unused tiles for recycling
 
 	function init() {
-		// geo = new THREE.ExtrudeGeometry(nexus.grid.cellShape, extrudeSettings);
-		// create a default tileset with these materials
-		materials.push(new THREE.MeshPhongMaterial({
-			color: 'rgb(0, 0, 0)'
-		}));
-		materials.push(new THREE.MeshPhongMaterial({
-			color: 'rgb(10, 64, 16)'
-		}));
-		materials.push(new THREE.MeshPhongMaterial({
-			color: 'rgb(64, 51, 10)'
-		}));
-		materials.push(new THREE.MeshPhongMaterial({
-			color: 'rgb(200, 200, 200)'
-		}));
-
-		// create all the tiles and meshes for the grid
-		/*var cells = nexus.grid.cells;
-		var i, t;
-		for (i in cells) {
-			t = cells[i];
-			// t = getTile(0);
-			// t.position.copy(nexus.grid.cellToPixel(c));
-			// t.position.y = 0;
-			tiles.push(t);
-		}*/
+		var map = data.get('map');
+		var mats = map.materials;
+		if (map.mesh) {
+			// TODO
+			// tileset.load(map, onMatLoad);
+		}
+		else {
+			// generate a placeholder tileset with the materials saved in the map data
+			var c = [
+				'rgb(10, 64, 16)',
+				'rgb(10, 51, 64)',
+				'rgb(70, 70, 0)',
+				'rgb(0, 200, 200)',
+				'rgb(255, 100, 200)',
+			];
+			for (var i = 0; i < mats.length; i++) {
+				materials[mats[i].id] = new THREE.MeshPhongMaterial({
+					color: c[i] || vg.util.randomizeRGB(0, 100)
+				});
+			}
+		}
 	}
 
 	// make sure all tiles are under new height, or rebuild geo if height is taller
 	function resetHeightStep(newHeightStep) {
-		// var i, t;
-		// var step = newHeightStep || nexus.board.tileHeightStep;
-		/*for (i = 0; t = nexus.board.tiles[i]; i++) { // board is undefined on map load!
+		if (!nexus.board) return;
+		var i, t;
+		var step = newHeightStep || nexus.board.tileHeightStep;
+		for (i = 0; t = nexus.board.tiles[i]; i++) {
 			t.position.y = t.cell.h * step;
-		}*/
+		}
 	}
 
 	function getTile(cell, matid) { // eslint-disable-line no-unused-vars
 		var mat = materials[matid];
+		var map = data.get('map');
 		if (cell.tile) {
 			// don't rebuild, just update
 			cell.tile.material = mat;
@@ -65,7 +65,7 @@ define('tilemaker', function() {
 		else {
 			t = new vg.Tile({
 				cell: cell,
-				geometry: nexus.board.geoGen.tileGeo,
+				geometry: map.mesh || nexus.gen.geoGen.tileGeo,
 				material: materials[matid]
 			});
 		}
@@ -84,10 +84,10 @@ define('tilemaker', function() {
 		var newHeightStep;
 
 		if (key === 'settings') {
-			newHeightStep = newData.tileHeightStep;
+			newHeightStep = newData.heightStep;
 		}
 		else if (key === 'load-success') {
-			newHeightStep = oldData.settings.tileHeightStep;
+			newHeightStep = oldData.settings.heightStep;
 		}
 
 		if (newHeightStep) resetHeightStep(newHeightStep);

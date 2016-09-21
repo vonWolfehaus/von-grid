@@ -65,7 +65,7 @@ define('toolbag', function() {
 				if (overTile) {
 					var dif = lastHeight - data;
 					overTile.cell.h += dif > 0 ? -1 : +1;
-					if (overTile.cell.h < 1) overTile.cell.h = 1;
+					if (overTile.cell.h < 1) overTile.cell.h = 0;
 
 					nexus.mouse.wheel = Math.round((overTile.cell.h / heightStep) + (dif > 0 ? -1 : 1));
 					lastHeight = nexus.mouse.wheel;

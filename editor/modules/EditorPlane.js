@@ -84,7 +84,7 @@ define('EditorPlane', function() {
 				this.mesh.geometry.dispose();
 			}
 
-			this.board.makeOverlay(this.planeSize);
+			this.nexus.gen.makeOverlay(this.planeSize);
 
 			switch (this.grid.type) {
 				case vg.HEX:
@@ -110,13 +110,13 @@ define('EditorPlane', function() {
 			if (this.hoverMesh && this.hoverMesh.parent) {
 				this.hoverMesh.parent.remove(this.hoverMesh);
 			}
-			this.hoverMesh = this.board.geoGen.makeTilePoly(this.hoverMaterial);
+			this.hoverMesh = this.nexus.gen.geoGen.makeTilePoly(this.hoverMaterial);
 			this.nexus.scene.container.add(this.hoverMesh);
 
 			if (this.tileHoverMesh && this.tileHoverMesh.parent) {
 				this.tileHoverMesh.parent.remove(this.tileHoverMesh);
 			}
-			this.tileHoverMesh = this.board.geoGen.makeTileHighlight(this.hoverMaterial);
+			this.tileHoverMesh = this.nexus.gen.geoGen.makeTileHighlight(this.hoverMaterial);
 			this.nexus.scene.container.add(this.tileHoverMesh);
 			this.tileHoverMesh.visible = false;
 		},

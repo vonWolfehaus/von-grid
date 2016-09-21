@@ -40,42 +40,16 @@ riot.tag2('tool-menu', '<ul class="btn-list tool-menu__list"> <li class="tool-me
 		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
 	});
 }, '{ }');
-riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="tilesets">Tileset</label> <span class="tilesets__add" onclick="{addTileset}" title="Add a new tileset"> <i class="icon-plus"></i> </span> </span> <form> <select name="tilesets" onchange="{selectTileset}"> <option no-reorder each="{name, i in setList}" value="{i}">{name}</option> </select> </form> <ul class="btn-list tilesets__list"> <li class="tilesets__item {active: active}" each="{items}" onclick="{selectTile}" data-slotid="{slotid}"> <img class="tilesets__item-preview" riot-src="{preview}"> </li> <li class="tilesets__item" onclick="{addTile}" title="Add a new tile to this set"> <i class="icon-plus"></i> </li> </ul> <div class="tilesets__preview"> <preview-canvas></preview-canvas> <button onclick="{onEdit}">Edit</button> <button onclick="{onDelete}">Delete</button> </div>', '', 'class="flex-container"', function(opts) {
+riot.tag2('tileset-menu', '<ul class="btn-list tilesets__list"> <li class="tilesets__item {active: active}" each="{tiles}" onclick="{selectTile}" data-slotid="{slotid}"> <img class="tilesets__item-preview" riot-src="{preview}"> </li> <li class="tilesets__item" onclick="{addTile}" title="Add a new tile to this set"> <i class="icon-plus"></i> </li> </ul> <div class="tilesets__preview"> <preview-canvas></preview-canvas> <button onclick="{onEdit}">Edit</button> <button onclick="{onDelete}">Delete</button> </div>', '', 'class="flex-container"', function(opts) {
 	var self = this;
 
-	this.setList = ['default'];
-
-	this.sets = {
-		'default': [
-			{
-				active: false,
-				slotid: 0,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 1,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 2,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 3,
-				preview: null
-			},
-			{
-				active: false,
-				slotid: 4,
-				preview: null
-			}
-		]
-	};
-
-	this.items = null;
+	this.tiles = [
+		{
+			active: false,
+			slotid: 0,
+			preview: null
+		}
+	];
 
 	this.onEdit = function() {
 		var el = document.getElementById('js-overlay-newtile');
@@ -87,23 +61,17 @@ riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="ti
 	this.onDelete = function() {
 		var i = ui.activeTile.slotid;
 
-		this.items.splice(i, 1);
+		this.tiles.splice(i, 1);
 		ui.activeTile = null;
 
-			this.selectTile({item: this.items[i]});
+			this.selectTile({item: this.tiles[i]});
 
-	}.bind(this)
-
-	this.newTileset = function(name) {
-
-		this.sets[name] = [];
-		this.setList.push(name);
-		this.update();
 	}.bind(this)
 
 	this.newTile = function(evt) {
 
-		var slot = this.items.length;
+		var slot = this.tiles.length;
+
 		if (evt === ui.Events.EDIT_TILE) {
 
 			slot = ui.activeTile.slotid;
@@ -114,16 +82,11 @@ riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="ti
 			slotid: slot,
 			preview: null
 		};
-		this.items.push(tile);
+		this.tiles.push(tile);
 
 		setTimeout(function() {
 			ui.trigger(ui.Events.GEN_TILE_PREVIEW, tile);
 		}, 65);
-	}.bind(this)
-
-	this.addTileset = function() {
-		var el = document.getElementById('js-overlay-newtileset');
-		el.classList.remove('hidden');
 	}.bind(this)
 
 	this.addTile = function() {
@@ -131,13 +94,6 @@ riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="ti
 		el.classList.remove('hidden');
 		ui.tileEditMode = false;
 		riot.update();
-	}.bind(this)
-
-	this.selectTileset = function(evt) {
-		var i = parseInt(evt.target.value);
-
-		this.items = this.sets[this.setList[i]];
-		this.update();
 	}.bind(this)
 
 	this.selectTile = function(evt) {
@@ -168,15 +124,12 @@ riot.tag2('tileset-menu', '<span class="flex-container flex-row"> <label for="ti
 	}.bind(this)
 
 	this.on('mount', function(evt) {
-		this.items = this.sets.default;
 
 		this.open(ui.Tools.ADD_TILE);
-		this.selectTile({item: this.items[0]});
-		this.update();
+		this.selectTile({item: this.tiles[0]});
 	});
 
 	ui.on(ui.Events.TOOL_CHANGE, this.open);
-	ui.on(ui.Events.NEW_TILESET, this.newTileset);
 	ui.on(ui.Events.NEW_TILE+' '+ui.Events.EDIT_TILE, this.newTile);
 }, '{ }');
 riot.tag2('preview-canvas', '<canvas id="preview"></canvas> <span class="preview__info"> {meshSize} </span>', '', '', function(opts) {
@@ -313,7 +266,7 @@ riot.tag2('form-newtileset', '<form onsubmit="{onCreate}"> <label for="tilesetNa
 		ui.trigger(ui.Events.HIDE_OVERLAY);
 	}.bind(this)
 }, '{ }');
-riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> Generate </label> <input if="{!generateTile.checked}" type="file" accept=".dae" name="tileFile"> <label if="{generateTile.checked}"> Color: <input name="tileColor" type="color"> </label> <span if="{showMessage}" class="form-newtile__error"> {warningMessage} </span> <button onclick="{onCreate}">{ui.tileEditMode ? \'Change\' : \'Create\'} Tile</button>', '', 'class="flex-container"', function(opts) {
+riot.tag2('form-newtile', '<label> <input type="checkbox" name="generateTile"> Generate </label> <span if="{!generateTile.checked}"> <label> Map: <input type="file" accept=".jpg" name="tileFile"> </label> <label> Normal map: <input type="file" accept=".jpg" name="tileFile"> </label> <label> Specular map: <input type="file" accept=".jpg" name="tileFile"> </label> </span> <label if="{generateTile.checked}"> Color: <input name="tileColor" type="color"> </label> <span if="{showMessage}" class="form-newtile__error"> {warningMessage} </span> <button onclick="{onCreate}">{ui.tileEditMode ? \'Change\' : \'Create\'} Tile</button>', '', 'class="flex-container"', function(opts) {
 	this.wrongFileType = false;
 	this.showMessage = false;
 	this.warningMessage = '';
@@ -426,8 +379,7 @@ riot.tag2('form-map-settings', '<span> <label for="mapSize">Map size:</label> <i
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
 			mapSize: parseInt(this.mapSize.value),
 			cellSize: parseInt(this.cellSize.value),
-			heightStep: parseInt(this.heightStep.value),
-			maxTileHeight: parseInt(this.maxTileHeight.value),
+			heightStep: parseFloat(this.heightStep.value),
 			planeSize: parseInt(this.planeSize.value),
 			planeColor: this.planeColor.value,
 		});
@@ -483,6 +435,7 @@ var ui = {
 	activeTileMesh: null, // what's shown in the preview scene
 	previewUpdate: null, // function that should get called every frame to update the preview scene
 	tileEditMode: false,
+	data: null, // a link to the app data store (require('data'))
 
 	Events: {
 		TOOL_CHANGE: 'tool-change',

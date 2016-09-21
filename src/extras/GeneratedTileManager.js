@@ -16,7 +16,7 @@ vg.GeneratedTileManager.prototype = {
 
 		tileHeight 	[int] 	How tall the tile geometry is
 	*/
-	makeTiles: function(tileHeight) {
+	makeTiles: function(tileHeight, mats) {
 		this.board.reset();
 		this.makeGenerator();
 
@@ -25,11 +25,13 @@ vg.GeneratedTileManager.prototype = {
 			height: tileHeight || 50
 		});
 
-		var mats = [];
-		for (i = 0; i < 10; i++) {
-			mats.push(new THREE.MeshPhongMaterial({
-				color: vg.util.randomizeRGB('30, 30, 30', 13)
-			}));
+		if (!mats) {
+			mats = [];
+			for (i = 0; i < 10; i++) {
+				mats.push(new THREE.MeshPhongMaterial({
+					color: vg.util.randomizeRGB('30, 30, 30', 13)
+				}));
+			}
 		}
 
 		for (i in this.board.grid.cells) {
@@ -37,7 +39,7 @@ vg.GeneratedTileManager.prototype = {
 			t = new vg.Tile({
 				cell: c,
 				geometry: geo,
-				material: mats[vg.util.randomInt(0, 9)],
+				material: mats[c.materialId],
 				scale: 1
 			});
 
@@ -60,9 +62,10 @@ vg.GeneratedTileManager.prototype = {
 		this.geoGen.init(this.board.grid.cellSize);
 	},
 
-	makeOverlay: function(size) {
+	makeOverlay: function(size, color) {
+		color = color || 0x000000;
 		var mat = new THREE.LineBasicMaterial({
-			color: 0x000000,
+			color: color,
 			opacity: 0.3
 		});
 		this.makeGenerator();

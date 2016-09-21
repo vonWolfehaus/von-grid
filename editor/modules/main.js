@@ -76,23 +76,23 @@ window.addEventListener('load', function(evt) {
 	nexus.board = board;
 	var mouse = new vg.MouseCaster(board.group, scene.camera, canvas);
 	nexus.mouse = mouse;
+	var gen = new vg.GeneratedTileManager(board);
+	nexus.gen = gen;
 
 	var input = new Input(board.group, mouse);
 	nexus.input = input;
 	var plane = new EditorPlane(board.group, grid, mouse);
 	nexus.plane = plane;
 
-	require('tilemaker').init();
-
 	tower.tileAction.add(onMapChange, this);
 	tower.save.add(onMapChange, this);
 
 	function dataChanged(key, oldData, newData) {
 		if (key === 'settings') {
-			board.tileHeightStep = newData.tileHeightStep;
+			board.tileHeightStep = newData.heightStep;
 		}
 		if (key === 'load-success') {
-			board.tileHeightStep = oldData.settings.tileHeightStep;
+			board.tileHeightStep = oldData.settings.heightStep;
 		}
 	}
 	data.changed.add(dataChanged);
@@ -107,18 +107,20 @@ window.addEventListener('load', function(evt) {
 		grid.generate({
 			size: 5
 		});
-		board.makeTiles(30);
 
 		map = grid.toJSON();
 		data.set('map', map);
+		console.log('set data')
+
+		nexus.gen.makeTiles(50, map.materials);
 
 		var settings = {
 			mapSize: grid.size,
 			cellSize: grid.cellSize,
 			planeSize: plane.planeSize,
-			tileHeightStep: 3,
+			heightStep: 3,
 			planeColor: '#ffffff',
-			tileset: 'default'
+			mesh: null
 		};
 		data.set('settings', settings);
 
@@ -127,6 +129,8 @@ window.addEventListener('load', function(evt) {
 
 		plane.generate();
 	}
+
+	require('tilemaker').init();
 
 	// reflect new values in the UI
 	ui.trigger(ui.Events.UPDATE_SETTINGS, data.get('settings'));
@@ -160,8 +164,8 @@ window.addEventListener('load', function(evt) {
 
 		plane.generate();
 
-		if (settings.tileset === 'default') {
-			board.makeTiles(30);
+		if (!settings.mesh) {
+			gen.geoGen.makeTiles(30);
 		}
 	});
 
@@ -211,8 +215,9 @@ window.addEventListener('load', function(evt) {
 
 		var settings = data.get('settings');
 
-		if (settings.tileset === 'default') {
-			board.makeTiles(30);
+		if (!settings.mesh) {
+			// TODO: reflect height step in settings
+			nexus.gen.makeTiles(30);
 		}
 
 		plane.updatePlane(settings.planeColor, settings.planeSize);

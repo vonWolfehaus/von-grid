@@ -4,7 +4,20 @@
 		Generate
 	</label>
 
-	<input if={ !generateTile.checked } type="file" accept=".dae" name="tileFile"/>
+	<span if={ !generateTile.checked }>
+		<label>
+			Map:
+			<input type="file" accept=".jpg" name="tileFile"/>
+		</label>
+		<label>
+			Normal map:
+			<input type="file" accept=".jpg" name="tileFile"/>
+		</label>
+		<label>
+			Specular map:
+			<input type="file" accept=".jpg" name="tileFile"/>
+		</label>
+	</span>
 
 	<label if={ generateTile.checked }>
 		Color:
