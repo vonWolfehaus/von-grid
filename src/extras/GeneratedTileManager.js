@@ -57,6 +57,11 @@ vg.GeneratedTileManager.prototype = {
 				case vg.HEX:
 					this.geoGen = new vg.HexGeoGenerator();
 					break;
+				case vg.SQR:
+					this.geoGen = new vg.SqrGeoGenerator();
+					break;
+				default:
+					throw new Error('[GeneratedTileManager] Only hex and square grids are supported');
 			}
 		}
 		this.geoGen.init(this.board.grid.cellSize);

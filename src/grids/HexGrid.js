@@ -38,7 +38,6 @@ vg.HexGrid = function(config) {
 	this._list = [];
 	this._vec3 = new THREE.Vector3();
 	this._cel = new vg.Cell();
-	this._conversionVec = new THREE.Vector3();
 };
 
 vg.HexGrid.TWO_THIRDS = 2 / 3;
@@ -212,7 +211,6 @@ vg.HexGrid.prototype = {
 		this.numCells = 0;
 		this._list = null;
 		this._vec3 = null;
-		this._conversionVec = null;
 	},
 
 	/*
@@ -235,7 +233,9 @@ vg.HexGrid.prototype = {
 			],
 			materials: [
 				{
-					id: 0
+					id: 0,
+					map: 'path/to/diffuse.jpg',
+					...
 				}
 			]
 		}

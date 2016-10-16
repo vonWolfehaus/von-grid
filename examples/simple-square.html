@@ -35,6 +35,7 @@
 			cameraPosition: {x:0, y:150, z:150}
 		}, true);
 
+		// this constructs the cells in grid coordinate space
 		var grid = new vg.SqrGrid({
 			cellSize: 11 // size of individual cells
 		});
@@ -43,16 +44,17 @@
 			size: 5 // size of the board
 		});
 
-		var mouse = new vg.MouseCaster(scene.container, scene.camera);
+		// var mouse = new vg.MouseCaster(scene.container, scene.camera);
 		var board = new vg.Board(grid);
 
 		// this will generate extruded square tiles
-		board.makeTiles();
+		var gen = new vg.GeneratedTileManager(board);
+		gen.makeTiles(10);
 
 		scene.add(board.group);
 		scene.focusOn(board.group);
 
-		mouse.signal.add(function(evt, tile) {
+		/*mouse.signal.add(function(evt, tile) {
 			if (evt === vg.MouseCaster.CLICK) {
 				// we can simply access tile, like this:
 				// tile.toggle();
@@ -61,12 +63,12 @@
 				var t = board.getTileAtCell(cell);
 				if (t) t.toggle();
 			}
-		}, this);
+		}, this);*/
 
 		update();
 
 		function update() {
-			mouse.update();
+			// mouse.update();
 			scene.render();
 			requestAnimationFrame(update);
 		}
