@@ -6,6 +6,11 @@
 
 	<script>
 	dismiss() {
+		if (ui.activeTool.name === ui.Tools.ADD_TILE && this.tags['tileset-menu']) {
+			// always keep this menu up unless a different tool is selected expicitly
+			return;
+		}
+
 		this.root.classList.add('hidden');
 	}
 

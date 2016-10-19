@@ -129,6 +129,12 @@ vg.SqrGeoGenerator.prototype = {
 		console.log('verts: '+tally);*/
 	},
 
+	dispose: function() {
+		if (this.tileGeo) this.tileGeo.dispose();
+		if (this.flatGeo) this.flatGeo.dispose();
+		if (this.shapeGeo) this.shapeGeo.dispose();
+	},
+
 	_cellToPixel: function(cell) {
 		this._vec3.x = cell.q * this._fullCellSize;
 		this._vec3.y = cell.h;

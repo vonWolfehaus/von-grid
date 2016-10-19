@@ -1,11 +1,5 @@
 <form-map-settings class="flex-container">
 	<span>
-		<label for="mapSize">Map size:</label>
-		<input type="number" name="mapSize" value="5" min="1" max="{ maxMapSize }"/>
-		<button onclick={ onMapUpdate }>Create Map</button>
-	</span>
-
-	<span>
 		<label for="cellSize">Cell size:</label>
 		<input type="number" name="cellSize" value="10" min="1"/>
 		<button onclick={ onMapUpdate }>Update Map</button>
@@ -29,13 +23,25 @@
 		</span>
 		<br>
 		<button onclick={ onMapUpdate }>Update Plane</button>
-	<div>
+	</div>
+
+	<button onclick={ onNewMap } style="background-color: #fd0; color: black">New Map</button>
 
 	<script>
 	this.maxMapSize = 1000;
 
+	onNewMap() {
+		var el = document.getElementById('js-overlay-newmap');
+		var newmapTag = el._tag.tags['form-newmap'];
+		newmapTag.cellsize.value = this.cellSize.value;
+		newmapTag.heightstep.value = this.heightStep.value;
+
+		el.classList.remove('hidden');
+
+		riot.update(); // brute force update so the overlay reflects new mode
+	}
+
 	updateSettings(settings) {
-		this.mapSize.value = settings.mapSize;
 		this.cellSize.value = settings.cellSize;
 		this.heightStep.value = settings.heightStep;
 		this.planeSize.value = settings.planeSize;
@@ -44,19 +50,12 @@
 	}
 
 	onMapUpdate() {
-		if (this.mapSize.value > this.maxMapSize) {
-			this.mapSize.value = this.maxMapSize;
-		}
-
 		ui.trigger(ui.Events.UPDATE_SETTINGS, {
-			mapSize: parseInt(this.mapSize.value),
 			cellSize: parseInt(this.cellSize.value),
 			heightStep: parseFloat(this.heightStep.value),
 			planeSize: parseInt(this.planeSize.value),
 			planeColor: this.planeColor.value,
 		});
-
-		// ui.trigger(ui.Events.HIDE_FLYOUT);
 	}
 
 	this.on('mount unmount', function(evt) {

@@ -92,7 +92,7 @@ gulp.task('scripts-editor', function() {
 		.pipe($.flatten()) // required by sorting alg for some reason
 		.pipe($.sortAmd())
 		.pipe($.sourcemaps.init())
-		.pipe($.concat('app.js'))
+		.pipe($.concat('app.min.js'))
 		.pipe($.uglify())
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest('editor'))
@@ -105,7 +105,7 @@ gulp.task('scripts-editor-ui', function() {
 		.pipe($.if('*.tag', $.riot()))
 		.pipe($.sortAmd())
 		.pipe($.sourcemaps.init())
-		.pipe($.concat('ui.js'))
+		.pipe($.concat('ui.min.js'))
 		.pipe($.sourcemaps.write('.'))
 		.pipe(gulp.dest('editor'))
 		.pipe(browserSync.stream());

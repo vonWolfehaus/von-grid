@@ -17,7 +17,7 @@ vg.HexGrid = function(config) {
 		GRID INTERFACE
 	*/
 	this.type = vg.HEX;
-	this.size = 5; // only used for generated maps
+	this.size = typeof config.size === 'undefined' ? 5 : config.size; // only used for generated maps
 	this.cellSize = typeof config.cellSize === 'undefined' ? 10 : config.cellSize;
 	this.cells = {};
 	this.numCells = 0;
@@ -154,6 +154,9 @@ vg.HexGrid.prototype = {
 		if (config.overwrite) {
 			this.removeAll();
 		}
+		if (config.cellSize) {
+			this.updateCellSize(config.cellSize);
+		}
 
 		var x, y, z, c;
 		for (x = -this.size; x < this.size+1; x++) {
@@ -218,6 +221,7 @@ vg.HexGrid.prototype = {
 		json = {
 			size,
 			cellSize,
+			heightStep,
 			type,
 			cells: [
 				{

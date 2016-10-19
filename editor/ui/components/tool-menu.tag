@@ -1,6 +1,6 @@
 <tool-menu>
 	<ul class="btn-list tool-menu__list">
-		<li class="tool-menu__item { active: active }" each={ items } data={ this} title={ displayText } onclick={ parent.selectTool }>
+		<li class="tool-menu__item { active: active }" each={ items } data={ this } title={ displayText } onclick={ parent.selectTool }>
 			<img src="images/{ icon }"/>
 		</li>
 	</ul>
@@ -8,19 +8,19 @@
 	<script>
 	this.items = [
 		{
-			name: 'ADD_TILE',
+			name: ui.Tools.ADD_TILE,
 			displayText: 'Add Tile',
 			icon: 'add-tile.png',
 			active: true
 		},
 		{
-			name: 'REMOVE_TILE',
+			name: ui.Tools.REMOVE_TILE,
 			displayText: 'Remove Tile',
 			icon: 'remove-tile.png',
 			active: false
 		},
 		{
-			name: 'WALK_TILE',
+			name: ui.Tools.WALK_TILE,
 			displayText: 'Set Tile Walkability',
 			icon: 'set-walkability.png',
 			active: false
@@ -38,13 +38,13 @@
 		item.active = true;
 		ui.activeTool = item;
 
-		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[item.name]);
+		ui.trigger(ui.Events.TOOL_CHANGE, item.name);
 		this.update();
 	}
 
 	this.on('mount', function() {
 		ui.activeTool = this.items[0];
-		ui.trigger(ui.Events.TOOL_CHANGE, ui.Tools[ui.activeTool]);
+		ui.trigger(ui.Events.TOOL_CHANGE, ui.activeTool.name);
 	});
 	</script>
 </tool-menu>

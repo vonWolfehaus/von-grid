@@ -20,7 +20,6 @@ vg.HexGeoGenerator.prototype = {
 	init: function(size) {
 		if (this.flatGeo) this.flatGeo.dispose();
 		if (this.shapeGeo) this.shapeGeo.dispose();
-		if (size === this._tileSize) return; // already generated necessary geo
 		this._tileSize = size || 10;
 		this._cellWidth = this._tileSize * 2;
 		this._cellLength = (vg.SQRT3 * 0.5) * this._cellWidth;
@@ -129,6 +128,12 @@ vg.HexGeoGenerator.prototype = {
 			tally += containerObj.children[x].geometry.vertices.length;
 		}
 		console.log('verts: '+tally);*/
+	},
+
+	dispose: function() {
+		if (this.tileGeo) this.tileGeo.dispose();
+		if (this.flatGeo) this.flatGeo.dispose();
+		if (this.shapeGeo) this.shapeGeo.dispose();
 	},
 
 	_cellToPixel: function(cell) {

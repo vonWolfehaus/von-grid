@@ -53,6 +53,10 @@ window.addEventListener('load', function(evt) {
 		fileInput.click();
 	});
 
+	ui.on(ui.Events.NEW_MAP, function(config) {
+		createMap(config);
+	});
+
 	keyboard.on();
 	motor.on();
 
@@ -70,6 +74,7 @@ window.addEventListener('load', function(evt) {
 	// listen to the orbit controls to disable the raycaster while user adjusts the view
 	scene.controls.addEventListener('wheel', onControlWheel);
 
+	// hex grid by default
 	var grid = new vg.HexGrid();
 	nexus.grid = grid;
 	var board = new vg.Board(grid);
@@ -104,30 +109,7 @@ window.addEventListener('load', function(evt) {
 		loadMap(map);
 	}
 	else {
-		grid.generate({
-			size: 5
-		});
-
-		map = grid.toJSON();
-		data.set('map', map);
-		console.log('set data')
-
-		nexus.gen.makeTiles(50, map.materials);
-
-		var settings = {
-			mapSize: grid.size,
-			cellSize: grid.cellSize,
-			planeSize: plane.planeSize,
-			heightStep: 3,
-			planeColor: '#ffffff',
-			mesh: null
-		};
-		data.set('settings', settings);
-
-		console.log('Created a new map');
-		data.save();
-
-		plane.generate();
+		createMap();
 	}
 
 	require('tilemaker').init();
@@ -208,9 +190,30 @@ window.addEventListener('load', function(evt) {
 	}
 
 	function loadMap(json) {
-		grid.fromJSON(json);
-		board.setGrid(grid);
+		if (json.type !== grid.type) {
+			var newGrid;
+			switch (json.type) {
+				case vg.HEX:
+					newGrid = new vg.HexGrid(json);
+					break;
+				case vg.SQR:
+					newGrid = new vg.SqrGrid(json);
+					break;
+				default:
+					// unsupported
+					break;
+			}
+			nexus.grid = newGrid;
+			grid = newGrid;
+			// nexus.gen.geoGen.init(grid.cellSize);
+		}
 
+		grid.fromJSON(json);
+
+		board.setGrid(grid);
+		board.heightStep = json.heightStep;
+
+		plane.setGrid(grid);
 		plane.generate();
 
 		var settings = data.get('settings');
@@ -227,8 +230,11 @@ window.addEventListener('load', function(evt) {
 
 	function saveMap() {
 		var output = null;
+		var settings = data.get('settings');
 
 		map = grid.toJSON();
+		map.heightStep = settings.heightStep;
+		console.log(settings);
 
 		try {
 			output = JSON.stringify(map, null, '\t');
@@ -238,7 +244,65 @@ window.addEventListener('load', function(evt) {
 			output = JSON.stringify(map);
 		}
 
-		exportString(output, 'hex-map.json');
+		exportString(output, 'von-grid-map.json');
+	}
+
+	function createMap(config) {
+		var settings = data.get('settings'); // use previous settings if needed
+		var newGrid;
+		if (config) {
+			switch (config.type) {
+				case vg.HEX:
+					newGrid = new vg.HexGrid(config);
+					break;
+				case vg.SQR:
+					newGrid = new vg.SqrGrid(config);
+					break;
+				default:
+					// unsupported
+					break;
+			}
+		}
+		else {
+			config = {
+				mapSize: settings.mapSize,
+				cellSize: settings.cellSize,
+				planeSize: settings.planeSize,
+				heightStep: settings.heightStep,
+				planeColor: '#ffffff',
+				mesh: null
+			};
+		}
+
+		vg.util.overwrite(settings, config);
+
+		newGrid.generate({
+			size: config.mapSize,
+			cellSize: config.cellSize
+		});
+
+		nexus.grid = newGrid;
+		board.setGrid(newGrid);
+		board.heightStep = config.heightStep;
+		grid = newGrid;
+
+		nexus.gen.geoGen.init(grid.cellSize);
+
+		plane.setGrid(grid);
+		plane.generate();
+
+		map = grid.toJSON();
+		data.set('map', map);
+
+		settings.planeSize = plane.planeSize;
+		data.set('settings', settings);
+
+		if (!settings.mesh) {
+			nexus.gen.makeTiles(50, map.materials);
+		}
+
+		console.log('Created a new map');
+		data.save();
 	}
 
 	// taken from https://github.com/mrdoob/three.js/blob/master/editor/js/Menubar.File.js

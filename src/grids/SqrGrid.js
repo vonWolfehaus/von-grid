@@ -15,7 +15,7 @@ vg.SqrGrid = function(config) {
 		GRID INTERFACE:
 	*/
 	this.type = vg.SQR;
-	this.size = 5; // only used for generated maps
+	this.size = typeof config.size === 'undefined' ? 5 : config.size; // only used for generated maps
 	this.cellSize = typeof config.cellSize === 'undefined' ? 10 : config.cellSize;
 	this.cells = {};
 	this.numCells = 0;
@@ -111,6 +111,10 @@ vg.SqrGrid.prototype = {
 		return d;
 	},
 
+	updateCellSize: function(newSize) {
+		this.cellSize = newSize;
+	},
+
 	clearPath: function() {
 		var i, c;
 		for (i in this.cells) {
@@ -135,6 +139,9 @@ vg.SqrGrid.prototype = {
 		this.size = typeof config.size === 'undefined' ? this.size : config.size;
 		if (config.overwrite) {
 			this.removeAll();
+		}
+		if (config.cellSize) {
+			this.updateCellSize(config.cellSize);
 		}
 
 		var x, y, c;
@@ -199,6 +206,7 @@ vg.SqrGrid.prototype = {
 		json = {
 			size,
 			cellSize,
+			heightStep,
 			type,
 			cells: [
 				{

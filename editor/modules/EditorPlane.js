@@ -21,15 +21,13 @@ define('EditorPlane', function() {
 		});
 
 		this.scene = scene;
-		this.grid = grid;
 		this.mouse = mouse;
 		this.board = this.nexus.board;
 
 		this.hoverMesh = null; // mesh that hovers over empty cells
 		this.tileHoverMesh = null; // mesh that hovers over tiles
 
-		this.planeSize = grid.size + 5;
-		this._actualSize = this.planeSize * (vg.SQRT3 * 0.5) * this.grid._cellWidth + this.grid.cellSize;
+		this.setGrid(grid);
 
 		this.tower.userAction.add(function onUserAction(type, overTile, data) {
 			switch (type) {
@@ -47,7 +45,6 @@ define('EditorPlane', function() {
 			}
 		}, this);
 
-
 		this.tower.tileAction.add(function onUserAction(type, overTile) {
 			if (type === this.tower.TILE_CHANGE_HEIGHT) {
 				// console.log(overTile.position)
@@ -58,7 +55,6 @@ define('EditorPlane', function() {
 	}
 
 	EditorPlane.prototype = {
-
 		updatePlane: function(color, size) {
 			var newColor = parseInt(color.replace(/^#/, ''), 16);
 			this.planeMaterial.color.setHex(newColor);
@@ -130,6 +126,17 @@ define('EditorPlane', function() {
 			}
 			else {
 				this.hoverMesh.visible = false;
+			}
+		},
+
+		setGrid: function(grid) {
+			this.grid = grid;
+			this.planeSize = grid.size + 5;
+			if (grid.type === vg.HEX) {
+				this._actualSize = this.planeSize * (vg.SQRT3 * 0.5) * this.grid._cellWidth + this.grid.cellSize;
+			}
+			else {
+				this._actualSize = this.planeSize * this.grid.cellSize + this.grid.cellSize;
 			}
 		}
 	};
