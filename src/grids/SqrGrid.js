@@ -133,7 +133,7 @@ vg.SqrGrid.prototype = {
 		}
 	},
 
-	// create a flat, hexagon-shaped grid
+	// create a flat, square-shaped grid that has its first cell at 0, 0 and expands in the positive directions
 	generate: function(config) {
 		config = config || {};
 		this.size = typeof config.size === 'undefined' ? this.size : config.size;
@@ -145,16 +145,14 @@ vg.SqrGrid.prototype = {
 		}
 
 		var x, y, c;
-		for (x = -this.size; x < this.size+1; x++) {
-			for (y = -this.size; y < this.size+1; y++) {
-				if (Math.abs(x) <= this.size && Math.abs(y) <= this.size) {
-					if (this.cells[x+this._hashDelimeter+y]) {
-						// don't overwrite cells already there
-						continue;
-					}
-					c = new vg.Cell(x, y, 0);
-					this.add(c);
+		for (x = 0; x < this.size; x++) {
+			for (y = 0; y < this.size; y++) {
+				if (this.cells[x+this._hashDelimeter+y]) {
+					// don't overwrite cells already there
+					continue;
 				}
+				c = new vg.Cell(x, y, 0);
+				this.add(c);
 			}
 		}
 	},
@@ -230,10 +228,11 @@ vg.SqrGrid.prototype = {
 		}
 	*/
 	load: function(url, callback, scope) {
+		var self = this;
 		vg.util.getJSON({
 			url: url,
 			callback: function(json) {
-				this.fromJSON(json);
+				self.fromJSON(json);
 				callback.call(scope || null, json);
 			},
 			cache: false,

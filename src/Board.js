@@ -120,5 +120,9 @@ vg.Board.prototype = {
 		if (this.tileGroup) this.group.remove(this.tileGroup);
 		this.tileGroup = new THREE.Object3D();
 		this.group.add(this.tileGroup);
+	},
+
+	dispose: function() {
+		this.removeAllTiles();
 	}
 };

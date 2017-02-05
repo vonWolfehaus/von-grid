@@ -171,7 +171,7 @@ vg.util = {
 
 	getJSON: function(config) {
 		var xhr = new XMLHttpRequest();
-		var cache = typeof config.cache === 'undefined' ? false : config.cache;
+		var cache = typeof config.cache === 'undefined' ? true : config.cache;
 		var uri = cache ? config.url : config.url + '?t=' + Math.floor(Math.random() * 10000) + Date.now();
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4 && xhr.status === 200) {

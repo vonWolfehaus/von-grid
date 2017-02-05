@@ -4,6 +4,8 @@ vg.HexGeoGenerator = function() {
 	this.flatGeo = null;
 	this.shapeGeo = null;
 	this.vertices = null;
+	this.grid = null;
+	this.type = vg.HEX;
 
 	this._cel = new vg.Cell(); // used as scratch object in various operations
 	this._vec3 = new THREE.Vector3();
@@ -17,7 +19,10 @@ vg.HexGeoGenerator.prototype = {
 		Make all the required geometry for constructing tiles.
 		size 	[int]	Cell size as a radius, in threejs world space.
 	*/
-	init: function(size) {
+	init: function(grid) {
+		this.grid = grid;
+		var size = this.grid.cellSize;
+		// if (size === this._tileSize) return; // already generated necessary geo
 		if (this.flatGeo) this.flatGeo.dispose();
 		if (this.shapeGeo) this.shapeGeo.dispose();
 		this._tileSize = size || 10;
@@ -86,12 +91,11 @@ vg.HexGeoGenerator.prototype = {
 	},
 
 	makeTileHighlight: function(material) {
-		var grid = require('nexus').grid;
 		if (!material) {
 			material = new THREE.MeshBasicMaterial({color: 0x24b4ff});
 		}
 
-		var geo = new THREE.TorusGeometry(grid.cellSize, 2, 3, 6);
+		var geo = new THREE.TorusGeometry(this.grid.cellSize, 2, 3, 6);
 		var mesh = new THREE.Mesh(geo, material);
 
 		mesh.rotateX(vg.PI/2);

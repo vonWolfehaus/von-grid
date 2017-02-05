@@ -74,8 +74,8 @@ window.addEventListener('load', function(evt) {
 	// listen to the orbit controls to disable the raycaster while user adjusts the view
 	scene.controls.addEventListener('wheel', onControlWheel);
 
-	// hex grid by default
-	var grid = new vg.HexGrid();
+	// create all the things; hex grid by default
+	var grid = new vg.SqrGrid();
 	nexus.grid = grid;
 	var board = new vg.Board(grid);
 	nexus.board = board;
@@ -89,6 +89,7 @@ window.addEventListener('load', function(evt) {
 	var plane = new EditorPlane(board.group, grid, mouse);
 	nexus.plane = plane;
 
+	// listen to all the things
 	tower.tileAction.add(onMapChange, this);
 	tower.save.add(onMapChange, this);
 
@@ -249,7 +250,18 @@ window.addEventListener('load', function(evt) {
 
 	function createMap(config) {
 		var settings = data.get('settings'); // use previous settings if needed
-		var newGrid;
+		if (!settings) {
+			settings = {
+				mapSize: 10,
+				cellSize: 10,
+				planeSize: plane.planeSize,
+				heightStep: 3,
+				planeColor: '#ffffff',
+				mesh: null
+			};
+		}
+
+		var newGrid = grid; // use old one if there's no config
 		if (config) {
 			switch (config.type) {
 				case vg.HEX:
@@ -281,25 +293,22 @@ window.addEventListener('load', function(evt) {
 			cellSize: config.cellSize
 		});
 
-		nexus.grid = newGrid;
-		board.setGrid(newGrid);
+		board.setGrid(newGrid); // this will dispose the old grid so don't worry about it
 		board.heightStep = config.heightStep;
+		// update references
+		nexus.grid = newGrid;
 		grid = newGrid;
-
-		nexus.gen.geoGen.init(grid.cellSize);
-
-		plane.setGrid(grid);
-		plane.generate();
 
 		map = grid.toJSON();
 		data.set('map', map);
 
+		nexus.gen.makeTiles(50, map.materials);
+
+		plane.setGrid(grid);
+		plane.generate();
+
 		settings.planeSize = plane.planeSize;
 		data.set('settings', settings);
-
-		if (!settings.mesh) {
-			nexus.gen.makeTiles(50, map.materials);
-		}
 
 		console.log('Created a new map');
 		data.save();

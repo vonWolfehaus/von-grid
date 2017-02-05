@@ -55,6 +55,7 @@ vg.Scene = function(sceneConfig, controlConfig) {
 		sceneSettings.light.position.set(-1, 1, -1).normalize();
 	}
 	this.container.add(sceneSettings.light);
+	this.light = sceneSettings.light; // main shadow-casting light
 
 	if (sceneSettings.cameraType === 'OrthographicCamera') {
 		var width = window.innerWidth / this.orthoZoom;
@@ -65,8 +66,8 @@ vg.Scene = function(sceneConfig, controlConfig) {
 		this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 1, 5000);
 	}
 
-	this.contolled = !!controlConfig;
-	if (this.contolled) {
+	this.controlled = !!controlConfig;
+	if (this.controlled) {
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		vg.util.overwrite(this.controls, controlSettings);
 	}
@@ -116,8 +117,18 @@ vg.Scene.prototype = {
 	},
 
 	render: function() {
-		if (this.contolled) this.controls.update();
+		if (this.controlled) this.controls.update();
 		this.renderer.render(this.container, this.camera);
+	},
+
+	enableShadows: function() {
+		this.light.castShadow = true;
+		this.light.shadow.bias = 0.0001;
+		this.light.shadow.mapSize.width = 2048;
+		this.light.shadow.mapSize.height = 2048;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFShadowMap; //PCFSoftShadowMap
+		// this.light.shadowCameraVisible = true;
 	},
 
 	updateOrthoZoom: function() {

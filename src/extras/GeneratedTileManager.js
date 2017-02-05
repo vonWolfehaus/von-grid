@@ -52,7 +52,7 @@ vg.GeneratedTileManager.prototype = {
 	},
 
 	makeGenerator: function() {
-		if (!this.geoGen) {
+		if (!this.geoGen || this.geoGen.type !== this.board.grid.type) {
 			switch (this.board.grid.type) {
 				case vg.HEX:
 					this.geoGen = new vg.HexGeoGenerator();
@@ -64,7 +64,7 @@ vg.GeneratedTileManager.prototype = {
 					throw new Error('[GeneratedTileManager] Only hex and square grids are supported');
 			}
 		}
-		this.geoGen.init(this.board.grid.cellSize);
+		this.geoGen.init(this.board.grid);
 	},
 
 	makeOverlay: function(size, color) {

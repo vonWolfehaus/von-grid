@@ -9,7 +9,8 @@ vg.Tile = function(config) {
 		scale: 1,
 		cell: null, // required vg.Cell
 		geometry: null, // required threejs geometry
-		material: null // not required but it would improve performance significantly
+		material: null, // not required but it would improve performance significantly
+		rotate: true // should be true for generated meshes, otherwise set to false
 	};
 	settings = vg.util.merge(settings, config);
 
@@ -50,7 +51,7 @@ vg.Tile = function(config) {
 	this.rotation = this.mesh.rotation;
 
 	// rotate it to face "up" (the threejs coordinate space is Y+)
-	this.rotation.x = 90 * vg.DEG_TO_RAD;
+	if (settings.rotate) this.rotation.x = 90 * vg.DEG_TO_RAD;
 	this.mesh.scale.set(settings.scale, settings.scale, 1);
 
 	if (this.material.emissive) {
