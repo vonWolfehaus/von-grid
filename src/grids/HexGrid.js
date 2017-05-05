@@ -89,6 +89,7 @@ vg.HexGrid.prototype = {
 
 	pixelToCell: function(pos) {
 		// convert a position in world space ("pixels") to cell coordinates
+		// Note this returns just the position; use getCellAt to actually get a reference to the picked cell.
 		var q = pos.x * (vg.HexGrid.TWO_THIRDS / this.cellSize);
 		var r = ((-pos.x / 3) + (vg.SQRT3/3) * pos.z) / this.cellSize;
 		this._cel.set(q, r, -q-r);
