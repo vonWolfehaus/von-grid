@@ -1,0 +1,4 @@
+- get rid of square grid
+- upgrade 3js to latest (r94)
+- fix and clean up examples (get rid of some?)
+- convert editor to hex only
