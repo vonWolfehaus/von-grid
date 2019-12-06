@@ -214,8 +214,8 @@ vg.HexGrid.prototype = {
 				bevelEnabled: true,
 				bevelSegments: 1,
 				steps: 1,
-				bevelSize: 0.5,
-				bevelThickness: 0.5
+				bevelSize: this.cellSize/20,
+				bevelThickness: this.cellSize/20
 			}
 		}
 		settings = vg.Tools.merge(settings, config);
