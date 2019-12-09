@@ -176,7 +176,7 @@ vg.HexGrid.prototype = {
 
 		var geo = this._geoCache[height];
 		if (!geo) {
-			this.extrudeSettings.amount = height;
+			this.extrudeSettings.depth = height;
 			geo = new THREE.ExtrudeGeometry(this.cellShape, this.extrudeSettings);
 			this._geoCache[height] = geo;
 		}
@@ -210,7 +210,7 @@ vg.HexGrid.prototype = {
 			cellSize: this.cellSize,
 			material: null,
 			extrudeSettings: {
-				amount: 1,
+				depth: 1,
 				bevelEnabled: true,
 				bevelSegments: 1,
 				steps: 1,
