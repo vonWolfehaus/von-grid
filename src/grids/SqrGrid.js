@@ -166,7 +166,7 @@ vg.SqrGrid.prototype = {
 
 		var geo = this._geoCache[height];
 		if (!geo) {
-			this.extrudeSettings.amount = height;
+			this.extrudeSettings.depth = height;
 			geo = new THREE.ExtrudeGeometry(this.cellShape, this.extrudeSettings);
 			this._geoCache[height] = geo;
 		}
@@ -200,12 +200,12 @@ vg.SqrGrid.prototype = {
 			cellSize: this.cellSize,
 			material: null,
 			extrudeSettings: {
-				amount: 1,
+				depth: 1,
 				bevelEnabled: true,
 				bevelSegments: 1,
 				steps: 1,
-				bevelSize: 0.5,
-				bevelThickness: 0.5
+				bevelSize: this.cellSize/20,
+				bevelThickness: this.cellSize/20
 			}
 		}
 		settings = vg.Tools.merge(settings, config);
