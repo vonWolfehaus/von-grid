@@ -1,3 +1,7 @@
+# NOTE: This repo is no longer maintained
+
+Feel free to fork and do whatever. There is a dev branch that has an incomplete rewrite, but everything here is so old that even I don't get what I was thinking. Enjoy!
+
 # 3D hex tile system
 
 ![screenshot](hex-grid.jpg)
